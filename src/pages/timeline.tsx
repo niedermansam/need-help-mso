@@ -1,5 +1,5 @@
-import { ComponentProps, ComponentPropsWithoutRef, useState } from "react";
-import NavBar from "../components/Navbar";
+import { useState } from "react";
+import NavBar from "../components/Nav";
 import React from "react";
 
 type HeartIconProps = JSX.IntrinsicElements["svg"] & {
@@ -18,7 +18,7 @@ const HeartIcon = ({
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
-      className={`icon-heart ${className}`}
+      className={`icon-heart ${className || ''}`}
     >
       <circle
         cx="12"
@@ -43,7 +43,7 @@ const HeartIcon = ({
   );
 };
 
-const FIRST_FEATURES = [
+export const FIRST_FEATURES = [
   {
     title: "Search Bar with for organizations and resources",
     description: "Search for resources by name, category, or tag.",
@@ -71,7 +71,7 @@ const FIRST_FEATURES = [
   },
 ];
 
-const SECOND_FEATURES = [
+export const SECOND_FEATURES = [
   {
     title: "Bug Hunt.",
     description: "Add resources to the database.",
@@ -115,7 +115,6 @@ type statusOptions = keyof typeof statusSortObject;
 
 const sortFeatures = (a: Feature, b: Feature) => {
   if (a.status === b.status) {
-    const aPriori = prioritySortObject[a.priority as priorityOptions];
     return (
       prioritySortObject[a.priority as priorityOptions] -
       prioritySortObject[b.priority as priorityOptions]
@@ -178,8 +177,8 @@ function FeatureList({ features }: { features: Feature[] }) {
     <div className="flex w-fit max-w-md flex-col items-center justify-center">
       <h1 className="text-4xl font-bold text-stone-600">Feature Details</h1>
 
-      {features.sort(sortFeatures).map((feature, index) => {
-        return <FeatureDetails feature={feature} />;
+      {features.sort(sortFeatures).map((feature) => {
+        return <FeatureDetails key={feature.title} feature={feature} />;
       })}
     </div>
   );
@@ -229,7 +228,7 @@ export function Timeline({
     <div className="flex p-6">
       {events.map((event, index) => {
         return (
-          <div className="relative ml-3 w-96">
+          <div key={event.title} className="relative ml-3 w-96">
             <div className="flex items-end justify-between px-4">
               <h2 className=" min-w-fit font-semibold text-stone-600">
                 {event.title}

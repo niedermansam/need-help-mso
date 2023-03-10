@@ -1,15 +1,11 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
-import Image from "next/image";
 
 export default function NavBar() {
   const session = useSession();
-    const userId =session.data?.user?.id;
-    const userName = session.data?.user?.name;
-    const displayName = userName?.split(" ")[0]; // get the first name of the user (if they have a first and last name
-    const userImage = session.data?.user?.image;
-    const [isOpen, setIsOpen] = useState(false);
+  const userId = session.data?.user?.id;
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <nav className="fixed z-10 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
       <div className="mr-6 flex flex-shrink-0 items-center text-white">
@@ -48,23 +44,13 @@ export default function NavBar() {
             href="/timeline"
             className="mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block"
           >
-           Timeline
+            Timeline
           </Link>
-          {/**
-             * 
-          <Link
-            href="/resources"
-            className="mt-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block"
-          >
-            Resources
-          </Link>
-          
-             */}
         </div>
         <div className="flex">
           {userId && ( // if user is logged in, show their name and profile pic in the navbar
             <Link href={"/user"} className="mx-2 flex items-center">
-              <p className="mx-2 text-white">Welcome, {displayName}!</p>
+              <p className="mx-2 text-white">Your Profile</p>
             </Link>
           )}
           <button
@@ -77,4 +63,4 @@ export default function NavBar() {
       </div>
     </nav>
   );
-} 
+}

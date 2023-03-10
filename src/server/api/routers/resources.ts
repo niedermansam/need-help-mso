@@ -1,8 +1,6 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import Airtable from "airtable";
-import { NextResponse } from "next/server";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const resourceRouter = createTRPCRouter({
   create: protectedProcedure
@@ -21,27 +19,27 @@ export const resourceRouter = createTRPCRouter({
 
       const newResource = await ctx.prisma.resource.create({
         data: {
-          name: input.name,
-          description: input.description,
+          name: name,
+          description: description,
           categoryMeta: {
             connectOrCreate: {
-              where: { category: input.category },
+              where: { category: category },
               create: {
-                category: input.category,
+                category: category,
               },
             },
           },
           organization: {
             connect: {
-              name: input.orgName,
+              name: orgName,
             },
           },
-          url: input.url,
+          url: url,
         },
       });
 
       if (tags && tags[0]) {
-        ctx.prisma.tag.createMany({
+       await ctx.prisma.tag.createMany({
           data: tags.map((tag) => ({
             tag: tag,
             resource: {

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import NavBar from "../../components/Navbar";
+import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
 
 export default function OrganizationDetailsPage () {
@@ -15,7 +15,7 @@ export default function OrganizationDetailsPage () {
         <p>{orgData.description}</p>
         {
             orgData.resources.map(resource => {
-                return <div className="p-4 m-4 border border-gray-200">
+                return <div key={resource.id} className="p-4 m-4 border border-gray-200">
                     <h2>{resource.name}</h2>
                     </div>
             })

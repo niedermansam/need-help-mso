@@ -1,7 +1,8 @@
-import NavBar from "../../components/Navbar";
+import NavBar from "../../components/Nav";
 
-function CreateResourceForm() {
+export function CreateResourceForm() {
 
+    /**
     const INIT_RESOURCE = {
         name: '',
         description: '',
@@ -10,12 +11,12 @@ function CreateResourceForm() {
         tags: [],
         category: '',
     }
-
+*/
     return <form>
 
     </form>
 }
-
+ 
 export default function ResourcePage() {
     return <div>
         <NavBar />

@@ -1,9 +1,10 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import Airtable from "airtable";
+//import Airtable from "airtable";
 
-interface OrganizationSchema {
+
+export interface OrganizationSchema {
   Tags?: string[];
   URL?: string;
   Category?: string;
@@ -20,7 +21,7 @@ interface OrganizationSchema {
   "Affiliated Organizations"?: string[];
 }
 
-interface ResourceSchema {
+export interface ResourceSchema {
   Contacts?: string[];
   Name: string;
   "Forms & Files"?: string[];
@@ -92,7 +93,8 @@ export const organizationRouter = createTRPCRouter({
       }
     }),
 
-  syncAirtableOrgs: publicProcedure.mutation(async ({ ctx }) => {
+/*
+  syncAirtableOrgs: publicProcedure.mutation(({ ctx }) => {
     const base = new Airtable({
       apiKey:
         "patQokBzWVmDj821y.729da362fc840f86665519df7170ee4bbb90a402e406b37dc0e0267434e911d7",
@@ -109,7 +111,6 @@ export const organizationRouter = createTRPCRouter({
 
           records.forEach(async function (record) {
             const fields = record.fields as unknown as OrganizationSchema;
-            /*
             const newTags = fields.Tags?.map(async(tag) => {
             await ctx.prisma.tag.create({data: {
                 tag: tag,
@@ -118,7 +119,7 @@ export const organizationRouter = createTRPCRouter({
             return {tag: tag}
             })
 
- */
+
 
             await ctx.prisma.organization.create({
               data: {
@@ -159,7 +160,7 @@ export const organizationRouter = createTRPCRouter({
       );
   }),
 
-  syncAirtableResources: publicProcedure.mutation(async ({ ctx }) => {
+  syncAirtableResources: publicProcedure.mutation(({}) => {
     const base = new Airtable({
       apiKey:
         "patQokBzWVmDj821y.729da362fc840f86665519df7170ee4bbb90a402e406b37dc0e0267434e911d7",
@@ -176,7 +177,6 @@ export const organizationRouter = createTRPCRouter({
 
           records.forEach(async function (record) {
             const fields = record.fields as unknown as ResourceSchema;
-            /*
             const newTags = fields.Tags?.map(async (tag) => {
               await ctx.prisma.tag.create({
                 data: {
@@ -186,7 +186,6 @@ export const organizationRouter = createTRPCRouter({
               });
               return { tag: tag };
             });
-        */
 
             console.log(
               "CONSOLE________________________________________- ",
@@ -195,7 +194,6 @@ export const organizationRouter = createTRPCRouter({
                 : "whoops"
             );
 
-            /*
             await ctx.prisma.resources.create({
               data: {
                 name: fields.Name,
@@ -224,7 +222,6 @@ export const organizationRouter = createTRPCRouter({
                 },
               },
             });
-            */
 
           });
 
@@ -241,4 +238,5 @@ export const organizationRouter = createTRPCRouter({
         }
       );
   }),
+  */
 });

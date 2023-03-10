@@ -1,7 +1,7 @@
 import { useState } from "react";
-import NavBar from "../../components/Navbar";
+import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
-import { Organization } from "@prisma/client";
+import type { Organization } from "@prisma/client";
 import Link from "next/link";
 
 function CreateOrganizationForm() {
@@ -52,7 +52,7 @@ export default function OrganizationsPage() {
       <CreateOrganizationForm />
       <div className="flex flex-wrap">
       {
-        orgs?.map(org => <OrganizationCard org={org} />)
+        orgs?.map(org => <OrganizationCard key={org.id} org={org} />)
       }
     </div></div>
   );

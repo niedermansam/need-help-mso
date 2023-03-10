@@ -3,9 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 
-import { api } from "../utils/api";
-import { createTextGradient } from "../styles/createGradient";
-import NavBar from "../components/Navbar";
+import NavBar from "../components/Nav";
 
 const CallToAction: React.FC = () => {
   return (
@@ -59,9 +57,9 @@ const Description = () => {
         We hope to be a hub for different organizations and groups that help
         people who need a hand. A place where social workers, case managers, and
         other professionals can find resources for their clients. But right now,
-        we're still under construction. Please support this project if you can
-        afford to, and check back soon! check out the development timeline for
-        more information about when to check back!
+        we&apos;re still under construction. Please support this project if you
+        can afford to, and check back soon! check out the development timeline
+        for more information about when to check back!
       </p>
     </div>
   );
@@ -101,13 +99,14 @@ const Home: NextPage = () => {
 
 export default Home;
 
-const AuthShowcase: React.FC = () => {
+export   const AuthShowcase: React.FC = () => {
   const { data: sessionData } = useSession();
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <button
         className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClick={sessionData ? () => void signOut() : () => void signIn()}
       >
         {sessionData ? "Sign out" : "Sign in"}
