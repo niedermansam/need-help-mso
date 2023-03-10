@@ -5,19 +5,17 @@ generator client {
     provider = "prisma-client-js"
 }
 
+generator dbml {
+    provider = "prisma-dbml-generator"
+}
+
 datasource db {
-    provider = "sqlite"
+    provider = "postgresql"
     // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
     // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url      = env("DATABASE_URL")
-}
-
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
 }
 
 // Necessary for Next auth
@@ -27,12 +25,12 @@ model Account {
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String? // @db.Text
-    access_token      String? // @db.Text
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
     expires_at        Int?
     token_type        String?
     scope             String?
-    id_token          String? // @db.Text
+    id_token          String? @db.Text
     session_state     String?
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -48,13 +46,16 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String             @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?            @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
+    adminOf       Organization[]
+    resources     ResourceContact[]
+    roles         OrganizationRole[]
 }
 
 model VerificationToken {
@@ -63,4 +64,85 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Category {
+    category      String         @id @unique
+    description   String?
+    organizations Organization[]
+    resources     Resource[]
+}
+
+model Tag {
+    tag           String         @id @unique
+    description   String?
+    organizations Organization[]
+    resources     Resource[]
+}
+
+model Community {
+    name               String         @id @unique
+    exclusiveOrgs      Organization[]
+    exclusiveResources Resource[]
+    helpfulOrgs        Organization[] @relation("Helpful")
+    helpfulResources   Resource[]     @relation("Helpful")
+}
+
+model Organization {
+    id                     String             @id @default(cuid())
+    name                   String             @unique
+    createdAt              DateTime           @default(now())
+    updatedAt              DateTime           @updatedAt
+    admins                 User[]
+    description            String
+    category               String
+    categoryMeta           Category           @relation(fields: [category], references: [category])
+    tags                   Tag[]
+    website                String?
+    logo                   String?
+    phone                  String?
+    email                  String?
+    adminOf                Organization[]     @relation("AffiliatedOrgs")
+    administeringOrg       Organization[]     @relation("AffiliatedOrgs")
+    resources              Resource[]
+    assistsWith            Resource[]         @relation("HelpingOrgs")
+    exclusiveToCommunities Community[]
+    helpfulToCommunities   Community[]        @relation("Helpful")
+    roles                  OrganizationRole[]
+}
+
+model OrganizationRole {
+    userId       String
+    orgId        String
+    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+    @@id([userId, orgId])
+}
+
+model Resource {
+    id                     String            @id @default(cuid())
+    name                   String
+    description            String
+    url                    String
+    organizationId         String
+    organization           Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    helpingOrganizations   Organization[]    @relation("HelpingOrgs")
+    category               String
+    categoryMeta           Category          @relation(fields: [category], references: [category])
+    tags                   Tag[]
+    website                String?
+    fundingSource          String?
+    exclusiveToCommunities Community[]
+    helpfulToCommunities   Community[]       @relation("Helpful")
+    contacts               ResourceContact[]
+}
+
+model ResourceContact {
+    userId     String
+    resourceId String
+    user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+    @@id([userId, resourceId])
 }

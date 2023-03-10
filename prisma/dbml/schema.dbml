@@ -1,0 +1,157 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Account {
+  id String [pk]
+  userId String [not null]
+  type String [not null]
+  provider String [not null]
+  providerAccountId String [not null]
+  refresh_token String
+  access_token String
+  expires_at Int
+  token_type String
+  scope String
+  id_token String
+  session_state String
+  user User [not null]
+
+  indexes {
+    (provider, providerAccountId) [unique]
+  }
+}
+
+Table Session {
+  id String [pk]
+  sessionToken String [unique, not null]
+  userId String [not null]
+  expires DateTime [not null]
+  user User [not null]
+}
+
+Table User {
+  id String [pk]
+  name String
+  email String [unique]
+  emailVerified DateTime
+  image String
+  accounts Account [not null]
+  sessions Session [not null]
+  adminOf Organization [not null]
+  resources ResourceContact [not null]
+  roles OrganizationRole [not null]
+}
+
+Table VerificationToken {
+  identifier String [not null]
+  token String [unique, not null]
+  expires DateTime [not null]
+
+  indexes {
+    (identifier, token) [unique]
+  }
+}
+
+Table Category {
+  category String [pk]
+  description String
+  organizations Organization [not null]
+  resources Resource [not null]
+}
+
+Table Tag {
+  tag String [pk]
+  description String
+  organizations Organization [not null]
+  resources Resource [not null]
+}
+
+Table Community {
+  name String [pk]
+  exclusiveOrgs Organization [not null]
+  exclusiveResources Resource [not null]
+  helpfulOrgs Organization [not null]
+  helpfulResources Resource [not null]
+}
+
+Table Organization {
+  id String [pk]
+  name String [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  admins User [not null]
+  description String [not null]
+  category String [not null]
+  categoryMeta Category [not null]
+  tags Tag [not null]
+  website String
+  logo String
+  phone String
+  email String
+  adminOf Organization [not null]
+  administeringOrg Organization [not null]
+  resources Resource [not null]
+  assistsWith Resource [not null]
+  exclusiveToCommunities Community [not null]
+  helpfulToCommunities Community [not null]
+  roles OrganizationRole [not null]
+}
+
+Table OrganizationRole {
+  userId String [not null]
+  orgId String [not null]
+  user User [not null]
+  organization Organization [not null]
+
+  indexes {
+    (userId, orgId) [pk]
+  }
+}
+
+Table Resource {
+  id String [pk]
+  name String [not null]
+  description String [not null]
+  url String [not null]
+  organizationId String [not null]
+  organization Organization [not null]
+  helpingOrganizations Organization [not null]
+  category String [not null]
+  categoryMeta Category [not null]
+  tags Tag [not null]
+  website String
+  fundingSource String
+  exclusiveToCommunities Community [not null]
+  helpfulToCommunities Community [not null]
+  contacts ResourceContact [not null]
+}
+
+Table ResourceContact {
+  userId String [not null]
+  resourceId String [not null]
+  user User [not null]
+  resource Resource [not null]
+
+  indexes {
+    (userId, resourceId) [pk]
+  }
+}
+
+Ref: Account.userId > User.id [delete: Cascade]
+
+Ref: Session.userId > User.id [delete: Cascade]
+
+Ref: Organization.category > Category.category
+
+Ref: OrganizationRole.userId > User.id [delete: Cascade]
+
+Ref: OrganizationRole.orgId > Organization.id [delete: Cascade]
+
+Ref: Resource.organizationId > Organization.id [delete: Cascade]
+
+Ref: Resource.category > Category.category
+
+Ref: ResourceContact.userId > User.id [delete: Cascade]
+
+Ref: ResourceContact.resourceId > Resource.id [delete: Cascade]
