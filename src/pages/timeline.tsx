@@ -1,13 +1,19 @@
-import { ComponentProps,  ComponentPropsWithoutRef, useState } from "react";
+import { ComponentProps, ComponentPropsWithoutRef, useState } from "react";
 import NavBar from "../components/Navbar";
 import React from "react";
 
 type HeartIconProps = JSX.IntrinsicElements["svg"] & {
-    primaryColor?: string;
-    secondaryColor?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  pulse: boolean;
 };
 
-const HeartIcon = ({className, primaryColor, secondaryColor}:HeartIconProps) => {
+const HeartIcon = ({
+  className,
+  primaryColor,
+  secondaryColor,
+  pulse,
+}: HeartIconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -26,9 +32,16 @@ const HeartIcon = ({className, primaryColor, secondaryColor}:HeartIconProps) => 
         style={{ fill: secondaryColor }}
         d="M12.88 8.88a3 3 0 1 1 4.24 4.24l-4.41 4.42a1 1 0 0 1-1.42 0l-4.41-4.42a3 3 0 1 1 4.24-4.24l.88.88.88-.88z"
       />
+      {pulse && (
+        <path
+          className="secondary animate-pulse-sm "
+          style={{ fill: secondaryColor }}
+          d="M12.88 8.88a3 3 0 1 1 4.24 4.24l-4.41 4.42a1 1 0 0 1-1.42 0l-4.41-4.42a3 3 0 1 1 4.24-4.24l.88.88.88-.88z"
+        />
+      )}
     </svg>
   );
-}
+};
 
 const FIRST_FEATURES = [
   {
@@ -53,7 +66,7 @@ const FIRST_FEATURES = [
   {
     title: "List resources and organizations by category",
     description: "Add resources to the database.",
-    status: "TODO",
+    status: "IN_PROGRESS",
     priority: "HIGH",
   },
 ];
@@ -86,8 +99,8 @@ const SECOND_FEATURES = [
 
 const statusSortObject = {
   DONE: 0,
-  TODO: 1,
-  IN_PROGRESS: 2,
+  IN_PROGRESS: 1,
+  TODO: 2,
 };
 
 const prioritySortObject = {
@@ -117,33 +130,39 @@ const sortFeatures = (a: Feature, b: Feature) => {
 type Feature = (typeof FIRST_FEATURES)[number];
 
 function FeatureDetails({ feature }: { feature: Feature }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
     <div className="m-2 mx-6 w-full p-2">
       <div>
         <h2
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => setIsCollapsed(!isCollapsed)}
           className="flex cursor-pointer items-center text-lg font-light text-stone-800"
         >
-          {" "}
-          <HeartIcon className="mr-2 w-8" primaryColor={feature.status === "DONE" ? "#E11D48" : 'gray'} secondaryColor="white" />{" "}
+          <HeartIcon
+            className="mr-2 w-8"
+            pulse={false}
+            primaryColor={
+              feature.status === "DONE"
+                ? "#E11D48"
+                : feature.status === "IN_PROGRESS"
+                ? "#FDA4AF"
+                : "gray"
+            }
+            secondaryColor={
+              feature.status === "IN_PROGRESS" ? "#E11D48" : "white"
+            }
+          />{" "}
           {feature.title}
         </h2>
         <div
-          className={`flex flex-wrap justify-between text-sm text-stone-600 ${
-            isExpanded ? "hidden" : ""
+          className={`text-md flex flex-wrap justify-between text-stone-600 ${
+            isCollapsed ? "hidden" : ""
           }`}
         >
-          <div className="mb-1 flex w-full">
-            <p className="basis-40">Status: {feature.status}</p>
-            {feature.status !== "DONE" ? (
-              <p>Priority: {feature.priority}</p>
-            ) : null}
-          </div>
           <p
             className={` w-full font-light text-stone-700 ${
-              isExpanded ? "hidden" : ""
+              isCollapsed ? "hidden" : ""
             }`}
           >
             {feature.description}
@@ -239,7 +258,7 @@ export function Timeline({
                 border-4 border-rose-500 bg-rose-300 
                ${
                  index === currentIndex
-                   ? "animate-ping delay-200 duration-500"
+                   ? "animate-[ping_4s_infinite] delay-200"
                    : ""
                }`}
               ></span>
@@ -289,7 +308,7 @@ export default function ProjectTimeline() {
   return (
     <div>
       <NavBar />
-      <h1 className="pt-20 text-4xl">Project Timeline</h1>
+      <h1 className="pt-20 pl-6 text-4xl font-light text-stone-700">Project Timeline</h1>
       <div>
         <Timeline events={TIMELINE} currentIndex={1} />
         <div className="mb-20 flex w-full justify-center">
