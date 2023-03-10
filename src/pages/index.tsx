@@ -7,21 +7,21 @@ import NavBar from "../components/Nav";
 
 const CallToAction: React.FC = () => {
   return (
-    <div className="mt-4 flex w-full justify-around">
+    <div className="m-4 mt-4 flex w-full flex-col justify-around md:flex-row">
       <Link
-        className="rounded-lg bg-rose-600 px-4 py-2 font-bold text-white shadow-lg transition-all  hover:bg-rose-700 hover:shadow-xl"
+        className="my-2 rounded-lg bg-rose-600 px-4 py-2 font-bold text-white shadow-lg transition-all  hover:bg-rose-700 hover:shadow-xl"
         href="https://www.patreon.com/NeedHelpMissoula"
       >
         Support on Patreon
       </Link>
       <Link
-        className="rounded-lg bg-rose-200 px-4 py-2 font-bold text-rose-600 shadow transition-all hover:bg-rose-300 hover:shadow-lg"
+        className="my-2 rounded-lg bg-rose-200 px-4 py-2 font-bold text-rose-600 shadow transition-all hover:bg-rose-300 hover:shadow-lg"
         href="/timeline"
       >
         Project Timeline
       </Link>
       <Link
-        className="rounded-lg bg-stone-200 px-4 py-2 font-bold text-stone-500 transition-all hover:bg-stone-300 hover:shadow-sm"
+        className="my-2 rounded-lg bg-stone-200 px-4 py-2 font-bold text-stone-500 transition-all hover:bg-stone-300 hover:shadow-sm"
         href="https://github.com/niedermansam/need-help-mso"
       >
         View on Github
@@ -32,17 +32,17 @@ const CallToAction: React.FC = () => {
 
 const Title = () => {
   return (
-    <div className=" max-w-lg text-stone-700">
-      <h1 className=" flex-grow text-center text-8xl font-extrabold leading-[0.85] tracking-tight">
+    <div className=" max-w-lg text-stone-700 md:mt-0">
+      <h1 className=" flex-grow text-center text-5xl font-extrabold leading-[0.85] tracking-tight md:text-6xl lg:text-8xl">
         <span>Need Help</span>
         <br /> <span className="tracking-wide">Missoula</span>
       </h1>{" "}
-      <p className="m-2 text-center tracking-tight">
-        <span className=" text-3xl font-bold">
+      <p className="my-4 text-center tracking-tight w-full">
+        <span className=" text-xl font-bold md:text-2xl lg:text-3xl">
           A Digital Directory of Resources
         </span>{" "}
         <br />{" "}
-        <span className="text-2xl tracking-tighter text-stone-400">
+        <span className="text-lg tracking-tighter text-stone-400  md:text-2xl lg:text-3xl">
           for People Who Could Use a Helping Hand
         </span>
       </p>
@@ -52,7 +52,7 @@ const Title = () => {
 
 const Description = () => {
   return (
-    <div className="ml-8 flex max-w-lg items-center text-stone-900">
+    <div className="ml-8 flex px-6 md:px-3 max-w-full items-center text-stone-900 ">
       <p className=" text-xl font-light leading-8">
         We hope to be a hub for different organizations and groups that help
         people who need a hand. A place where social workers, case managers, and
@@ -79,16 +79,16 @@ const Home: NextPage = () => {
       <main className="">
         <NavBar />
         <div className="flex h-screen items-center justify-center bg-stone-100">
-          <div className="flex max-w-6xl flex-wrap rounded-xl border border-stone-200 bg-white px-6 pb-10 pt-20 shadow-xl">
+          <div className="flex max-w-6xl md:m-12 justify-center flex-wrap rounded-xl border border-stone-200 bg-white md:px-6 pb-10 pt-20 shadow-xl">
             <Title />
             <Description />
             <CallToAction />
             <Link
               href="https://niedermansam.github.io/need-help-missoula/"
               target="_blank"
-              className="mt-4 w-full text-center text-lg font-light text-rose-400"
+              className="mt-4 w-full mx-4 font-light text-rose-400"
             >
-              Check out the Minimum Viable Product
+              Check out the Prototype →
             </Link>
           </div>
         </div>
