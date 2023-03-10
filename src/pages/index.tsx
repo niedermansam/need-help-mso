@@ -35,7 +35,7 @@ const Title = () => {
     <div className=" max-w-lg text-stone-700 md:mt-0">
       <h1 className=" flex-grow text-center text-5xl font-extrabold leading-[0.85] tracking-tight md:text-6xl lg:text-8xl">
         <span>Need Help</span>
-        <br /> <span className="tracking-wide">Missoula</span>
+        <br /> <span className="tracking-wide text-rose-500">Missoula</span>
       </h1>{" "}
       <p className="my-4 text-center tracking-tight w-full">
         <span className=" text-xl font-bold md:text-2xl lg:text-3xl">
@@ -78,8 +78,8 @@ const Home: NextPage = () => {
       </Head>
       <main className="">
         <NavBar />
-        <div className="flex h-screen items-center justify-center bg-stone-100">
-          <div className="flex max-w-6xl md:m-12 justify-center flex-wrap rounded-xl border border-stone-200 bg-white md:px-6 pb-10 pt-20 shadow-xl">
+        <div className="flex min-h-screen items-center justify-center bg-stone-100 md:p-20">
+          <div className="flex max-w-6xl  justify-center flex-wrap rounded-xl border border-stone-200 bg-white  md:px-6 pb-10 pt-20 shadow-xl">
             <Title />
             <Description />
             <CallToAction />
