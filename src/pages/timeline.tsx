@@ -56,7 +56,6 @@ type FeatureProps = {
 };
 
 export const REBUILD_FEATURES: FeatureProps[] = [
-
   {
     title: "Add, edit, and delete resources and organizations",
     description: "Add resources to the database.",
@@ -121,15 +120,17 @@ export const CLOSED_BETA_FEATURES: FeatureProps[] = [
   },
   {
     title: "Allow service providers to save multiple lists of resources.",
-    description: "Create functionality that will allow social workers or case managers to create a list of resources for their clients, save that list, and send it to their clients via text or email.",
+    description:
+      "Create functionality that will allow social workers or case managers to create a list of resources for their clients, save that list, and send it to their clients via text or email.",
     status: "TODO",
     priority: "HIGH",
-  }
+  },
 ];
 
 export const CLOSED_BETA_DETAILS: PhaseDetails = {
   title: "Closed Beta",
-  description: "During this phase, the application will be shared with a small group of service providers in Missoula, and focus will shift for a time to filling out the database with resources, and organizations.",
+  description:
+    "During this phase, the application will be shared with a small group of service providers in Missoula, and focus will shift for a time to filling out the database with resources, and organizations.",
   features: CLOSED_BETA_FEATURES,
 };
 
@@ -157,20 +158,22 @@ export const OPEN_BETA_FEATURES: FeatureProps[] = [
 
 const OPEN_BETA_DETAILS: PhaseDetails = {
   title: "Open Beta",
-  description: "During this phase, the application will be shared with the public, and focus will shift to bug hunting and adding new features to filter resources and organizations and prevent the application from overwhelming users as the database grows.",
+  description:
+    "During this phase, the application will be shared with the public, and focus will shift to bug hunting and adding new features to filter resources and organizations and prevent the application from overwhelming users as the database grows.",
   features: OPEN_BETA_FEATURES,
 };
 
 const PUBLIC_LAUNCH_DETAILS: PhaseDetails = {
   title: "Public Launch",
-  description: "Who knows. I'm not planning this far out yet. It depends on what the public response to the Beta version is like.", 
+  description:
+    "Who knows. I'm not planning this far out yet. It depends on what the public response to the Beta version is like.",
   features: [
     {
       title: "The never ending hunt for bugs and optiminizations.",
       description: "Add resources to the database.",
       status: "TODO",
       priority: "LOW",
-    }
+    },
   ],
 };
 
@@ -198,15 +201,9 @@ type statusOptions = keyof typeof statusSortObject;
 
 const sortFeatures = (a: Feature, b: Feature) => {
   if (a.status === b.status) {
-    return (
-      prioritySortObject[a.priority] -
-      prioritySortObject[b.priority]
-    );
+    return prioritySortObject[a.priority] - prioritySortObject[b.priority];
   }
-  return (
-    statusSortObject[a.status] -
-    statusSortObject[b.status]
-  );
+  return statusSortObject[a.status] - statusSortObject[b.status];
 };
 
 type Feature = (typeof REBUILD_FEATURES)[number];
@@ -285,21 +282,21 @@ function FeatureList({
       <h2 className="w-full text-xl font-semibold text-stone-600">
         Important Tasks & Features
       </h2>
-      {phaseDetails.features.sort(sortFeatures).map((feature) => {
-        return <FeatureDetails key={feature.title} feature={feature} />;
-      })}{" "}
-      <div className="ml-2 mr-6 mt-2 flex w-full items-center justify-around text-sm">
+      <div className="ml-2 mr-6 mt-4 mb-4 flex w-full items-center justify-around text-xs">
         <span className="flex items-center">
-          <HeartCheckmark className="h-5 w-5" status="DONE" /> DONE
+          <HeartCheckmark className="h-5 w-5 mr-1" status="DONE" /> DONE
         </span>
         <span className="flex items-center">
-          <HeartCheckmark className="h-5 w-5" status="IN_PROGRESS" /> IN
+          <HeartCheckmark className="h-5 w-5 mr-1" status="IN_PROGRESS" /> IN
           PROGRESS
         </span>
         <span className="flex items-center">
-          <HeartCheckmark className="h-5 w-5" status="TODO" /> TO DO
+          <HeartCheckmark className="h-5 w-5 mr-1" status="TODO" /> TO DO
         </span>
       </div>
+      {phaseDetails.features.sort(sortFeatures).map((feature) => {
+        return <FeatureDetails key={feature.title} feature={feature} />;
+      })}{" "}
     </div>
   );
 }
@@ -437,32 +434,30 @@ function FeatureCarousel({ featureArray }: { featureArray: PhaseDetails[] }) {
   };
   return (
     <div className="mb-20 flex w-full items-center justify-center">
-      <div
-        className="cursor-pointer leading-3"
-        onClick={handlePreviousFeatures}
-      >
-        <button className="text-3xl font-bold leading-3 text-stone-600">
-          ←
-        </button>
-        <p className="mx-0.5 text-xs font-light text-stone-600">back</p>
-      </div>
-      <div className="w-[500px] rounded-lg border border-stone-200 p-6 shadow-lg">
+          <div
+            className="cursor-pointer leading-3 text-stone-600 hover:text-stone-400"
+            onClick={handlePreviousFeatures}
+          >
+            <button className="text-3xl font-bold leading-3">←</button>
+            <p className="mx-0.5 text-xs font-light">back</p>
+          </div>
+      <div className="w-[500px] rounded-lg border border-stone-200 p-6 shadow-lg h-[600px]">
         <FeatureList
           phaseDetails={featureArray[currentFeature] || REBUILD_DETAILS}
-        />
-      </div>
-      <div className="cursor-pointer leading-3" onClick={handleNextFeatures}>
-        <button className="text-3xl font-bold leading-3 text-stone-600">
-          →
-        </button>
-        <p className="mx-0.5 text-xs font-light text-stone-600">next</p>
-      </div>
+        />{" "}
+
+      </div>          <div
+            className="cursor-pointer leading-3 text-stone-600 hover:text-stone-400"
+            onClick={handleNextFeatures}
+          >
+            <button className="text-3xl font-bold leading-3 ">→</button>
+            <p className="mx-0.5 text-xs font-light ">next</p>
+          </div>
     </div>
   );
 }
 
 export default function ProjectTimeline() {
-
   return (
     <div>
       <NavBar />
