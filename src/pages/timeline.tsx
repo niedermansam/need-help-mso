@@ -8,6 +8,11 @@ type HeartIconProps = JSX.IntrinsicElements["svg"] & {
   pulse: boolean;
 };
 
+type PhaseDetails = {
+  title: string;
+  description: string;
+  features: Feature[];
+};
 const HeartIcon = ({
   className,
   primaryColor,
@@ -43,13 +48,15 @@ const HeartIcon = ({
   );
 };
 
-export const REBUILD_FEATURES = [
-  {
-    title: "Search Bar with for organizations and resources",
-    description: "Search for resources by name, category, or tag.",
-    status: "TODO",
-    priority: "MEDIUM",
-  },
+type FeatureProps = {
+  title: string;
+  description: string;
+  status: "DONE" | "IN_PROGRESS" | "TODO";
+  priority: "HIGH" | "MEDIUM" | "LOW" | "COMPLETED";
+};
+
+export const REBUILD_FEATURES: FeatureProps[] = [
+
   {
     title: "Add, edit, and delete resources and organizations",
     description: "Add resources to the database.",
@@ -57,38 +64,81 @@ export const REBUILD_FEATURES = [
     priority: "COMPLETED",
   },
   {
-    title: "Custom user profiles/pages",
+    title: "Filter and sort by tag.",
+    description:
+      "Filter resources by category or tag. Allow users to mark tags as favorites and/or less interested, and sort resources by priority.",
+    status: "TODO",
+    priority: "HIGH",
+  },
+  {
+    title: "Custom user profiles/pages and favorites list.",
     description:
       'Allow users to save their most referenced resources to a "Favorites" Page. Allow service providers to add their organization to the database, and social workers to save multiple lists of resources that are often used together.',
     status: "TODO",
     priority: "MEDIUM",
   },
   {
-    title: "List resources and organizations by category",
+    title: "List resources and organizations by category.",
     description: "Add resources to the database.",
     status: "IN_PROGRESS",
     priority: "HIGH",
   },
 ];
 
-export const REBUILD_DETAILS = {
+export const REBUILD_DETAILS: PhaseDetails = {
   title: "Rebuild",
-  description: "Rebuild the Minimum Viable Product from the ground up using scalable web technologies.",
+  description:
+    "Rebuild the Minimum Viable Product from the ground up using scalable web technologies.",
   features: REBUILD_FEATURES,
-}
+};
 
-export const CLOSED_BETA_FEATURES = [
+export const CLOSED_BETA_FEATURES: FeatureProps[] = [
+  {
+    title: "Bug Hunt.",
+    description:
+      "Get feedback from users about what areas of the site work, what doesn't, and try to find as many bugs as possible before launching the open Beta version.",
+    status: "TODO",
+    priority: "HIGH",
+  },
+  {
+    title: "Feature request and bug reporting forms.",
+    description:
+      "Allow users to submit feature requests and bug reports directly from the site.",
+    status: "TODO",
+    priority: "MEDIUM",
+  },
+  {
+    title: 'Create a "How to Use" page.',
+    description: "Add resources to the database.",
+    status: "TODO",
+    priority: "MEDIUM",
+  },
+  {
+    title: "Search Bar with for organizations and resources",
+    description: "Search for resources by name, category, or tag.",
+    status: "TODO",
+    priority: "LOW",
+  },
+  {
+    title: "Allow service providers to save multiple lists of resources.",
+    description: "Create functionality that will allow social workers or case managers to create a list of resources for their clients, save that list, and send it to their clients via text or email.",
+    status: "TODO",
+    priority: "HIGH",
+  }
+];
+
+export const CLOSED_BETA_DETAILS: PhaseDetails = {
+  title: "Closed Beta",
+  description: "During this phase, the application will be shared with a small group of service providers in Missoula, and focus will shift for a time to filling out the database with resources, and organizations.",
+  features: CLOSED_BETA_FEATURES,
+};
+
+export const OPEN_BETA_FEATURES: FeatureProps[] = [
   {
     title: "Bug Hunt.",
     description: "Add resources to the database.",
     status: "TODO",
     priority: "LOW",
-  },
-  {
-    title: "Filter and sort by tag.",
-    description: "Filter resources by category or tag.",
-    status: "TODO",
-    priority: "HIGH",
   },
   {
     title: 'Add a "Contact Us" page.',
@@ -97,18 +147,39 @@ export const CLOSED_BETA_FEATURES = [
     priority: "LOW",
   },
   {
-    title: 'Create a "How to Use" page.',
-    description: "Add resources to the database.",
+    title: "Allow users to filter by community/identity.",
+    description:
+      "Add functionality to hide or search for resources and organizations that only serve specific groups (e.g. UM students, veterans, people with disabilities, etc.)",
     status: "TODO",
     priority: "HIGH",
   },
 ];
 
-export const CLOSED_BETA_DETAILS = {
-  title: "Closed Beta",
-  description: "Add resources to the database.",
-  features: CLOSED_BETA_FEATURES,
-}
+const OPEN_BETA_DETAILS: PhaseDetails = {
+  title: "Open Beta",
+  description: "During this phase, the application will be shared with the public, and focus will shift to bug hunting and adding new features to filter resources and organizations and prevent the application from overwhelming users as the database grows.",
+  features: OPEN_BETA_FEATURES,
+};
+
+const PUBLIC_LAUNCH_DETAILS: PhaseDetails = {
+  title: "Public Launch",
+  description: "Who knows. I'm not planning this far out yet. It depends on what the public response to the Beta version is like.", 
+  features: [
+    {
+      title: "The never ending hunt for bugs and optiminizations.",
+      description: "Add resources to the database.",
+      status: "TODO",
+      priority: "LOW",
+    }
+  ],
+};
+
+const PHASE_DETAILS: PhaseDetails[] = [
+  REBUILD_DETAILS,
+  CLOSED_BETA_DETAILS,
+  OPEN_BETA_DETAILS,
+  PUBLIC_LAUNCH_DETAILS,
+];
 
 const statusSortObject = {
   DONE: 0,
@@ -123,19 +194,18 @@ const prioritySortObject = {
   COMPLETED: 3,
 };
 
-type priorityOptions = keyof typeof prioritySortObject;
 type statusOptions = keyof typeof statusSortObject;
 
 const sortFeatures = (a: Feature, b: Feature) => {
   if (a.status === b.status) {
     return (
-      prioritySortObject[a.priority as priorityOptions] -
-      prioritySortObject[b.priority as priorityOptions]
+      prioritySortObject[a.priority] -
+      prioritySortObject[b.priority]
     );
   }
   return (
-    statusSortObject[a.status as statusOptions] -
-    statusSortObject[b.status as statusOptions]
+    statusSortObject[a.status] -
+    statusSortObject[b.status]
   );
 };
 
@@ -169,7 +239,6 @@ function HeartCheckmark({
 function FeatureDetails({ feature }: { feature: Feature }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
-
   return (
     <div className="m-2 mx-6 w-full p-2">
       <div>
@@ -180,7 +249,7 @@ function FeatureDetails({ feature }: { feature: Feature }) {
           <HeartCheckmark
             className="mr-2 w-8"
             pulse={false}
-            status={feature.status as statusOptions}
+            status={feature.status}
           />
           {feature.title}
         </h2>
@@ -202,11 +271,21 @@ function FeatureDetails({ feature }: { feature: Feature }) {
   );
 }
 
-function FeatureList({ features }: { features: Feature[] }) {
+function FeatureList({
+  phaseDetails: phaseDetails,
+}: {
+  phaseDetails: PhaseDetails;
+}) {
   return (
-    <div className="flex w-full max-w-md flex-col items-center justify-center text-stone-400">
-      <h1 className="text-4xl font-bold text-stone-600">Feature Details</h1>
-      {features.sort(sortFeatures).map((feature) => {
+    <div className="flex w-full max-w-md flex-col items-center  text-stone-400">
+      <h1 className="w-full text-3xl font-bold text-stone-600">
+        {phaseDetails.title}
+      </h1>
+      <p className=" my-2 w-full">{phaseDetails.description}</p>
+      <h2 className="w-full text-xl font-semibold text-stone-600">
+        Important Tasks & Features
+      </h2>
+      {phaseDetails.features.sort(sortFeatures).map((feature) => {
         return <FeatureDetails key={feature.title} feature={feature} />;
       })}{" "}
       <div className="ml-2 mr-6 mt-2 flex w-full items-center justify-around text-sm">
@@ -266,12 +345,12 @@ export function Timeline({
   progress: number;
 }) {
   return (
-    <div className="flex p-6 overflow-x-scroll pb-12 mb-4">
+    <div className="mb-4 flex overflow-x-scroll p-6 pb-12">
       {events.map((event, index) => {
         return (
           <div key={event.title} className="relative ml-3 w-[500px]">
             <div className="flex items-end justify-between px-4">
-              <h2 className=" min-w-[120px] font-semibold text-stone-600 mr-4">
+              <h2 className=" mr-4 min-w-[120px] font-semibold text-stone-600">
                 {event.title}
               </h2>
               <div className="min-w-fit">
@@ -344,36 +423,46 @@ export function Timeline({
   );
 }
 
-function FeatureCarousel({ featureArray }: { featureArray: Feature[][] }) {
+function FeatureCarousel({ featureArray }: { featureArray: PhaseDetails[] }) {
   const [currentFeature, setCurrentFeature] = useState(0);
 
   const handlePreviousFeatures = () => {
-    if(currentFeature === 0) return;
+    if (currentFeature === 0) return;
     setCurrentFeature(currentFeature - 1);
   };
 
   const handleNextFeatures = () => {
-    if(currentFeature === featureArray.length - 1) return;
+    if (currentFeature === featureArray.length - 1) return;
     setCurrentFeature(currentFeature + 1);
   };
   return (
-    <div className="flex w-full justify-center mb-20">
-      <button className="text-3xl text-stone-600 font-bold" onClick={handlePreviousFeatures}>←</button>
+    <div className="mb-20 flex w-full items-center justify-center">
+      <div
+        className="cursor-pointer leading-3"
+        onClick={handlePreviousFeatures}
+      >
+        <button className="text-3xl font-bold leading-3 text-stone-600">
+          ←
+        </button>
+        <p className="mx-0.5 text-xs font-light text-stone-600">back</p>
+      </div>
       <div className="w-[500px] rounded-lg border border-stone-200 p-6 shadow-lg">
         <FeatureList
-          features={featureArray[currentFeature] || REBUILD_FEATURES}
+          phaseDetails={featureArray[currentFeature] || REBUILD_DETAILS}
         />
       </div>
-      <button className="text-3xl text-stone-600 font-bold" onClick={handleNextFeatures}>→</button>
+      <div className="cursor-pointer leading-3" onClick={handleNextFeatures}>
+        <button className="text-3xl font-bold leading-3 text-stone-600">
+          →
+        </button>
+        <p className="mx-0.5 text-xs font-light text-stone-600">next</p>
+      </div>
     </div>
   );
 }
 
 export default function ProjectTimeline() {
-  const [featureArray, setFeatureArray] = useState<Feature[][]>([
-    REBUILD_FEATURES,
-    CLOSED_BETA_FEATURES,
-  ]);
+
   return (
     <div>
       <NavBar />
@@ -382,7 +471,7 @@ export default function ProjectTimeline() {
       </h1>
       <div>
         <Timeline events={TIMELINE} progress={1} />
-        <FeatureCarousel featureArray={featureArray} />
+        <FeatureCarousel featureArray={PHASE_DETAILS} />
       </div>
     </div>
   );
