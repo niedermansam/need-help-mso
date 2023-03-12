@@ -71,7 +71,7 @@ export const REBUILD_FEATURES = [
   },
 ];
 
-const REBUILD_DETAILS = {
+export const REBUILD_DETAILS = {
   title: "Rebuild",
   description: "Rebuild the Minimum Viable Product from the ground up using scalable web technologies.",
   features: REBUILD_FEATURES,
@@ -104,7 +104,7 @@ export const CLOSED_BETA_FEATURES = [
   },
 ];
 
-const CLOSED_BETA_DETAILS = {
+export const CLOSED_BETA_DETAILS = {
   title: "Closed Beta",
   description: "Add resources to the database.",
   features: CLOSED_BETA_FEATURES,
@@ -271,7 +271,7 @@ export function Timeline({
         return (
           <div key={event.title} className="relative ml-3 w-[500px]">
             <div className="flex items-end justify-between px-4">
-              <h2 className=" min-w-[200px] font-semibold text-stone-600 mr-4">
+              <h2 className=" min-w-[120px] font-semibold text-stone-600 mr-4">
                 {event.title}
               </h2>
               <div className="min-w-fit">
@@ -357,14 +357,14 @@ function FeatureCarousel({ featureArray }: { featureArray: Feature[][] }) {
     setCurrentFeature(currentFeature + 1);
   };
   return (
-    <div className="flex w-full justify-center">
-      <button className="text-3xl font-bold" onClick={handlePreviousFeatures}>←</button>
+    <div className="flex w-full justify-center mb-20">
+      <button className="text-3xl text-stone-600 font-bold" onClick={handlePreviousFeatures}>←</button>
       <div className="w-[500px] rounded-lg border border-stone-200 p-6 shadow-lg">
         <FeatureList
           features={featureArray[currentFeature] || REBUILD_FEATURES}
         />
       </div>
-      <button className="text-3xl font-bold" onClick={handleNextFeatures}>→</button>
+      <button className="text-3xl text-stone-600 font-bold" onClick={handleNextFeatures}>→</button>
     </div>
   );
 }
