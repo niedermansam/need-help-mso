@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { SVGAttributes, useState } from "react";
 import NavBar from "../components/Nav";
 import React from "react";
 
@@ -18,7 +18,7 @@ const HeartIcon = ({
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
-      className={`icon-heart ${className || ''}`}
+      className={`icon-heart ${className || ""}`}
     >
       <circle
         cx="12"
@@ -43,7 +43,7 @@ const HeartIcon = ({
   );
 };
 
-export const FIRST_FEATURES = [
+export const REBUILD_FEATURES = [
   {
     title: "Search Bar with for organizations and resources",
     description: "Search for resources by name, category, or tag.",
@@ -71,11 +71,18 @@ export const FIRST_FEATURES = [
   },
 ];
 
-export const SECOND_FEATURES = [
+const REBUILD_DETAILS = {
+  title: "Rebuild",
+  description: "Rebuild the Minimum Viable Product from the ground up using scalable web technologies.",
+  features: REBUILD_FEATURES,
+}
+
+export const CLOSED_BETA_FEATURES = [
   {
     title: "Bug Hunt.",
     description: "Add resources to the database.",
-    status: "DONE",
+    status: "TODO",
+    priority: "LOW",
   },
   {
     title: "Filter and sort by tag.",
@@ -96,6 +103,12 @@ export const SECOND_FEATURES = [
     priority: "HIGH",
   },
 ];
+
+const CLOSED_BETA_DETAILS = {
+  title: "Closed Beta",
+  description: "Add resources to the database.",
+  features: CLOSED_BETA_FEATURES,
+}
 
 const statusSortObject = {
   DONE: 0,
@@ -126,10 +139,36 @@ const sortFeatures = (a: Feature, b: Feature) => {
   );
 };
 
-type Feature = (typeof FIRST_FEATURES)[number];
+type Feature = (typeof REBUILD_FEATURES)[number];
+
+function HeartCheckmark({
+  status,
+  className,
+}: SVGAttributes<SVGAElement> & { status: statusOptions; pulse?: boolean }) {
+  // create a variable that holds a color value
+  const darkColor = "#E11D48";
+  const lightColor = "#FDA4AF";
+
+  const primaryColor =
+    status === "DONE"
+      ? darkColor
+      : status === "IN_PROGRESS"
+      ? lightColor
+      : "lightgray";
+
+  return (
+    <HeartIcon
+      pulse={false}
+      className={className}
+      primaryColor={primaryColor}
+      secondaryColor={status === "IN_PROGRESS" ? darkColor : "white"}
+    />
+  );
+}
 
 function FeatureDetails({ feature }: { feature: Feature }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
+
 
   return (
     <div className="m-2 mx-6 w-full p-2">
@@ -138,20 +177,11 @@ function FeatureDetails({ feature }: { feature: Feature }) {
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="flex cursor-pointer items-center text-lg font-light text-stone-800"
         >
-          <HeartIcon
+          <HeartCheckmark
             className="mr-2 w-8"
             pulse={false}
-            primaryColor={
-              feature.status === "DONE"
-                ? "#E11D48"
-                : feature.status === "IN_PROGRESS"
-                ? "#FDA4AF"
-                : "gray"
-            }
-            secondaryColor={
-              feature.status === "IN_PROGRESS" ? "#E11D48" : "white"
-            }
-          />{" "}
+            status={feature.status as statusOptions}
+          />
           {feature.title}
         </h2>
         <div
@@ -174,12 +204,23 @@ function FeatureDetails({ feature }: { feature: Feature }) {
 
 function FeatureList({ features }: { features: Feature[] }) {
   return (
-    <div className="flex w-fit max-w-md flex-col items-center justify-center">
+    <div className="flex w-full max-w-md flex-col items-center justify-center text-stone-400">
       <h1 className="text-4xl font-bold text-stone-600">Feature Details</h1>
-
       {features.sort(sortFeatures).map((feature) => {
         return <FeatureDetails key={feature.title} feature={feature} />;
-      })}
+      })}{" "}
+      <div className="ml-2 mr-6 mt-2 flex w-full items-center justify-around text-sm">
+        <span className="flex items-center">
+          <HeartCheckmark className="h-5 w-5" status="DONE" /> DONE
+        </span>
+        <span className="flex items-center">
+          <HeartCheckmark className="h-5 w-5" status="IN_PROGRESS" /> IN
+          PROGRESS
+        </span>
+        <span className="flex items-center">
+          <HeartCheckmark className="h-5 w-5" status="TODO" /> TO DO
+        </span>
+      </div>
     </div>
   );
 }
@@ -219,25 +260,25 @@ type TimelineItem = (typeof TIMELINE)[number];
 
 export function Timeline({
   events,
-  currentIndex,
+  progress,
 }: {
   events: TimelineItem[];
-  currentIndex: number;
+  progress: number;
 }) {
   return (
-    <div className="flex p-6">
+    <div className="flex p-6 overflow-x-scroll pb-12 mb-4">
       {events.map((event, index) => {
         return (
-          <div key={event.title} className="relative ml-3 w-96">
+          <div key={event.title} className="relative ml-3 w-[500px]">
             <div className="flex items-end justify-between px-4">
-              <h2 className=" min-w-fit font-semibold text-stone-600">
+              <h2 className=" min-w-[200px] font-semibold text-stone-600 mr-4">
                 {event.title}
               </h2>
               <div className="min-w-fit">
                 <p className="text-xs text-stone-400">
-                  {index === currentIndex - 1
+                  {index === progress - 1
                     ? "in progress"
-                    : index < currentIndex - 1
+                    : index < progress - 1
                     ? "completed"
                     : "projected"}
                 </p>
@@ -250,13 +291,13 @@ export function Timeline({
               <span
                 className={`absolute z-10 rounded-full ${
                   // pinging dot
-                  index <= currentIndex
+                  index <= progress
                     ? "-left-3 -bottom-1 h-4 w-4"
                     : "bottom-[0px] -left-3 h-2 w-2"
                 }
                 border-4 border-rose-500 bg-rose-300 
                ${
-                 index === currentIndex
+                 index === progress
                    ? "animate-[ping_4s_infinite] delay-200"
                    : ""
                }`}
@@ -264,14 +305,14 @@ export function Timeline({
               <span
                 className={`absolute z-10 ${
                   // normal dot
-                  index <= currentIndex
+                  index <= progress
                     ? "-left-3 -bottom-1 h-4 w-4"
                     : "bottom-[0px] -left-3 h-2 w-2"
                 } rounded-full border-4 border-rose-500 bg-rose-300 `}
               ></span>
               <span
                 className={`absolute z-0 w-[calc(100%+15px)] ${
-                  index <= currentIndex - 1
+                  index <= progress - 1
                     ? " top-2 border-b-8 border-rose-400"
                     : " top-2.5 border-b-4 border-rose-300"
                 }`}
@@ -303,18 +344,45 @@ export function Timeline({
   );
 }
 
+function FeatureCarousel({ featureArray }: { featureArray: Feature[][] }) {
+  const [currentFeature, setCurrentFeature] = useState(0);
+
+  const handlePreviousFeatures = () => {
+    if(currentFeature === 0) return;
+    setCurrentFeature(currentFeature - 1);
+  };
+
+  const handleNextFeatures = () => {
+    if(currentFeature === featureArray.length - 1) return;
+    setCurrentFeature(currentFeature + 1);
+  };
+  return (
+    <div className="flex w-full justify-center">
+      <button className="text-3xl font-bold" onClick={handlePreviousFeatures}>←</button>
+      <div className="w-[500px] rounded-lg border border-stone-200 p-6 shadow-lg">
+        <FeatureList
+          features={featureArray[currentFeature] || REBUILD_FEATURES}
+        />
+      </div>
+      <button className="text-3xl font-bold" onClick={handleNextFeatures}>→</button>
+    </div>
+  );
+}
+
 export default function ProjectTimeline() {
+  const [featureArray, setFeatureArray] = useState<Feature[][]>([
+    REBUILD_FEATURES,
+    CLOSED_BETA_FEATURES,
+  ]);
   return (
     <div>
       <NavBar />
-      <h1 className="pt-20 pl-6 text-4xl font-light text-stone-700">Project Timeline</h1>
+      <h1 className="pt-20 pl-6 text-4xl font-light text-stone-700">
+        Project Timeline
+      </h1>
       <div>
-        <Timeline events={TIMELINE} currentIndex={1} />
-        <div className="mb-20 flex w-full justify-center">
-          <div className="rounded-lg border border-stone-200 p-6 shadow-lg">
-            <FeatureList features={FIRST_FEATURES} />
-          </div>
-        </div>
+        <Timeline events={TIMELINE} progress={1} />
+        <FeatureCarousel featureArray={featureArray} />
       </div>
     </div>
   );
