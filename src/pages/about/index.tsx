@@ -4,8 +4,8 @@ export default function AboutPage() {
   return (
     <div>
       <NavBar />
-      <div className="relative mx-auto mb-20 max-w-4xl pt-16 pl-6 text-lg font-light text-stone-800">
-        <h1 className=" mb-2 text-5xl">About Need Help Missoula</h1>
+      <div className="relative mx-12 md:mx-auto mb-20 max-w-4xl pt-16 md:pl-6 text-lg font-light text-stone-800">
+        <h1 className=" mb-2 text-5xl">About The App</h1>
         <h2 className="mb-4 text-2xl text-stone-500">Hi! My name is Sam!</h2>
         <p className="my-2 leading-relaxed">
           I&apos;m the developer behind Need Help Missoula, and I like to think

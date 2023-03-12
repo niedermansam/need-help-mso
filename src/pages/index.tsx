@@ -32,7 +32,7 @@ const CallToAction: React.FC = () => {
 
 const Title = () => {
   return (
-    <div className=" max-w-lg w-[45%] text-stone-700 md:mt-0">
+    <div className=" max-w-lg lg:w-[45%] text-stone-700 md:mt-0">
       <h1 className=" flex-grow text-center text-5xl font-extrabold leading-[0.85] tracking-tight md:text-6xl lg:text-8xl">
         <span>Need&nbsp;Help</span>
         <br /> <span className="tracking-wide text-rose-500">Missoula</span>
@@ -84,7 +84,7 @@ const Home: NextPage = () => {
             <Description />
             <CallToAction />
             <Link
-              href="https://niedermansam.github.io/need-help-missoula/"
+              href="https://niedermansam.github.io/need-help-missoula/#/resources"
               target="_blank"
               className="mt-4 w-full mx-4 font-light text-rose-400 hover:rose-60 focus: rose-60"
             >
