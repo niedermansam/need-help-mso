@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 export const resourceRouter = createTRPCRouter({
   create: protectedProcedure
@@ -9,13 +9,13 @@ export const resourceRouter = createTRPCRouter({
         name: z.string(),
         description: z.string(),
         category: z.string(),
-        orgName: z.string(),
-        url: z.string(),
+        orgId: z.string(),
+        url: z.string().nullish(),
         tags: z.array(z.string()).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { name, description, category, orgName, url, tags } = input;
+      const { name, description, category, orgId, url, tags } = input;
 
       const newResource = await ctx.prisma.resource.create({
         data: {
@@ -31,15 +31,27 @@ export const resourceRouter = createTRPCRouter({
           },
           organization: {
             connect: {
-              name: orgName,
+              id: orgId,
             },
           },
+
+          tags: {
+            connectOrCreate: tags
+              ? tags.map((tag) => ({
+                  where: { tag },
+                  create: {
+                    tag,
+                  },
+                }))
+              : [],
+          },
+
           url: url,
         },
       });
 
       if (tags && tags[0]) {
-       await ctx.prisma.tag.createMany({
+        await ctx.prisma.tag.createMany({
           data: tags.map((tag) => ({
             tag: tag,
             resource: {
@@ -51,4 +63,27 @@ export const resourceRouter = createTRPCRouter({
         });
       }
     }),
+  getAll: publicProcedure.query(async ({ ctx }) => {
+    const resources = await ctx.prisma.resource.findMany({
+      include: {
+        organization: true,
+        categoryMeta: true,
+        tags: true,
+      },
+    });
+    return resources;
+  }),
+  getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const resource = await ctx.prisma.resource.findUnique({
+      where: {
+        id: input,
+      },
+      include: {
+        organization: true,
+        categoryMeta: true,
+        tags: true,
+      },
+    });
+    return resource;
+  }),
 });

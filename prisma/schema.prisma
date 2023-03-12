@@ -124,15 +124,13 @@ model Resource {
     id                     String            @id @default(cuid())
     name                   String
     description            String
-    url                    String
+    url                    String ?
     organizationId         String
     organization           Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
     helpingOrganizations   Organization[]    @relation("HelpingOrgs")
     category               String
     categoryMeta           Category          @relation(fields: [category], references: [category])
     tags                   Tag[]
-    website                String?
-    fundingSource          String?
     exclusiveToCommunities Community[]
     helpfulToCommunities   Community[]       @relation("Helpful")
     contacts               ResourceContact[]
