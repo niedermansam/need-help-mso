@@ -58,7 +58,7 @@ type FeatureProps = {
 export const REBUILD_FEATURES: FeatureProps[] = [
   {
     title: "Add, edit, and delete resources and organizations",
-    description: "Add resources to the database.",
+    description: "Create forms, database, and API endpoints. Add a few resources and organizations to the database.",
     status: "DONE",
     priority: "COMPLETED",
   },
@@ -78,7 +78,7 @@ export const REBUILD_FEATURES: FeatureProps[] = [
   },
   {
     title: "List resources and organizations by category.",
-    description: "Add resources to the database.",
+    description: "Show a list of resources and organizations with filters for general category (e.g. food, housing, etc.).",
     status: "IN_PROGRESS",
     priority: "HIGH",
   },
@@ -237,7 +237,7 @@ function FeatureDetails({ feature }: { feature: Feature }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
-    <div className="m-2 mx-6 w-full p-2">
+    <div className="m-2 mx-6 w-full p-2 ">
       <div>
         <h2
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -274,7 +274,7 @@ function FeatureList({
   phaseDetails: PhaseDetails;
 }) {
   return (
-    <div className="flex w-full max-w-md flex-col items-center  text-stone-400">
+    <div className="flex w-full max-w-md flex-col items-center h-full  text-stone-400 overflow-scroll overflow-x-hidden">
       <h1 className="w-full text-3xl font-bold text-stone-600">
         {phaseDetails.title}
       </h1>
@@ -441,7 +441,7 @@ function FeatureCarousel({ featureArray }: { featureArray: PhaseDetails[] }) {
             <button className="text-3xl font-bold leading-3">←</button>
             <p className="mx-0.5 text-xs font-light">back</p>
           </div>
-      <div className="w-[500px] rounded-lg border border-stone-200 p-6 shadow-lg h-[600px]">
+      <div className="w-[500px] rounded-lg border border-stone-200 p-6 shadow-lg h-[600px] overflow-hidden">
         <FeatureList
           phaseDetails={featureArray[currentFeature] || REBUILD_DETAILS}
         />{" "}
