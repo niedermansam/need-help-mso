@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 export const resourceRouter = createTRPCRouter({
   create: protectedProcedure
@@ -51,4 +51,20 @@ export const resourceRouter = createTRPCRouter({
         });
       }
     }),
+
+    getAll: publicProcedure.query(async({ctx}) => {
+      const resources = await ctx.prisma.resource.findMany({
+        include: {
+          tags: true,
+          categoryMeta: true,
+          organization: {
+            select: {
+              name: true,
+            }
+          },
+
+        },
+      });
+      return resources;
+    })
 });
