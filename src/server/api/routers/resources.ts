@@ -77,7 +77,7 @@ export const resourceRouter = createTRPCRouter({
         },
       });
       return resources;
-    })
+    }),
   getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     const resource = await ctx.prisma.resource.findUnique({
       where: {
@@ -91,4 +91,17 @@ export const resourceRouter = createTRPCRouter({
     });
     return resource;
   }),
+  getByCategory: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const resources = await ctx.prisma.resource.findMany({
+      where: {
+          category: input
+      },
+      include: {
+        organization: true,
+        categoryMeta: true,
+        tags: true,
+      },
+    });
+    return resources;
+  })
 });
