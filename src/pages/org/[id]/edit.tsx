@@ -1,34 +1,34 @@
 import { useState } from "react";
-import NavBar from "../../components/Nav";
-import { api } from "../../utils/api";
-import type { Organization } from "@prisma/client";
-import Link from "next/link";
+import { OrganizationProps } from "..";
+import NavBar from "../../../components/Nav";
+import { api } from "../../../utils/api";
+import { useRouter } from "next/router";
+import { Organization, Resource, Tag } from "@prisma/client";
+import { CreateResourceForm } from "../../resource";
 
-export type OrganizationProps = {
-  name: string;
-  description: string;
-  url: string;
-  email: string;
-  phone: string;
-  category: string;
-  tags: string[];
-};
-
-function CreateOrganizationForm() {
-  const INITIAL_STATE:OrganizationProps = {
-    name: "",
-    description: "",
-    url: "",
-    email: "",
-    phone: "",
-    category: "",
-    tags: [],
+function CreateOrganizationForm({
+  orgData,
+}: {
+  orgData: Organization & {
+    resources: Resource[];
+    tags: Tag[];
   };
+}) {
+  const { id, name, description, website, email, phone, category, tags } =
+    orgData;
+  const INITIAL_STATE = {
+    id: id,
+    name: name,
+    description: description,
+    website: website,
+    email,
+    phone,
+    category,
+    tags: tags.map((x) => x.tag),
+  } as const;
 
-  const [formData, setFormData] = useState(INITIAL_STATE);
-  const addOrg = api.organization.create.useMutation({
-    onSuccess: () => setFormData({...INITIAL_STATE, category: formData.category}),
-  });
+  const [formData, setFormData] = useState({ ...INITIAL_STATE });
+  const addOrg = api.organization.update.useMutation();
   return (
     <div className="mx-6 max-w-md bg-gray-100 p-6">
       <h1>Create Organization</h1>
@@ -55,9 +55,9 @@ function CreateOrganizationForm() {
           type="text"
           name="website"
           id="website"
-          value={formData.url}
+          value={formData.website || ""}
           onChange={(e) =>
-            setFormData({ ...formData, url: e.target.value })
+            setFormData({ ...formData, website: e.target.value })
           }
         />
         <label htmlFor="email">Email</label>
@@ -65,7 +65,7 @@ function CreateOrganizationForm() {
           type="text"
           name="email"
           id="email"
-          value={formData.email}
+          value={formData.email || ""}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
         <label htmlFor="phone">Phone</label>
@@ -73,7 +73,7 @@ function CreateOrganizationForm() {
           type="text"
           name="phone"
           id="phone"
-          value={formData.phone}
+          value={formData.phone || ""}
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
         />
         <label htmlFor="category">Category</label>
@@ -81,7 +81,7 @@ function CreateOrganizationForm() {
           type="text"
           name="category"
           id="category"
-          value={formData.category}
+          value={formData.category || ""}
           onChange={(e) =>
             setFormData({ ...formData, category: e.target.value })
           }
@@ -92,39 +92,38 @@ function CreateOrganizationForm() {
           name="tags"
           id="tags"
           value={formData.tags}
-          onChange={(e) => setFormData({ ...formData, tags: e.target.value.split(",") })}
+          onChange={(e) =>
+            setFormData({ ...formData, tags: e.target.value.split(",") })
+          }
         />
-        <button type="button" onClick={() => addOrg.mutate({...formData, tags: formData.tags.map(x => x.trim())})}>
+        <button
+          type="button"
+          onClick={() =>
+            addOrg.mutate({
+              ...INITIAL_STATE,
+              ...formData,
+              website: formData.website || undefined,
+              tags: formData.tags.map((x) => x.trim()),
+            })
+          }
+        >
           Submit
         </button>
       </form>
     </div>
   );
 }
-
-function OrganizationCard({ org }: { org: Organization }) {
-  return (
-    <div className="m-6 w-80 max-w-sm border border-gray-200 p-6">
-      <Link href={`/org/${org.id}`}>
-        {" "}
-        <h2 className="text-xl">{org.name}</h2>
-      </Link>
-      <p>{org.description}</p>
-    </div>
-  );
-}
-
-export default function OrganizationsPage() {
-  const { data: orgs } = api.organization.getAll.useQuery();
+export default function EditOrgPage() {
+  const resourceId = useRouter().query.id;
+  const { data: orgData } = api.organization.getById.useQuery({
+    id: resourceId as string,
+  });
   return (
     <div>
       <NavBar />
-      <CreateOrganizationForm />
-      <div className="flex flex-wrap">
-        {orgs?.map((org) => (
-          <OrganizationCard key={org.id} org={org} />
-        ))}
-      </div>
+      <p>Edit Organization</p>
+      {orgData ? <CreateOrganizationForm orgData={orgData} /> : null}
+      {orgData ? <CreateResourceForm orgId={orgData.id} /> : null}
     </div>
   );
 }

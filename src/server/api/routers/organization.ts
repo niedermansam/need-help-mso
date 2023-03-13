@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import Airtable from "airtable";
 //import Airtable from "airtable";
-
 
 export interface OrganizationSchema {
   Tags?: string[];
@@ -42,21 +42,49 @@ export interface ResourceSchema {
   Notes?: string;
   "Income Restrictions Details"?: string;
 }
+const orgInput = z.object({
+  name: z.string(),
+  description: z.string(),
+  category: z.string(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  website: z.string().optional(),
+});
+
+const orgUpdateInput = z.object({
+  id: z.string(),
+  name: z.string().nullish(),
+  description: z.string().nullish(),
+  category: z.string().nullish(),
+  email: z.string().email().nullish(),
+  phone: z.string().nullish(),
+  tags: z.array(z.string()).nullish(),
+  website: z.string().nullish(),
+});
 
 export const organizationRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        description: z.string(),
-        category: z.string(),
-      })
-    )
+    .input(orgInput)
     .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.organization.create({
         data: {
           name: input.name,
           description: input.description,
+          email: input.email,
+          phone: input.phone,
+          website: input.website,
+          tags: {
+            connectOrCreate: input.tags
+              ? input.tags.map((tag) => ({
+                  where: { tag },
+                  create: {
+                    tag,
+                  },
+                }))
+              : [],
+          },
+
           categoryMeta: {
             connectOrCreate: {
               where: { category: input.category },
@@ -64,6 +92,44 @@ export const organizationRouter = createTRPCRouter({
                 category: input.category,
               },
             },
+          },
+        },
+      });
+    }),
+
+  update: protectedProcedure
+    .input(orgUpdateInput)
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.organization.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          name: input.name || undefined,
+          description: input.description || undefined,
+          email: input.email,
+          phone: input.phone,
+          website: input.website,
+          tags: {
+            connectOrCreate: input.tags
+              ? input.tags.map((tag) => ({
+                  where: { tag },
+                  create: {
+                    tag,
+                  },
+                }))
+              : [],
+          },
+
+          categoryMeta: {
+            connectOrCreate: input.category
+              ? {
+                  where: { category: input.category },
+                  create: {
+                    category: input.category,
+                  },
+                }
+              : undefined,
           },
         },
       });
@@ -80,163 +146,19 @@ export const organizationRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-        try {
-      return await ctx.prisma.organization.findUnique({
-        where: {
-          id: input.id,
-        },
-        include: {
-            resources: true
-        }
-      });} catch (err) {
-        console.log(err)
+      try {
+        return await ctx.prisma.organization.findUnique({
+          where: {
+            id: input.id,
+          },
+          include: {
+            resources: true,
+            tags: true,
+            categoryMeta: true,
+          },
+        });
+      } catch (err) {
+        console.log(err);
       }
     }),
-
-/*
-  syncAirtableOrgs: publicProcedure.mutation(({ ctx }) => {
-    const base = new Airtable({
-      apiKey:
-        "patQokBzWVmDj821y.729da362fc840f86665519df7170ee4bbb90a402e406b37dc0e0267434e911d7",
-    }).base("appZYx8yOoxvAISJG");
-
-    base("Organizations")
-      .select({
-        // Selecting the first 3 records in Grid view:
-        view: "Grid view",
-      })
-      .eachPage(
-        function page(records, fetchNextPage) {
-          // This function (`page`) will get called for each page of records.
-
-          records.forEach(async function (record) {
-            const fields = record.fields as unknown as OrganizationSchema;
-            const newTags = fields.Tags?.map(async(tag) => {
-            await ctx.prisma.tag.create({data: {
-                tag: tag,
-                description: ''
-            }})
-            return {tag: tag}
-            })
-
-
-
-            await ctx.prisma.organization.create({
-              data: {
-                name: fields.Name,
-                description: fields.Notes || "",
-                categoryMeta: {
-                  connectOrCreate: {
-                    where: { category: fields.Expertise },
-                    create: {
-                      category: fields.Expertise,
-                      description: "",
-                    },
-                  },
-                },
-                tags: {
-                  connect: fields.Tags?.map((tag) => {
-                    return { tag: tag };
-                  }),
-                },
-                website: fields.URL,
-                phone: fields.Phone,
-                email: fields.Email,
-              },
-            });
-          });
-
-          // To fetch the next page of records, call `fetchNextPage`.
-          // If there are more records, `page` will get called again.
-          // If there are no more records, `done` will get called.
-          fetchNextPage();
-        },
-        function done(err) {
-          if (err) {
-            console.error(err);
-            return;
-          }
-        }
-      );
-  }),
-
-  syncAirtableResources: publicProcedure.mutation(({}) => {
-    const base = new Airtable({
-      apiKey:
-        "patQokBzWVmDj821y.729da362fc840f86665519df7170ee4bbb90a402e406b37dc0e0267434e911d7",
-    }).base("appZYx8yOoxvAISJG");
-
-    base("Resources")
-      .select({
-        // Selecting the first 3 records in Grid view:
-        view: "Organization View",
-      })
-      .eachPage(
-        function page(records, fetchNextPage) {
-          // This function (`page`) will get called for each page of records.
-
-          records.forEach(async function (record) {
-            const fields = record.fields as unknown as ResourceSchema;
-            const newTags = fields.Tags?.map(async (tag) => {
-              await ctx.prisma.tag.create({
-                data: {
-                  tag: tag,
-                  description: "",
-                },
-              });
-              return { tag: tag };
-            });
-
-            console.log(
-              "CONSOLE________________________________________- ",
-              fields["Administering Org"]
-                ? fields["Administering Org"][0]
-                : "whoops"
-            );
-
-            await ctx.prisma.resources.create({
-              data: {
-                name: fields.Name,
-                description: fields.Notes || "",
-                categoryMeta: {
-                  connectOrCreate: {
-                    where: { category: fields.Provides },
-                    create: {
-                      category: fields.Provides,
-                      description: "",
-                    },
-                  },
-                },
-                tags: {
-                  connect: fields.Tags?.map((tag) => {
-                    return { tag: tag };
-                  }),
-                },
-                url: fields.URL || "",
-                organization: {
-                  connect: {
-                    name: fields["Administering Org"]
-                      ? fields["Administering Org"][0]
-                      : undefined,
-                  },
-                },
-              },
-            });
-
-          });
-
-          // To fetch the next page of records, call `fetchNextPage`.
-          // If there are more records, `page` will get called again.
-          // If there are no more records, `done` will get called.
-          fetchNextPage();
-        },
-        function done(err) {
-          if (err) {
-            console.error(err);
-            return;
-          }
-        }
-      );
-  }),
-  */
 });

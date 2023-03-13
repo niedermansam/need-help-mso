@@ -113,15 +113,13 @@ Table Resource {
   id String [pk]
   name String [not null]
   description String [not null]
-  url String [not null]
+  url String
   organizationId String [not null]
   organization Organization [not null]
   helpingOrganizations Organization [not null]
   category String [not null]
   categoryMeta Category [not null]
   tags Tag [not null]
-  website String
-  fundingSource String
   exclusiveToCommunities Community [not null]
   helpfulToCommunities Community [not null]
   contacts ResourceContact [not null]
