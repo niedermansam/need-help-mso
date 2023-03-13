@@ -58,7 +58,7 @@ const Description = () => {
         people who need a hand. A place where social workers, case managers, and
         other professionals can find resources for their clients. But right now,
         we&apos;re still under construction. Please support this project if you
-        can afford to, and check back soon! check out the development timeline
+        can afford to, and check back soon! Check out the development timeline
         for more information about when to check back!
       </p>
     </div>

@@ -7,7 +7,7 @@ export default function NavBar() {
   const userId = session.data?.user?.id;
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <nav className="fixed z-10 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
+    <nav className="fixed z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
       <div className="mr-6 flex flex-shrink-0 items-center text-white">
         <Link href="/" className="text-xl font-semibold tracking-tight">
           Need Help Missoula
@@ -48,7 +48,9 @@ export default function NavBar() {
           </Link>
         </div>
         <div className="flex">
-          {userId && ( // if user is logged in, show their name and profile pic in the navbar
+          {// userId // uncomment this
+           false && // and delete this to show the profile link
+           ( // if user is logged in, show their name and profile pic in the navbar
             <Link href={"/user"} className="mx-2 flex items-center">
               <p className="mx-2 text-white">Your Profile</p>
             </Link>

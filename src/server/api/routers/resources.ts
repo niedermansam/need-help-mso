@@ -63,16 +63,21 @@ export const resourceRouter = createTRPCRouter({
         });
       }
     }),
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    const resources = await ctx.prisma.resource.findMany({
-      include: {
-        organization: true,
-        categoryMeta: true,
-        tags: true,
-      },
-    });
-    return resources;
-  }),
+    getAll: publicProcedure.query(async({ctx}) => {
+      const resources = await ctx.prisma.resource.findMany({
+        include: {
+          tags: true,
+          categoryMeta: true,
+          organization: {
+            select: {
+              name: true,
+            }
+          },
+
+        },
+      });
+      return resources;
+    })
   getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     const resource = await ctx.prisma.resource.findUnique({
       where: {
