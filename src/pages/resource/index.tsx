@@ -2,9 +2,10 @@
 import Link from "next/link";
 import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
-import { Resource, Category, Tag } from "@prisma/client";
+import type { Resource, Category, Tag } from "@prisma/client";
 
-export function CreateResourceForm() {
+export function CreateResourceForm({orgId}: {orgId: string}) {
+  console.log(orgId)
   /**
     const INIT_RESOURCE = {
         name: '',

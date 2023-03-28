@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { OrganizationProps } from "..";
 import NavBar from "../../../components/Nav";
 import { api } from "../../../utils/api";
 import { useRouter } from "next/router";
-import { Organization, Resource, Tag } from "@prisma/client";
+import type { Organization, Resource, Tag } from "@prisma/client";
 import { CreateResourceForm } from "../../resource";
 
 function CreateOrganizationForm({
