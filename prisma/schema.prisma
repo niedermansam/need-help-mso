@@ -71,6 +71,7 @@ model Category {
     description   String?
     organizations Organization[]
     resources     Resource[]
+    tags         Tag[]
 }
 
 model Tag {
@@ -78,12 +79,13 @@ model Tag {
     description   String?
     organizations Organization[]
     resources     Resource[]
+    categories    Category[]
 }
 
 model Community {
     name               String         @id @unique
     exclusiveOrgs      Organization[]
-    exclusiveResources Resource[]
+    exclusiveResources Resource[]    @relation("Exclusive")
     helpfulOrgs        Organization[] @relation("Helpful")
     helpfulResources   Resource[]     @relation("Helpful")
 }
@@ -131,9 +133,10 @@ model Resource {
     category               String
     categoryMeta           Category          @relation(fields: [category], references: [category])
     tags                   Tag[]
-    exclusiveToCommunities Community[]
+    exclusiveToCommunities Community[]         @relation("Exclusive")
     helpfulToCommunities   Community[]       @relation("Helpful")
     contacts               ResourceContact[]
+    @@unique([name, organizationId])
 }
 
 model ResourceContact {

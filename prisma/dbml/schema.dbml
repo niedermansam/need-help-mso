@@ -58,6 +58,7 @@ Table Category {
   description String
   organizations Organization [not null]
   resources Resource [not null]
+  tags Tag [not null]
 }
 
 Table Tag {
@@ -65,6 +66,7 @@ Table Tag {
   description String
   organizations Organization [not null]
   resources Resource [not null]
+  categories Category [not null]
 }
 
 Table Community {

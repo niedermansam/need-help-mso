@@ -1,6 +1,8 @@
-import { createTRPCRouter } from "./trpc";
+import { createTRPCRouter, publicProcedure } from "./trpc";
 import { organizationRouter } from "./routers/organization";
 import { resourceRouter } from "./routers/resources";
+import { tagRouter } from "./routers/tag";
+import { communityRouter } from "./routers/community";
 
 /**
  * This is the primary router for your server.
@@ -10,6 +12,13 @@ import { resourceRouter } from "./routers/resources";
 export const appRouter = createTRPCRouter({
   organization: organizationRouter,
   resource: resourceRouter,
+  tag: tagRouter,
+  community: communityRouter,
+
+  getCategoryList: publicProcedure.query(async ({ ctx }) => {
+    const categories = await ctx.prisma.category.findMany();
+    return categories;
+  }),
 });
 
 // export type definition of API

@@ -136,7 +136,11 @@ export const organizationRouter = createTRPCRouter({
     }),
 
   getAll: publicProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.organization.findMany();
+    return await ctx.prisma.organization.findMany({
+      include: {
+        tags: true,
+      }
+    });
   }),
 
   getById: publicProcedure

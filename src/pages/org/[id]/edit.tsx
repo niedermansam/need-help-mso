@@ -2,9 +2,11 @@ import { useState } from "react";
 import { OrganizationProps } from "..";
 import NavBar from "../../../components/Nav";
 import { api } from "../../../utils/api";
-import { useRouter } from "next/router";
+import router, { useRouter } from "next/router";
 import { Organization, Resource, Tag } from "@prisma/client";
 import { CreateResourceForm } from "../../resource";
+import { TagSelect } from "../../../components/select";
+import { MultiValue } from "react-select";
 
 function CreateOrganizationForm({
   orgData,
@@ -86,15 +88,16 @@ function CreateOrganizationForm({
             setFormData({ ...formData, category: e.target.value })
           }
         />
-        <label htmlFor="tags">Tags</label>
-        <input
-          type="text"
-          name="tags"
-          id="tags"
-          value={formData.tags}
-          onChange={(e) =>
-            setFormData({ ...formData, tags: e.target.value.split(",") })
-          }
+        <TagSelect
+          value={formData.tags.map((x) => ({ label: x, value: x }))}
+          isMulti
+          onChange={(value) => {
+            if(!value) return setFormData({ ...formData, tags: [] });
+            const newValue = value as MultiValue<{ label: string; value: string }>;
+            setFormData({ ...formData, tags: newValue.map((x) => x.value) });
+          
+          }}
+
         />
         <button
           type="button"
@@ -123,6 +126,7 @@ export default function EditOrgPage() {
       <NavBar />
       <p>Edit Organization</p>
       {orgData ? <CreateOrganizationForm orgData={orgData} /> : null}
+      <h2>Add Resource</h2>
       {orgData ? <CreateResourceForm orgId={orgData.id} /> : null}
     </div>
   );
