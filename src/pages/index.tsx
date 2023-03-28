@@ -59,7 +59,7 @@ const Description = () => {
         other professionals can find resources for their clients. But right now,
         we&apos;re still under construction. Check out the development timeline
         for more information about when to check back, and consider supporting
-        this project on Patreon, if you can afford it.
+        our efforts on Patreon.
       </p>
     </div>
   );
