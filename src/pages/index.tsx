@@ -15,13 +15,13 @@ const CallToAction: React.FC = () => {
         Support on Patreon
       </Link>
       <Link
-        className="my-2 rounded-lg bg-rose-200 px-4 py-2 font-bold text-rose-600 shadow transition-all hover:bg-rose-300 fous:bg-rose-300 hover:shadow-lg focus:shadow-lg"
+        className="fous:bg-rose-300 my-2 rounded-lg bg-rose-200 px-4 py-2 font-bold text-rose-600 shadow transition-all hover:bg-rose-300 hover:shadow-lg focus:shadow-lg"
         href="/timeline"
       >
         Project Timeline
       </Link>
       <Link
-        className="my-2 rounded-lg bg-stone-200 px-4 py-2 font-bold text-stone-500 transition-all hover:bg-stone-300 focus:bg-stone-300 hover:shadow-sm focus:shadow-sm"
+        className="my-2 rounded-lg bg-stone-200 px-4 py-2 font-bold text-stone-500 transition-all hover:bg-stone-300 hover:shadow-sm focus:bg-stone-300 focus:shadow-sm"
         href="https://github.com/niedermansam/need-help-mso"
       >
         View on Github
@@ -32,12 +32,12 @@ const CallToAction: React.FC = () => {
 
 const Title = () => {
   return (
-    <div className=" max-w-lg lg:w-[45%] text-stone-700 md:mt-0">
+    <div className=" max-w-lg text-stone-700 md:mt-0 lg:w-[45%]">
       <h1 className=" flex-grow text-center text-5xl font-extrabold leading-[0.85] tracking-tight md:text-6xl lg:text-8xl">
         <span>Need&nbsp;Help</span>
         <br /> <span className="tracking-wide text-rose-500">Missoula</span>
       </h1>{" "}
-      <p className="my-4 text-center tracking-tight w-full">
+      <p className="my-4 w-full text-center tracking-tight">
         <span className=" text-xl font-bold md:text-2xl lg:text-3xl">
           A Digital Directory of Resources
         </span>{" "}
@@ -52,14 +52,14 @@ const Title = () => {
 
 const Description = () => {
   return (
-    <div className="ml-8 flex px-6  max-w-full lg:w-[40%] items-center text-stone-900 ">
+    <div className="ml-8 flex max-w-full  items-center px-6 text-stone-900 lg:w-[40%] ">
       <p className=" text-xl font-light leading-8">
         We hope to be a hub for different organizations and groups that help
         people who need a hand. A place where social workers, case managers, and
         other professionals can find resources for their clients. But right now,
-        we&apos;re still under construction. Please support this project if you
-        can afford to, and check back soon! Check out the development timeline
-        for more information about when to check back!
+        we&apos;re still under construction. Check out the development timeline
+        for more information about when to check back, and consider supporting
+        this project on Patreon, if you can afford it.
       </p>
     </div>
   );
@@ -79,14 +79,14 @@ const Home: NextPage = () => {
       <main className="">
         <NavBar />
         <div className="flex min-h-screen items-center justify-center bg-stone-100 md:p-20">
-          <div className="flex max-w-6xl  justify-center flex-wrap rounded-xl border border-stone-200 bg-white  md:px-6 pb-10 pt-20 shadow-xl">
+          <div className="flex max-w-6xl  flex-wrap justify-center rounded-xl border border-stone-200 bg-white  pb-10 pt-20 shadow-xl md:px-6">
             <Title />
             <Description />
             <CallToAction />
             <Link
               href="https://niedermansam.github.io/need-help-missoula/#/resources"
               target="_blank"
-              className="mt-4 w-full mx-4 font-light text-rose-400 hover:rose-60 focus: rose-60"
+              className="hover:rose-60 focus: rose-60 mx-4 mt-4 w-full font-light text-rose-400"
             >
               Check out the Prototype →
             </Link>
@@ -99,7 +99,7 @@ const Home: NextPage = () => {
 
 export default Home;
 
-export   const AuthShowcase: React.FC = () => {
+export const AuthShowcase: React.FC = () => {
   const { data: sessionData } = useSession();
 
   return (
