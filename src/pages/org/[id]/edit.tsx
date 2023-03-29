@@ -1,26 +1,35 @@
 import { useState } from "react";
 import NavBar from "../../../components/Nav";
 import { api } from "../../../utils/api";
-import { useRouter } from "next/router";
 import type { Community, Organization, Resource, Tag } from "@prisma/client";
 import { CreateResourceForm } from "../../resource";
-import { CategorySelect, CommunitySelect, TagSelect } from "../../../components/Selectors";
+import {
+  CategorySelect,
+  CommunitySelect,
+  TagSelect,
+} from "../../../components/Selectors";
 import type { MultiValue, SingleValue } from "react-select";
+import type {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+} from "next/types";
+import { prisma } from "../../../server/db";
 
-function CreateOrganizationForm({
-  orgData,
-}: {
-  orgData: Organization & {
-    resources: Resource[];
-    tags: Tag[];
-    exclusiveToCommunities: Community[];
-    helpfulToCommunities: Community[];
-  };
-}) {
-  const { id, name, description, website, email, phone, category, tags, exclusiveToCommunities, helpfulToCommunities } =
-    orgData;
+function CreateOrganizationForm({ orgData }: { orgData: JsonReturnProps }) {
+  const {
+    id: orgId,
+    name,
+    description,
+    website,
+    email,
+    phone,
+    category,
+    tags,
+    exclusiveToCommunities,
+    helpfulToCommunities,
+  } = orgData;
   const INITIAL_STATE = {
-    id: id,
+    id: orgId,
     name: name,
     description: description,
     website: website,
@@ -34,6 +43,7 @@ function CreateOrganizationForm({
 
   const [formData, setFormData] = useState({ ...INITIAL_STATE });
   const addOrg = api.organization.update.useMutation();
+  const disconnectTag = api.organization.disconnectTag.useMutation();
   return (
     <div className="mx-6 max-w-md bg-gray-100 p-6">
       <h1>Edit Organization</h1>
@@ -101,11 +111,28 @@ function CreateOrganizationForm({
           isMulti
           onChange={(value) => {
             if (!value) return setFormData({ ...formData, tags: [] });
-            const newValue = value as MultiValue<{
-              label: string;
-              value: string;
-            }>;
-            setFormData({ ...formData, tags: newValue.map((x) => x.value) });
+            const newTags = (
+              value as MultiValue<{
+                label: string;
+                value: string;
+              }>
+            ).map((x) => x.value);
+
+            const oldTags = formData.tags.map((x) => x.trim());
+
+            // check if any tags have been removed from oldTags
+            const removedTags = oldTags.filter((x) => !newTags.includes(x));
+
+            console.log(removedTags);
+
+            if (removedTags.length > 0) {
+              // remove the tags from the org
+              removedTags.forEach((tag) => {
+                disconnectTag.mutate({ orgId: orgId, tag: tag });
+              });
+            }
+
+            setFormData({ ...formData, tags: newTags });
           }}
         />
 
@@ -117,7 +144,8 @@ function CreateOrganizationForm({
           }))}
           isMulti
           onChange={(value) => {
-            if (!value) return setFormData({ ...formData, exclusiveToCommunities: [] });
+            if (!value)
+              return setFormData({ ...formData, exclusiveToCommunities: [] });
             const newValue = value as MultiValue<{
               label: string;
               value: string;
@@ -127,7 +155,6 @@ function CreateOrganizationForm({
               exclusiveToCommunities: newValue.map((x) => x.value),
             });
           }}
-
         />
 
         <CommunitySelect
@@ -138,7 +165,8 @@ function CreateOrganizationForm({
           }))}
           isMulti
           onChange={(value) => {
-            if (!value) return setFormData({ ...formData, helpfulToCommunities: [] });
+            if (!value)
+              return setFormData({ ...formData, helpfulToCommunities: [] });
             const newValue = value as MultiValue<{
               label: string;
               value: string;
@@ -149,7 +177,7 @@ function CreateOrganizationForm({
             });
           }}
         />
-        
+
         <button
           type="button"
           onClick={() =>
@@ -167,11 +195,9 @@ function CreateOrganizationForm({
     </div>
   );
 }
-export default function EditOrgPage() {
-  const resourceId = useRouter().query.id;
-  const { data: orgData } = api.organization.getById.useQuery({
-    id: resourceId as string,
-  });
+export default function EditOrgPage({
+  orgData,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <div>
       <NavBar />
@@ -182,3 +208,53 @@ export default function EditOrgPage() {
     </div>
   );
 }
+
+type ReturnProps = Organization & {
+  tags: Tag[];
+  exclusiveToCommunities: Community[];
+  helpfulToCommunities: Community[];
+  resources: Resource[];
+};
+
+type JsonReturnProps = Omit<ReturnProps, "createdAt" | "updatedAt"> & {
+  createdAt: string;
+  updatedAt: string;
+};
+
+type ServerSideProps = {
+  orgData: JsonReturnProps;
+};
+
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
+  context
+) => {
+  const orgId = context.query.id as string;
+
+  const returnData = await prisma.organization.findUnique({
+    where: {
+      id: orgId,
+    },
+    include: {
+      tags: true,
+      exclusiveToCommunities: true,
+      helpfulToCommunities: true,
+      resources: true,
+    },
+  });
+
+  if (!returnData) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const propsData = {
+    ...returnData,
+    createdAt: returnData.createdAt.toISOString(),
+    updatedAt: returnData.updatedAt.toISOString(),
+  };
+
+  return {
+    props: { orgData: propsData },
+  };
+};
