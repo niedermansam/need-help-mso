@@ -62,104 +62,181 @@ const orgUpdateInput = z.object({
   phone: z.string().nullish(),
   tags: z.array(z.string()).nullish(),
   website: z.string().nullish(),
+  helpfulToCommunities: z.array(z.string()).nullish(),
+  exclusiveToCommunities: z.array(z.string()).nullish(),
 });
 
 export const organizationRouter = createTRPCRouter({
   create: protectedProcedure
     .input(orgInput)
     .mutation(async ({ input, ctx }) => {
-      return await ctx.prisma.organization.create({
-        data: {
-          name: input.name,
-          description: input.description,
-          email: input.email,
-          phone: input.phone,
-          website: input.website,
-          tags: {
-            connectOrCreate: input.tags
-              ? input.tags.map((tag) => ({
-                  where: { tag },
-                  create: {
-                    tag,
-                  },
-                }))
-              : [],
-          },
+      try {
+        return await ctx.prisma.organization.create({
+          data: {
+            name: input.name,
+            description: input.description,
+            email: input.email,
+            phone: input.phone,
+            website: input.website,
+            tags: {
+              connectOrCreate: input.tags
+                ? input.tags.map((tag) => ({
+                    where: { tag },
+                    create: {
+                      tag,
+                    },
+                  }))
+                : [],
+            },
 
-          helpfulToCommunities: {
-            connectOrCreate: input.helpfulToCommunities?.map((community) => ({
+            helpfulToCommunities: input.helpfulToCommunities
+              ? {
+                  connectOrCreate: input.helpfulToCommunities.map(
+                    (community) => ({
+                      where: { name: community },
+                      create: {
+                        name: community,
+                      },
+                    })
+                  ),
+                }
+              : undefined,
 
-              where: { name: community },
-              create: {
-               name:  community,
-              },
-            })),
-          },
+            exclusiveToCommunities: input.exclusiveToCommunities
+              ? {
+                  connectOrCreate: input.exclusiveToCommunities.map(
+                    (community) => ({
+                      where: { name: community },
+                      create: {
+                        name: community,
+                      },
+                    })
+                  ),
+                }
+              : undefined,
 
-          exclusiveToCommunities: {
-            connectOrCreate: input.exclusiveToCommunities?.map((community) => ({
-              where: { name: community },
-              create: {
-                name: community,
-              },
-            })),
-          },
-
-          categoryMeta: {
-            connectOrCreate: {
-              where: { category: input.category },
-              create: {
-                category: input.category,
+            categoryMeta: {
+              connectOrCreate: {
+                where: { category: input.category },
+                create: {
+                  category: input.category,
+                },
               },
             },
           },
-        },
-      });
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }),
 
   update: protectedProcedure
     .input(orgUpdateInput)
     .mutation(async ({ input, ctx }) => {
-      return await ctx.prisma.organization.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          name: input.name || undefined,
-          description: input.description || undefined,
-          email: input.email,
-          phone: input.phone,
-          website: input.website,
-          tags: {
-            connectOrCreate: input.tags
-              ? input.tags.map((tag) => ({
-                  where: { tag },
-                  create: {
-                    tag,
-                  },
-                }))
-              : [],
+      try {
+        const updatedOrg = await ctx.prisma.organization.update({
+          where: {
+            id: input.id,
           },
+          include: {
+            exclusiveToCommunities: true,
+            resources: {
+              select: {
+                id: true,
+              },
+            },
+          },
+          data: {
+            name: input.name || undefined,
+            description: input.description || undefined,
+            email: input.email,
+            phone: input.phone,
+            website: input.website,
+            tags: {
+              connectOrCreate: input.tags
+                ? input.tags.map((tag) => ({
+                    where: { tag },
+                    create: {
+                      tag,
+                    },
+                  }))
+                : [],
+            },
 
-          categoryMeta: {
-            connectOrCreate: input.category
+            categoryMeta: {
+              connectOrCreate: input.category
+                ? {
+                    where: { category: input.category },
+                    create: {
+                      category: input.category,
+                    },
+                  }
+                : undefined,
+            },
+
+            helpfulToCommunities: input.helpfulToCommunities
               ? {
-                  where: { category: input.category },
-                  create: {
-                    category: input.category,
-                  },
+                  connectOrCreate: input.helpfulToCommunities.map(
+                    (community) => ({
+                      where: { name: community },
+                      create: {
+                        name: community,
+                      },
+                    })
+                  ),
+                }
+              : undefined,
+
+            exclusiveToCommunities: input.exclusiveToCommunities
+              ? {
+                  connectOrCreate: input.exclusiveToCommunities.map(
+                    (community) => ({
+                      where: { name: community },
+                      create: {
+                        name: community,
+                      },
+                    })
+                  ),
                 }
               : undefined,
           },
-        },
-      });
+        });
+
+        if (input.exclusiveToCommunities && input.exclusiveToCommunities.length > 0) {
+          
+          updatedOrg.resources.map(async (resource) => {
+            await ctx.prisma.resource.update({
+              where: {
+                id: resource.id,
+              },
+              data: {
+                exclusiveToCommunities: input.exclusiveToCommunities ? {
+                  connectOrCreate: input.exclusiveToCommunities.map(
+                    (community) => ({
+                      where: { name: community },
+                      create: {
+                        name: community,
+                      },
+                    })
+                  ),
+                } : undefined,
+              },
+            });
+          });
+
+        }
+
+        return updatedOrg;
+      } catch (err) {
+        console.log(err);
+      }
     }),
 
   getAll: publicProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.organization.findMany({
       include: {
         tags: true,
-      }
+      },
     });
   }),
 
@@ -179,6 +256,8 @@ export const organizationRouter = createTRPCRouter({
             resources: true,
             tags: true,
             categoryMeta: true,
+            helpfulToCommunities: true,
+            exclusiveToCommunities: true,
           },
         });
       } catch (err) {

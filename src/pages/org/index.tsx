@@ -40,6 +40,7 @@ function CreateOrganizationForm() {
   const router = useRouter();
   const addOrg = api.organization.create.useMutation({
     onSuccess: async (results) => {
+      if(!results) return console.error("No results returned from mutation");
       await router.push(`/org/${results.id}/edit`);
     },
   });

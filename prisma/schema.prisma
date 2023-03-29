@@ -71,7 +71,7 @@ model Category {
     description   String?
     organizations Organization[]
     resources     Resource[]
-    tags         Tag[]
+    tags          Tag[]
 }
 
 model Tag {
@@ -84,14 +84,14 @@ model Tag {
 
 model Community {
     name               String         @id @unique
-    exclusiveOrgs      Organization[]
-    exclusiveResources Resource[]    @relation("Exclusive")
-    helpfulOrgs        Organization[] @relation("Helpful")
-    helpfulResources   Resource[]     @relation("Helpful")
+    exclusiveOrgs      Organization[] @relation("ExclusiveOrg")
+    exclusiveResources Resource[]     @relation("ExclusiveResource")
+    helpfulOrgs        Organization[] @relation("HelpfulOrg")
+    helpfulResources   Resource[]     @relation("HelpfulResource")
 }
 
 model Organization {
-    id                     String             @id @default(cuid())
+    id                     String             @id @unique @default(cuid())
     name                   String             @unique
     createdAt              DateTime           @default(now())
     updatedAt              DateTime           @updatedAt
@@ -108,8 +108,8 @@ model Organization {
     administeringOrg       Organization[]     @relation("AffiliatedOrgs")
     resources              Resource[]
     assistsWith            Resource[]         @relation("HelpingOrgs")
-    exclusiveToCommunities Community[]
-    helpfulToCommunities   Community[]        @relation("Helpful")
+    exclusiveToCommunities Community[]        @relation("ExclusiveOrg")
+    helpfulToCommunities   Community[]        @relation("HelpfulOrg")
     roles                  OrganizationRole[]
 }
 
@@ -123,20 +123,19 @@ model OrganizationRole {
 }
 
 model Resource {
-    id                     String            @id @default(cuid())
+    id                     String            @id @unique @default(cuid())
     name                   String
     description            String
-    url                    String ?
+    url                    String?
     organizationId         String
     organization           Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
     helpingOrganizations   Organization[]    @relation("HelpingOrgs")
     category               String
     categoryMeta           Category          @relation(fields: [category], references: [category])
     tags                   Tag[]
-    exclusiveToCommunities Community[]         @relation("Exclusive")
-    helpfulToCommunities   Community[]       @relation("Helpful")
+    exclusiveToCommunities Community[]       @relation("ExclusiveResource")
+    helpfulToCommunities   Community[]       @relation("HelpfulResource")
     contacts               ResourceContact[]
-    @@unique([name, organizationId])
 }
 
 model ResourceContact {

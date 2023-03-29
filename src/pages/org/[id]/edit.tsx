@@ -2,9 +2,9 @@ import { useState } from "react";
 import NavBar from "../../../components/Nav";
 import { api } from "../../../utils/api";
 import { useRouter } from "next/router";
-import type { Organization, Resource, Tag } from "@prisma/client";
+import type { Community, Organization, Resource, Tag } from "@prisma/client";
 import { CreateResourceForm } from "../../resource";
-import { CategorySelect, TagSelect } from "../../../components/Selectors";
+import { CategorySelect, CommunitySelect, TagSelect } from "../../../components/Selectors";
 import type { MultiValue, SingleValue } from "react-select";
 
 function CreateOrganizationForm({
@@ -13,9 +13,11 @@ function CreateOrganizationForm({
   orgData: Organization & {
     resources: Resource[];
     tags: Tag[];
+    exclusiveToCommunities: Community[];
+    helpfulToCommunities: Community[];
   };
 }) {
-  const { id, name, description, website, email, phone, category, tags } =
+  const { id, name, description, website, email, phone, category, tags, exclusiveToCommunities, helpfulToCommunities } =
     orgData;
   const INITIAL_STATE = {
     id: id,
@@ -26,13 +28,15 @@ function CreateOrganizationForm({
     phone,
     category,
     tags: tags.map((x) => x.tag),
+    exclusiveToCommunities: exclusiveToCommunities.map((x) => x.name),
+    helpfulToCommunities: helpfulToCommunities.map((x) => x.name),
   } as const;
 
   const [formData, setFormData] = useState({ ...INITIAL_STATE });
   const addOrg = api.organization.update.useMutation();
   return (
     <div className="mx-6 max-w-md bg-gray-100 p-6">
-      <h1>Create Organization</h1>
+      <h1>Edit Organization</h1>
       <form className="flex flex-col ">
         <label htmlFor="name">Name</label>
         <input
@@ -78,26 +82,74 @@ function CreateOrganizationForm({
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
         />
         <CategorySelect
-          value={formData.category ? {value: formData.category, label: formData.category} : undefined}
+          value={
+            formData.category
+              ? { value: formData.category, label: formData.category }
+              : undefined
+          }
           onChange={(value) => {
             if (!value) return setFormData({ ...formData, category: "" });
-            const newValue = value as SingleValue<{ label: string; value: string }>;
-            setFormData({ ...formData, category: newValue?.value || ""});
+            const newValue = value as SingleValue<{
+              label: string;
+              value: string;
+            }>;
+            setFormData({ ...formData, category: newValue?.value || "" });
           }}
-
-          
         />
         <TagSelect
           value={formData.tags.map((x) => ({ label: x, value: x }))}
           isMulti
           onChange={(value) => {
-            if(!value) return setFormData({ ...formData, tags: [] });
-            const newValue = value as MultiValue<{ label: string; value: string }>;
+            if (!value) return setFormData({ ...formData, tags: [] });
+            const newValue = value as MultiValue<{
+              label: string;
+              value: string;
+            }>;
             setFormData({ ...formData, tags: newValue.map((x) => x.value) });
-          
+          }}
+        />
+
+        <CommunitySelect
+          title="Exclusive to Communities"
+          value={formData.exclusiveToCommunities.map((x) => ({
+            label: x,
+            value: x,
+          }))}
+          isMulti
+          onChange={(value) => {
+            if (!value) return setFormData({ ...formData, exclusiveToCommunities: [] });
+            const newValue = value as MultiValue<{
+              label: string;
+              value: string;
+            }>;
+            setFormData({
+              ...formData,
+              exclusiveToCommunities: newValue.map((x) => x.value),
+            });
           }}
 
         />
+
+        <CommunitySelect
+          title="Helpful to Communities"
+          value={formData.helpfulToCommunities.map((x) => ({
+            label: x,
+            value: x,
+          }))}
+          isMulti
+          onChange={(value) => {
+            if (!value) return setFormData({ ...formData, helpfulToCommunities: [] });
+            const newValue = value as MultiValue<{
+              label: string;
+              value: string;
+            }>;
+            setFormData({
+              ...formData,
+              helpfulToCommunities: newValue.map((x) => x.value),
+            });
+          }}
+        />
+        
         <button
           type="button"
           onClick={() =>
