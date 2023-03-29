@@ -10,7 +10,7 @@ import {
   CategorySelect,
   CategorySelectItem,
   TagSelect,
-} from "../../components/select";
+} from "../../components/Selectors";
 
 type CreateResourceProps = {
   name: string;
@@ -35,7 +35,7 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
     onSuccess: () => setFormData({ ...INIT_RESOURCE, category: formData.category }),
   });
 
-  const { data: tags } = api.tag.getAll.useQuery();
+  const { data: tags } = api.tag.getAll.useQuery()
 
   return (
     <form className="m-6 flex max-w-md flex-col bg-gray-100 p-6">

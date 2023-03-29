@@ -1,11 +1,31 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { decodeTag } from "../../../utils/manageUrl";
+import type { Resource, Organization, Tag, Category } from "@prisma/client";
+
+type ResourceArray = (Resource & {
+    organization: Organization;
+    tags: Tag[];
+    categoryMeta: Category;
+})[]
+
+
+export const getTagsFromResources = (resources: ResourceArray ) => {
+  const tags = resources.map((resource) => resource.tags).flat();
+  const uniqueTags = [...new Set(tags.map((tag) => tag.tag))];
+  return uniqueTags;
+};
+
 
 export const tagRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const tags = await ctx.prisma.tag.findMany();
-    return tags;
+    try {
+      const tags = await ctx.prisma.tag.findMany();
+      return tags;
+    } catch (err) {
+      console.log(err);
+    }
   }),
   connectCategories: publicProcedure.mutation(async ({ ctx }) => {
     const resources = await ctx.prisma.resource.findMany({
@@ -48,52 +68,78 @@ export const tagRouter = createTRPCRouter({
 
     return true;
   }),
-  connectOrganization: publicProcedure.input(z.object({orgId: z.string(), tag: z.string()})).mutation(async ({ ctx, input }) => {
-    await ctx.prisma.tag.upsert({
-      where: { tag: input.tag },
-      create: {
-        tag: input.tag,
-        organizations: {
-          connect: {
-            id: input.orgId,
+  connectOrganization: publicProcedure
+    .input(z.object({ orgId: z.string(), tag: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.tag.upsert({
+        where: { tag: input.tag },
+        create: {
+          tag: input.tag,
+          organizations: {
+            connect: {
+              id: input.orgId,
+            },
           },
         },
-      },
-      update: {
-        organizations: {
-          connect: {
-            id: input.orgId,
+        update: {
+          organizations: {
+            connect: {
+              id: input.orgId,
+            },
           },
         },
-      },
-    })
+      });
 
-    return true;
-  }),
+      return true;
+    }),
 
-  connectResource: publicProcedure.input(z.object({resourceId: z.string(), tag: z.string()})).mutation(async ({ ctx, input }) => {
-    await ctx.prisma.tag.upsert({
-      where: { tag: input.tag },
-      create: {
-        tag: input.tag,
-        resources: {
-          connect: {
-            id: input.resourceId,
+  connectResource: publicProcedure
+    .input(z.object({ resourceId: z.string(), tag: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.tag.upsert({
+        where: { tag: input.tag },
+        create: {
+          tag: input.tag,
+          resources: {
+            connect: {
+              id: input.resourceId,
+            },
           },
         },
-      },
-      update: {
-        resources: {
-          connect: {
-            id: input.resourceId,
+        update: {
+          resources: {
+            connect: {
+              id: input.resourceId,
+            },
           },
         },
-      },
-    })
+      });
 
-    return true;
-  }),
+      return true;
+    }),
 
+  getResources: publicProcedure
+    .input(z.object({ tag: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        const decodedTag = decodeTag(input.tag);
+        const tagArray = await ctx.prisma.tag.findMany({
+          where: {
+            tag: {
+              equals: decodedTag,
+              mode: "insensitive",
+            },
+          },
+          include: { resources: true },
+        });
 
-  
+        const resources = tagArray.map((tag) => tag.resources).flat();
+
+      
+
+        return resources;
+      } catch (err) {
+        console.log(err);
+      }
+    }),
 });

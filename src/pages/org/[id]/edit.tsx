@@ -5,8 +5,8 @@ import { api } from "../../../utils/api";
 import router, { useRouter } from "next/router";
 import { Organization, Resource, Tag } from "@prisma/client";
 import { CreateResourceForm } from "../../resource";
-import { TagSelect } from "../../../components/select";
-import { MultiValue } from "react-select";
+import { CategorySelect, TagSelect } from "../../../components/Selectors";
+import { MultiValue, SingleValue } from "react-select";
 
 function CreateOrganizationForm({
   orgData,
@@ -78,15 +78,15 @@ function CreateOrganizationForm({
           value={formData.phone || ""}
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
         />
-        <label htmlFor="category">Category</label>
-        <input
-          type="text"
-          name="category"
-          id="category"
-          value={formData.category || ""}
-          onChange={(e) =>
-            setFormData({ ...formData, category: e.target.value })
-          }
+        <CategorySelect
+          value={formData.category ? {value: formData.category, label: formData.category} : undefined}
+          onChange={(value) => {
+            if (!value) return setFormData({ ...formData, category: "" });
+            const newValue = value as SingleValue<{ label: string; value: string }>;
+            setFormData({ ...formData, category: newValue?.value || ""});
+          }}
+
+          
         />
         <TagSelect
           value={formData.tags.map((x) => ({ label: x, value: x }))}

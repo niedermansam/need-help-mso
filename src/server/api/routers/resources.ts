@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { getTagsFromResources } from "./tag";
 
 export const resourceRouter = createTRPCRouter({
   create: protectedProcedure
@@ -86,20 +87,30 @@ export const resourceRouter = createTRPCRouter({
   getByCategory: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      const resources = await ctx.prisma.resource.findMany({
-        where: {
-          category: {
-            mode: "insensitive",
-            equals: input,
+      try {
+        const resources = await ctx.prisma.resource.findMany({
+          where: {
+            category: {
+              mode: "insensitive",
+              equals: input,
+            },
           },
-        },
-        include: {
-          organization: true,
-          categoryMeta: true,
-          tags: true,
-        },
-      });
-      return resources;
+          include: {
+            organization: true,
+            categoryMeta: true,
+            tags: true,
+          },
+        });
+
+
+
+        const uniqueTags = getTagsFromResources(resources)
+
+
+        return {resources, tags: uniqueTags};
+      } catch (e) {
+        console.log(e);
+      }
     }),
 
   update: publicProcedure

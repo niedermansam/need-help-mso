@@ -5,7 +5,7 @@ import {
   type CategorySelectItem,
   TagSelect,
   CommunitySelect,
-} from "../../../components/select";
+} from "../../../components/Selectors";
 import { api } from "../../../utils/api";
 import { useState } from "react";
 

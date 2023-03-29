@@ -50,6 +50,8 @@ const orgInput = z.object({
   phone: z.string().optional(),
   tags: z.array(z.string()).optional(),
   website: z.string().optional(),
+  helpfulToCommunities: z.array(z.string()).optional(),
+  exclusiveToCommunities: z.array(z.string()).optional(),
 });
 
 const orgUpdateInput = z.object({
@@ -83,6 +85,25 @@ export const organizationRouter = createTRPCRouter({
                   },
                 }))
               : [],
+          },
+
+          helpfulToCommunities: {
+            connectOrCreate: input.helpfulToCommunities?.map((community) => ({
+
+              where: { name: community },
+              create: {
+               name:  community,
+              },
+            })),
+          },
+
+          exclusiveToCommunities: {
+            connectOrCreate: input.exclusiveToCommunities?.map((community) => ({
+              where: { name: community },
+              create: {
+                name: community,
+              },
+            })),
           },
 
           categoryMeta: {
