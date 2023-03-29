@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { OrganizationProps } from "..";
 import NavBar from "../../../components/Nav";
 import { api } from "../../../utils/api";
-import router, { useRouter } from "next/router";
-import { Organization, Resource, Tag } from "@prisma/client";
+import { useRouter } from "next/router";
+import type { Organization, Resource, Tag } from "@prisma/client";
 import { CreateResourceForm } from "../../resource";
 import { CategorySelect, TagSelect } from "../../../components/Selectors";
-import { MultiValue, SingleValue } from "react-select";
+import type { MultiValue, SingleValue } from "react-select";
 
 function CreateOrganizationForm({
   orgData,

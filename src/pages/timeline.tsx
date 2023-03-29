@@ -1,4 +1,4 @@
-import { SVGAttributes, useState } from "react";
+import { type SVGAttributes, useState } from "react";
 import NavBar from "../components/Nav";
 import React from "react";
 

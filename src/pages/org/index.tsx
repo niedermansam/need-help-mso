@@ -1,17 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
 import type { Organization, Tag } from "@prisma/client";
 import Link from "next/link";
 import {
   CategorySelect,
-  CategorySelectItem,
   CommunitySelect,
   TagSelect,
   isValidCategory,
 } from "../../components/Selectors";
 import { useRouter } from "next/router";
-import { MultiValue, SingleValue } from "react-select";
 
 export type OrganizationProps = {
   name: string;

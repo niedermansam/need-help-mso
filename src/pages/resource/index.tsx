@@ -4,11 +4,12 @@ import { api } from "../../utils/api";
 import type { Resource, Category, Tag } from "@prisma/client";
 import OptionalLink from "../../components/OptionalLink";
 import { useEffect, useState } from "react";
-import Select, { MultiValue, SingleValue } from "react-select";
+import type { MultiValue, SingleValue } from "react-select";
 import { encodeTag } from "../../utils/manageUrl";
+import type {
+  CategorySelectItem} from "../../components/Selectors";
 import {
   CategorySelect,
-  CategorySelectItem,
   TagSelect,
 } from "../../components/Selectors";
 

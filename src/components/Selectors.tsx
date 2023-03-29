@@ -1,6 +1,6 @@
 import type { StateManagerProps } from "react-select/dist/declarations/src/useStateManager";
 import { api } from "../utils/api";
-import Select, { MultiValue, SingleValue } from "react-select";
+import type { MultiValue, SingleValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
 
 export type CategorySelectItem = {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 import { decodeTag } from "../../../utils/manageUrl";
 import type { Resource, Organization, Tag, Category } from "@prisma/client";
 
