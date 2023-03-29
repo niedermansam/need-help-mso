@@ -1,7 +1,6 @@
 import { useState } from "react";
 import NavBar from "../../../components/Nav";
 import { api } from "../../../utils/api";
-import type { Community, Organization, Resource, Tag } from "@prisma/client";
 import { CreateResourceForm } from "../../resource";
 import {
   CategorySelect,
@@ -14,8 +13,10 @@ import type {
   InferGetServerSidePropsType,
 } from "next/types";
 import { prisma } from "../../../server/db";
+import { getSession } from "next-auth/react";
+import type { OrgServerSideProps } from "../[id]";
 
-function CreateOrganizationForm({ orgData }: { orgData: JsonReturnProps }) {
+function CreateOrganizationForm({ orgData }: OrgServerSideProps) {
   const {
     id: orgId,
     name,
@@ -28,6 +29,7 @@ function CreateOrganizationForm({ orgData }: { orgData: JsonReturnProps }) {
     exclusiveToCommunities,
     helpfulToCommunities,
   } = orgData;
+
   const INITIAL_STATE = {
     id: orgId,
     name: name,
@@ -209,26 +211,21 @@ export default function EditOrgPage({
   );
 }
 
-type ReturnProps = Organization & {
-  tags: Tag[];
-  exclusiveToCommunities: Community[];
-  helpfulToCommunities: Community[];
-  resources: Resource[];
-};
-
-type JsonReturnProps = Omit<ReturnProps, "createdAt" | "updatedAt"> & {
-  createdAt: string;
-  updatedAt: string;
-};
-
-type ServerSideProps = {
-  orgData: JsonReturnProps;
-};
-
-export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
-  context
-) => {
+export const getServerSideProps: GetServerSideProps<
+  OrgServerSideProps
+> = async (context) => {
   const orgId = context.query.id as string;
+
+  const session = await getSession(context);
+
+  if (!session || !session.user || !session.user.admin) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
 
   const returnData = await prisma.organization.findUnique({
     where: {
