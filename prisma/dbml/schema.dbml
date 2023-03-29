@@ -41,6 +41,7 @@ Table User {
   adminOf Organization [not null]
   resources ResourceContact [not null]
   roles OrganizationRole [not null]
+  admin Boolean [not null, default: false]
 }
 
 Table VerificationToken {
