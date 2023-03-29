@@ -264,4 +264,28 @@ export const organizationRouter = createTRPCRouter({
         console.log(err);
       }
     }),
+
+  disconnectTag: protectedProcedure.input(z.object({orgId: z.string(), tag: z.string()})).mutation(async ({input, ctx}) => {
+
+    try {
+      return await ctx.prisma.organization.update({
+        where: {
+          id: input.orgId,
+        },
+        data: {
+          tags: {
+            disconnect: {
+              tag: input.tag
+            }
+          }
+        }
+      })
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  ),
+
 });
+
+
