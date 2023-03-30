@@ -41,8 +41,9 @@ export function CategorySelect({ title, ...attributes }: CategorySelectProps) {
   const { data } = api.getCategoryList.useQuery();
   return (
     <>
-      <h2>{title || "Category"}</h2>
+      <label className="text-lg font-light">{title || "Category"}</label>
       <CreatableSelect
+        className="mb-2.5"
         {...attributes}
         isClearable
         options={
@@ -77,8 +78,9 @@ export function TagSelect({ title, ...attributes }: CategorySelectProps) {
   });
   return (
     <>
-      <h2>{title || "Tags"}</h2>
+      <label className="text-lg font-light">{title || "Tags"}</label>
       <CreatableSelect
+        className="mb-2.5"
         {...attributes}
         isMulti={true}
         options={
@@ -101,17 +103,19 @@ export function CommunitySelect({ title, options, ...attributes }: CategorySelec
   
   return (
     <>
-      <h2>{title || "Community"}</h2>
+      <label className="text-lg font-light">{title || "Community"}</label>
       <CreatableSelect
+        className="mb-2.5"
         {...attributes}
         isMulti={true}
         isClearable
         options={
-          options ? options :
-          data?.map((community) => ({
-            value: community.name,
-            label: community.name,
-          })) ?? []
+          options
+            ? options
+            : data?.map((community) => ({
+                value: community.name,
+                label: community.name,
+              })) ?? []
         }
       />
     </>

@@ -45,116 +45,161 @@ function CreateOrganizationForm() {
     },
   });
   return (
-    <div className="mx-6 max-w-md bg-gray-100 p-6">
-      <h1>Create Organization</h1>
-      <form className="flex flex-col ">
-        <label htmlFor="name">Name</label>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        />
-        <label htmlFor="description">Description</label>
-        <textarea
-          name="description"
-          id="description"
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-        />
-        <label htmlFor="website">Website</label>
-        <input
-          type="text"
-          name="website"
-          id="website"
-          value={formData.website}
-          onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-        />
-        <label htmlFor="email">Email</label>
-        <input
-          type="text"
-          name="email"
-          id="email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        />
-        <label htmlFor="phone">Phone</label>
-        <input
-          type="text"
-          name="phone"
-          id="phone"
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-        />
-        <CategorySelect
-          onChange={(unvalidatedCategory) => {
-            // check that categofy is the type SingleValue<CategorySelectItem>
+    <div className="mx-6  pt-20">
+      <div className=" bg-stone-50 border border-stone-300 rounded-lg shadow-xl p-6 max-w-7xl">
+        <h2 className="mb-2 text-3xl font-bold">Create Organization</h2>
+        <form>
+          <div className="flex">
+            <div className="flex flex-col w-3/12">
+              <label htmlFor="name" className="text-lg font-light">
+                Name
+              </label>
+              <input
+                className="mb-2.5 px-2 py-1.5  rounded border border-stone-300 "
+                type="text"
+                name="name"
+                id="name"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+              />
+              <label className="text-lg font-light" htmlFor="description">
+                Description
+              </label>
+              <textarea
+                name="description"
+                id="description"
+                className="mb-2.5 h-28 rounded border border-stone-300"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+              />
+            </div>
+            <div className="mx-4 flex flex-col w-2/12">
+              <label className="text-lg font-light" htmlFor="website">
+                Website
+              </label>
+              <input
+                className="mb-2.5 rounded border border-stone-300 px-2 py-1.5"
+                type="text"
+                name="website"
+                id="website"
+                value={formData.website}
+                onChange={(e) =>
+                  setFormData({ ...formData, website: e.target.value })
+                }
+              />
+              <label className="text-lg font-light" htmlFor="email">
+                Email
+              </label>
+              <input
+                className="mb-2.5 rounded border border-stone-300 px-2  py-1.5"
+                type="text"
+                name="email"
+                id="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
+              <label className="text-lg font-light" htmlFor="phone">
+                Phone
+              </label>
+              <input
+                className="mb-2.5 rounded border border-stone-300 px-2  py-1.5"
+                type="text"
+                name="phone"
+                id="phone"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+              />
+            </div>
+            <div className="mx-4 flex flex-col w-2/12">
+              <CategorySelect
+                onChange={(unvalidatedCategory) => {
+                  // check that categofy is the type SingleValue<CategorySelectItem>
 
-            const category = isValidCategory(unvalidatedCategory)
-              ? unvalidatedCategory.value
-              : "";
+                  const category = isValidCategory(unvalidatedCategory)
+                    ? unvalidatedCategory.value
+                    : "";
 
-            setFormData({ ...formData, category: category });
-          }}
-        />
-        <TagSelect
-          onChange={(tags) => {
-            setFormData(() => {
-              const newTags = (tags as { label: string; value: string }[]).map(
-                (x) => x.value
-              );
+                  setFormData({ ...formData, category: category });
+                }}
+              />
+              <TagSelect
+                onChange={(tags) => {
+                  setFormData(() => {
+                    const newTags = (
+                      tags as { label: string; value: string }[]
+                    ).map((x) => x.value);
 
-              return { ...formData, tags: newTags };
-            });
-          }}
-          
-        />
+                    return { ...formData, tags: newTags };
+                  });
+                }}
+              />
+            </div>
 
-        <CommunitySelect 
-          title="Exclusive to Communities"
-          onChange={(communities) => {
-            setFormData(() => {
-              const newCommunities = (communities as { label: string; value: string }[]).map(
-                (x) => x.value
-              );
+            <div className="mx-4 flex flex-col w-3/12">
+              {" "}
+              <CommunitySelect
+                title="Exclusive to Communities"
+                onChange={(communities) => {
+                  setFormData(() => {
+                    const newCommunities = (
+                      communities as { label: string; value: string }[]
+                    ).map((x) => x.value);
 
-              return { ...formData, exclusiveCommunities: newCommunities };
-            });
-          }}
+                    return {
+                      ...formData,
+                      exclusiveCommunities: newCommunities,
+                    };
+                  });
+                }}
+                value={formData.exclusiveCommunities.map((x) => ({
+                  value: x,
+                  label: x,
+                }))}
+              />
+              <CommunitySelect
+                title="Helpful to Communities"
+                onChange={(communities) => {
+                  setFormData(() => {
+                    const newCommunities = (
+                      communities as { label: string; value: string }[]
+                    ).map((x) => x.value);
 
-          value={formData.exclusiveCommunities.map((x) => ({value: x, label: x}))}
+                    return {
+                      ...formData,
+                      helpfulToCommunities: newCommunities,
+                    };
+                  });
+                }}
+                value={formData.helpfulToCommunities.map((x) => ({
+                  value: x,
+                  label: x,
+                }))}
+              />
+            </div>
+          </div>
 
-        />
-        <CommunitySelect
-          title="Helpful to Communities" 
-          onChange={(communities) => {
-            setFormData(() => {
-              const newCommunities = (communities as { label: string; value: string }[]).map(
-                (x) => x.value
-              );
-
-              return { ...formData, helpfulToCommunities: newCommunities };
-            });
-          }}
-
-          value={formData.helpfulToCommunities.map((x) => ({value: x, label: x}))}
-        />
-
-        <button
-          type="button"
-          onClick={() =>
-            addOrg.mutate({
-              ...formData,
-              tags: formData.tags.map((x) => x.trim()),
-            })
-          }
-        >
-          Submit
-        </button>
-      </form>
+          <button
+            type="button"
+            className="w-full rounded bg-rose-500 p-2 font-bold text-white"
+            onClick={() =>
+              addOrg.mutate({
+                ...formData,
+                tags: formData.tags.map((x) => x.trim()),
+              })
+            }
+          >
+            Create Organization
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
