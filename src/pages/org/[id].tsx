@@ -1,14 +1,20 @@
 import NavBar from "../../components/Nav";
 import Link from "next/link";
-import type { GetServerSideProps } from "next/types";
+import type { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
 import { getSession } from "next-auth/react";
 import { prisma } from "../../server/db";
 import type { Community, Organization, Resource, Tag } from "@prisma/client";
+import type { Session } from "next-auth";
 
 export default function OrganizationDetailsPage({
   orgData,
-}: OrgServerSideProps) {
+  userSession
+}: 
+InferGetServerSidePropsType<typeof getServerSideProps>) {
   if (!orgData) return <p>no data</p>;
+
+  console.log(userSession)
+
   return (
     <div>
       <NavBar />
@@ -29,6 +35,14 @@ export default function OrganizationDetailsPage({
           </div>
         );
       })}
+      {
+        userSession.user.admin && (
+          <Link href={`/org/${orgData.id}/edit`}>
+            Edit
+          </Link>
+        )
+        
+      }
     </div>
   );
 }
@@ -47,15 +61,16 @@ export type OrgProps = Omit<OrgReturnProps, "createdAt" | "updatedAt"> & {
 
 export type OrgServerSideProps = {
   orgData: OrgProps;
+  userSession: Session;
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<OrgServerSideProps> = async (context) => {
   const session = await getSession(context);
 
   if (!session) {
     return {
       redirect: {
-        destination: "/login",
+        destination: "/",
         permanent: false,
       },
     };
@@ -91,6 +106,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
      orgData: propsData,
+     userSession: session,
     },
   };
 };

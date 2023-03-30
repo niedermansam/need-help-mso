@@ -199,12 +199,13 @@ function CreateOrganizationForm({ orgData }: OrgServerSideProps) {
 }
 export default function EditOrgPage({
   orgData,
+  userSession
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <div>
       <NavBar />
       <p>Edit Organization</p>
-      {orgData ? <CreateOrganizationForm orgData={orgData} /> : null}
+      {orgData ? <CreateOrganizationForm userSession={userSession} orgData={orgData}  /> : null}
       <h2>Add Resource</h2>
       {orgData ? <CreateResourceForm orgId={orgData.id} /> : null}
     </div>
@@ -221,7 +222,7 @@ export const getServerSideProps: GetServerSideProps<
   if (!session || !session.user || !session.user.admin) {
     return {
       redirect: {
-        destination: "/login",
+        destination: "/",
         permanent: false,
       },
     };
@@ -252,6 +253,7 @@ export const getServerSideProps: GetServerSideProps<
   };
 
   return {
-    props: { orgData: propsData },
+    props: { orgData: propsData, userSession: session, },
+    
   };
 };
