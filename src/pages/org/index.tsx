@@ -45,17 +45,17 @@ function CreateOrganizationForm() {
     },
   });
   return (
-    <div className="mx-6  pt-20">
-      <div className=" bg-stone-50 border border-stone-300 rounded-lg shadow-xl p-6 max-w-7xl">
-        <h2 className="mb-2 text-3xl font-bold">Create Organization</h2>
-        <form>
-          <div className="flex">
-            <div className="flex flex-col w-3/12">
+    <div className="mx-6  mb-16 flex justify-center pt-20">
+      <div className=" min-w-[90%] max-w-7xl rounded-lg border border-stone-300 bg-stone-50 p-6 shadow-xl">
+        <h3 className="mb-6 text-5xl font-extrabold text-stone-600">Create Organization</h3>
+        <form className="">
+          <div className="flex w-full">
+            <div className="flex w-4/12 flex-col mr-4">
               <label htmlFor="name" className="text-lg font-light">
                 Name
               </label>
               <input
-                className="mb-2.5 px-2 py-1.5  rounded border border-stone-300 "
+                className="mb-2.5 rounded border  border-stone-300 px-2 py-1.5 "
                 type="text"
                 name="name"
                 id="name"
@@ -76,8 +76,21 @@ function CreateOrganizationForm() {
                   setFormData({ ...formData, description: e.target.value })
                 }
               />
+
+              <button
+                type="button"
+                className="w-full mt-4 rounded bg-rose-500 p-2 font-bold text-white"
+                onClick={() =>
+                  addOrg.mutate({
+                    ...formData,
+                    tags: formData.tags.map((x) => x.trim()),
+                  })
+                }
+              >
+                Create Organization
+              </button>
             </div>
-            <div className="mx-4 flex flex-col w-2/12">
+            <div className="mx-4 flex w-3/12 flex-col">
               <label className="text-lg font-light" htmlFor="website">
                 Website
               </label>
@@ -118,7 +131,7 @@ function CreateOrganizationForm() {
                 }
               />
             </div>
-            <div className="mx-4 flex flex-col w-2/12">
+            <div className="mx-4 flex w-3/12 flex-col">
               <CategorySelect
                 onChange={(unvalidatedCategory) => {
                   // check that categofy is the type SingleValue<CategorySelectItem>
@@ -143,8 +156,8 @@ function CreateOrganizationForm() {
               />
             </div>
 
-            <div className="mx-4 flex flex-col w-3/12">
-              {" "}
+            <div className="mx-4 flex w-3/12 flex-col">
+              
               <CommunitySelect
                 title="Exclusive to Communities"
                 onChange={(communities) => {
@@ -185,19 +198,6 @@ function CreateOrganizationForm() {
               />
             </div>
           </div>
-
-          <button
-            type="button"
-            className="w-full rounded bg-rose-500 p-2 font-bold text-white"
-            onClick={() =>
-              addOrg.mutate({
-                ...formData,
-                tags: formData.tags.map((x) => x.trim()),
-              })
-            }
-          >
-            Create Organization
-          </button>
         </form>
       </div>
     </div>
