@@ -126,6 +126,10 @@ Table Resource {
   exclusiveToCommunities Community [not null]
   helpfulToCommunities Community [not null]
   contacts ResourceContact [not null]
+  barriersToEntry BarriersToEntry
+  barriersToEntryDetails String
+  speedOfAid SpeedOfAid[] [not null]
+  speedOfAidDetails String
 }
 
 Table ResourceContact {
@@ -137,6 +141,21 @@ Table ResourceContact {
   indexes {
     (userId, resourceId) [pk]
   }
+}
+
+Enum BarriersToEntry {
+  MINIMAL
+  LOW
+  MEDIUM
+  HIGH
+}
+
+Enum SpeedOfAid {
+  IMMEDIATE
+  DAYS
+  WEEKS
+  MONTHS
+  YEARS
 }
 
 Ref: Account.userId > User.id [delete: Cascade]
