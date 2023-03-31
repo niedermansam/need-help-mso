@@ -1,7 +1,7 @@
 import { useState } from "react";
 import NavBar from "../../../components/Nav";
 import { api } from "../../../utils/api";
-import { CreateResourceForm } from "../../resource";
+import { CreateResourceForm, CreateResourceModal } from "../../resource";
 import {
   CategorySelect,
   CommunitySelect,
@@ -14,9 +14,10 @@ import type {
 } from "next/types";
 import { prisma } from "../../../server/db";
 import { getSession } from "next-auth/react";
-import type { OrgServerSideProps } from "../[id]";
+import type { Community, Organization, Resource, Tag } from "@prisma/client";
+import type { Session } from "next-auth";
 
-function CreateOrganizationForm({ orgData }: OrgServerSideProps) {
+function CreateOrganizationForm({ orgData }: ServerSideProps) {
   const {
     id: orgId,
     name,
@@ -47,153 +48,191 @@ function CreateOrganizationForm({ orgData }: OrgServerSideProps) {
   const addOrg = api.organization.update.useMutation();
   const disconnectTag = api.organization.disconnectTag.useMutation();
   return (
-    <div className="mx-6 max-w-md bg-gray-100 p-6">
-      <h1>Edit Organization</h1>
-      <form className="flex flex-col ">
-        <label htmlFor="name">Name</label>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        />
-        <label htmlFor="description">Description</label>
-        <textarea
-          name="description"
-          id="description"
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-        />
-        <label htmlFor="website">Website</label>
-        <input
-          type="text"
-          name="website"
-          id="website"
-          value={formData.website || ""}
-          onChange={(e) =>
-            setFormData({ ...formData, website: e.target.value })
-          }
-        />
-        <label htmlFor="email">Email</label>
-        <input
-          type="text"
-          name="email"
-          id="email"
-          value={formData.email || ""}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        />
-        <label htmlFor="phone">Phone</label>
-        <input
-          type="text"
-          name="phone"
-          id="phone"
-          value={formData.phone || ""}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-        />
-        <CategorySelect
-          value={
-            formData.category
-              ? { value: formData.category, label: formData.category }
-              : undefined
-          }
-          onChange={(value) => {
-            if (!value) return setFormData({ ...formData, category: "" });
-            const newValue = value as SingleValue<{
-              label: string;
-              value: string;
-            }>;
-            setFormData({ ...formData, category: newValue?.value || "" });
-          }}
-        />
-        <TagSelect
-          value={formData.tags.map((x) => ({ label: x, value: x }))}
-          isMulti
-          onChange={(value) => {
-            if (!value) return setFormData({ ...formData, tags: [] });
-            const newTags = (
-              value as MultiValue<{
-                label: string;
-                value: string;
-              }>
-            ).map((x) => x.value);
+    <div className="bg-stone-50 text-stone-600">
+      <div className="mx-6 pt-8 ">
+        <h1 className="mb-3 text-4xl font-bold">Edit Organization</h1>
+        <form className="flex">
+          <div className="mx-3 flex w-4/12 flex-col">
+            <label htmlFor="name" className="text-lg font-light">
+              Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              value={formData.name}
+              className="mb-3 rounded border border-stone-300 px-2 py-1.5"
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+            />
+            <label className="text-lg font-light" htmlFor="description">
+              Description
+            </label>
+            <textarea
+              name="description"
+              id="description"
+              className="mb-3 h-36 rounded border border-stone-300 px-2  py-1.5"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+            />
 
-            const oldTags = formData.tags.map((x) => x.trim());
+            <button
+              type="button"
+              className="mb-6 rounded bg-rose-500 px-2 py-1.5 text-rose-50 font-bold uppercase tracking-wider"
+              onClick={() =>
+                addOrg.mutate({
+                  ...INITIAL_STATE,
+                  ...formData,
+                  website: formData.website || undefined,
+                  tags: formData.tags.map((x) => x.trim()),
+                })
+              }
+            >
+              Submit
+            </button>
+          </div>
 
-            // check if any tags have been removed from oldTags
-            const removedTags = oldTags.filter((x) => !newTags.includes(x));
+          <div className="mx-3 flex w-2/12 flex-col">
+            <label className="text-lg font-light" htmlFor="website">
+              Website
+            </label>
+            <input
+              type="text"
+              name="website"
+              id="website"
+              className="mb-3 rounded border border-stone-300 px-2  py-1.5 "
+              value={formData.website || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, website: e.target.value })
+              }
+            />
+            <label className="text-lg font-light" htmlFor="email">
+              Email
+            </label>
+            <input
+              type="text"
+              name="email"
+              id="email"
+              className="mb-3 rounded border border-stone-300 px-2  py-1.5 "
+              value={formData.email || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+            />
+            <label className="text-lg font-light" htmlFor="phone">
+              Phone
+            </label>
+            <input
+              type="text"
+              name="phone"
+              id="phone"
+              className="mb-3 rounded border border-stone-300 px-2  py-1.5 "
+              value={formData.phone || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
+            />
+          </div>
 
-            console.log(removedTags);
+          <div className="mx-3 flex w-4/12 flex-col">
+            <CategorySelect
+              value={
+                formData.category
+                  ? { value: formData.category, label: formData.category }
+                  : undefined
+              }
+              onChange={(value) => {
+                if (!value) return setFormData({ ...formData, category: "" });
+                const newValue = value as SingleValue<{
+                  label: string;
+                  value: string;
+                }>;
+                setFormData({ ...formData, category: newValue?.value || "" });
+              }}
+            />
+            <TagSelect
+              value={formData.tags.map((x) => ({ label: x, value: x }))}
+              isMulti
+              className="text-sm"
+              onChange={(value) => {
+                if (!value) return setFormData({ ...formData, tags: [] });
+                const newTags = (
+                  value as MultiValue<{
+                    label: string;
+                    value: string;
+                  }>
+                ).map((x) => x.value);
 
-            if (removedTags.length > 0) {
-              // remove the tags from the org
-              removedTags.forEach((tag) => {
-                disconnectTag.mutate({ orgId: orgId, tag: tag });
-              });
-            }
+                const oldTags = formData.tags.map((x) => x.trim());
 
-            setFormData({ ...formData, tags: newTags });
-          }}
-        />
+                // check if any tags have been removed from oldTags
+                const removedTags = oldTags.filter((x) => !newTags.includes(x));
 
-        <CommunitySelect
-          title="Exclusive to Communities"
-          value={formData.exclusiveToCommunities.map((x) => ({
-            label: x,
-            value: x,
-          }))}
-          isMulti
-          onChange={(value) => {
-            if (!value)
-              return setFormData({ ...formData, exclusiveToCommunities: [] });
-            const newValue = value as MultiValue<{
-              label: string;
-              value: string;
-            }>;
-            setFormData({
-              ...formData,
-              exclusiveToCommunities: newValue.map((x) => x.value),
-            });
-          }}
-        />
+                console.log(removedTags);
 
-        <CommunitySelect
-          title="Helpful to Communities"
-          value={formData.helpfulToCommunities.map((x) => ({
-            label: x,
-            value: x,
-          }))}
-          isMulti
-          onChange={(value) => {
-            if (!value)
-              return setFormData({ ...formData, helpfulToCommunities: [] });
-            const newValue = value as MultiValue<{
-              label: string;
-              value: string;
-            }>;
-            setFormData({
-              ...formData,
-              helpfulToCommunities: newValue.map((x) => x.value),
-            });
-          }}
-        />
+                if (removedTags.length > 0) {
+                  // remove the tags from the org
+                  removedTags.forEach((tag) => {
+                    disconnectTag.mutate({ orgId: orgId, tag: tag });
+                  });
+                }
 
-        <button
-          type="button"
-          onClick={() =>
-            addOrg.mutate({
-              ...INITIAL_STATE,
-              ...formData,
-              website: formData.website || undefined,
-              tags: formData.tags.map((x) => x.trim()),
-            })
-          }
-        >
-          Submit
-        </button>
-      </form>
+                setFormData({ ...formData, tags: newTags });
+              }}
+            />
+          </div>
+
+          <div className="mx-3 flex w-1/3 flex-col">
+            <CommunitySelect
+              title="Exclusive to Communities"
+              value={formData.exclusiveToCommunities.map((x) => ({
+                label: x,
+                value: x,
+              }))}
+              isMulti
+              onChange={(value) => {
+                if (!value)
+                  return setFormData({
+                    ...formData,
+                    exclusiveToCommunities: [],
+                  });
+                const newValue = value as MultiValue<{
+                  label: string;
+                  value: string;
+                }>;
+                setFormData({
+                  ...formData,
+                  exclusiveToCommunities: newValue.map((x) => x.value),
+                });
+              }}
+            />
+
+            <CommunitySelect
+              title="Helpful to Communities"
+              value={formData.helpfulToCommunities.map((x) => ({
+                label: x,
+                value: x,
+              }))}
+              isMulti
+              onChange={(value) => {
+                if (!value)
+                  return setFormData({ ...formData, helpfulToCommunities: [] });
+                const newValue = value as MultiValue<{
+                  label: string;
+                  value: string;
+                }>;
+                setFormData({
+                  ...formData,
+                  helpfulToCommunities: newValue.map((x) => x.value),
+                });
+              }}
+            />
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
@@ -201,19 +240,34 @@ export default function EditOrgPage({
   orgData,
   userSession
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
   return (
     <div>
       <NavBar />
       <p>Edit Organization</p>
       {orgData ? <CreateOrganizationForm userSession={userSession} orgData={orgData}  /> : null}
       <h2>Add Resource</h2>
-      {orgData ? <CreateResourceForm orgId={orgData.id} /> : null}
+      {orgData ? <CreateResourceModal orgId={orgData.id} /> : null}
     </div>
   );
 }
 
+type ServerSideProps = {
+  userSession: Session;
+  orgData:  Omit< Organization, 'createdAt' | 'updatedAt' > & {
+    createdAt: string;
+    updatedAt: string;
+
+  } & {
+    tags: Tag[];
+    exclusiveToCommunities: Community[];
+    helpfulToCommunities: Community[];
+    resources: Resource[];
+  };
+}
+
 export const getServerSideProps: GetServerSideProps<
-  OrgServerSideProps
+  ServerSideProps
 > = async (context) => {
   const orgId = context.query.id as string;
 

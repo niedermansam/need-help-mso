@@ -10,7 +10,7 @@ import {
   isValidCategory,
 } from "../../components/Selectors";
 import { useRouter } from "next/router";
-import { encodeTag} from "../../utils/manageUrl";
+import { encodeTag } from "../../utils/manageUrl";
 import { getRawPhoneNumber, prettyUrl } from "../../utils";
 import {
   faEnvelope,
@@ -18,10 +18,16 @@ import {
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
+import type {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+} from "next/types";
 import { getSession } from "next-auth/react";
-import { Session } from "next-auth/core/types";
+import type { Session } from "next-auth/core/types";
 import { faEdit } from "@fortawesome/free-regular-svg-icons";
+import ReactModal from "react-modal";
+
+ReactModal.setAppElement("#__next");
 
 export type OrganizationProps = {
   name: string;
@@ -57,8 +63,8 @@ function CreateOrganizationForm() {
     },
   });
   return (
-    <div className="mx-6  mb-16 flex justify-center pt-20">
-      <div className=" min-w-[90%] max-w-7xl rounded-lg border border-stone-300 bg-stone-50 p-6 shadow-xl">
+    <div className="mt-20 flex justify-center">
+      <div className=" min-w-full rounded-lg border border-stone-300 bg-stone-50 p-6 shadow-xl">
         <h3 className="mb-6 text-5xl font-extrabold text-stone-600">
           Create Organization
         </h3>
@@ -145,7 +151,7 @@ function CreateOrganizationForm() {
                 }
               />
             </div>
-            <div className="mx-4 flex w-3/12 flex-col">
+            <div className="mx-4 flex w-3/12 basis-80 flex-col">
               <CategorySelect
                 onChange={(unvalidatedCategory) => {
                   // check that categofy is the type SingleValue<CategorySelectItem>
@@ -170,7 +176,7 @@ function CreateOrganizationForm() {
               />
             </div>
 
-            <div className="mx-4 flex w-3/12 flex-col">
+            <div className="mx-4 flex w-3/12 basis-80 flex-col">
               <CommunitySelect
                 title="Exclusive to Communities"
                 onChange={(communities) => {
@@ -217,12 +223,47 @@ function CreateOrganizationForm() {
   );
 }
 
+function CreateOrganizationModal() {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <button
+        className="rounded bg-rose-500 py-2 px-4 font-bold text-white"
+        onClick={() => setIsOpen(true)}
+      >
+        Create Organization
+      </button>
+      <ReactModal
+        className="z-50 mx-auto w-fit min-w-[90%]"
+        style={{
+          overlay: {
+            backgroundColor: "rgba(0,0,0,0.5)",
+            cursor: "pointer",
+          },
+          content: {
+            cursor: "default",
+          }
+        }}
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+      >
+        <CreateOrganizationForm />
+      </ReactModal>
+    </>
+  );
+}
+
 type OrgProps = Organization & { tags: Tag[] };
 
 type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
 
-export function ContactInfo({ phone, email, website, shortUrl }: ContactInfo & { shortUrl?: boolean }) {
-  const shortenUrl= shortUrl ?? false;
+export function ContactInfo({
+  phone,
+  email,
+  website,
+  shortUrl,
+}: ContactInfo & { shortUrl?: boolean }) {
+  const shortenUrl = shortUrl ?? false;
   return (
     <>
       {phone && (
@@ -264,7 +305,7 @@ export function TagList({ tags }: { tags: Tag[] }) {
         <Link
           key={tag.tag}
           href={`/tag/${encodeTag(tag.tag)}`}
-          className="mr-2 mb-2 text-xs text-stone-600 bg-stone-200 px-1 py-0.5 rounded-sm hover:bg-rose-300 hover:text-stone-800"
+          className="mr-2 mb-2 rounded-sm bg-stone-200 px-1 py-0.5 text-xs text-stone-600 hover:bg-rose-300 hover:text-stone-800"
         >
           {tag.tag}
         </Link>
@@ -296,7 +337,9 @@ export function OrganizationItem({
             </Link>
           )}
         </h2>
-        <ContactInfo {...org} />
+        <div className="flex flex-col">
+          <ContactInfo {...org} />
+        </div>
       </div>
       <div className="flex h-fit basis-80 flex-col flex-wrap text-xs">
         <p className="mb-2 text-base">
@@ -388,10 +431,12 @@ export default function OrganizationsPage({
   const { data: orgs } = api.organization.getAll.useQuery();
   const admin = userSession?.user?.admin || false;
   return (
-    <div>
+    <div id="AppElement">
       <NavBar />
-      {admin && <CreateOrganizationForm />}
-      {orgs && <OrganizationSection orgs={orgs} admin={admin} />}
+      <div className="pt-16">
+        {admin && <CreateOrganizationModal />}
+        {orgs && <OrganizationSection orgs={orgs} admin={admin} />}
+      </div>
     </div>
   );
 }

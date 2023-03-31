@@ -41,16 +41,16 @@ export default function NavBar() {
             About
           </Link>
           <Link
-            href="/timeline"
-            className="mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block"
-          >
-            Timeline
-          </Link>
-          <Link
             href="/resource"
             className="mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block"
           >
             Resources
+          </Link>{" "}
+          <Link
+            href="/org"
+            className="mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block"
+          >
+            Organizations
           </Link>
         </div>
         <div className="flex">

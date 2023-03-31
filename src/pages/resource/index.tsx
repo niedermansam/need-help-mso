@@ -1,8 +1,7 @@
-import Link, { LinkProps } from "next/link";
+import Link, {type  LinkProps } from "next/link";
 import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
 import type { Resource, Category, Tag } from "@prisma/client";
-import OptionalLink from "../../components/OptionalLink";
 import { useEffect, useState } from "react";
 import type { MultiValue, SingleValue } from "react-select";
 import { encodeTag } from "../../utils/manageUrl";
@@ -10,6 +9,9 @@ import type { CategorySelectItem } from "../../components/Selectors";
 import { CategorySelect, TagSelect } from "../../components/Selectors";
 import { ContactInfo, TagList } from "../org";
 import { prettyPhoneNumber } from "../../utils";
+import ReactModal from "react-modal";
+
+ReactModal.setAppElement("#__next");
 
 type CreateResourceProps = {
   name: string;
@@ -29,7 +31,6 @@ type CreateResourceProps = {
         {resource.categoryMeta.category}
       </Link> */
 
-type LinkType = ReturnType<typeof Link>;
 
 export function CategoryLink({
   category,
@@ -43,6 +44,24 @@ export function CategoryLink({
     <Link className={className} {...props} href={`/cat/${encodeTag(category)}`}>
       {category}
     </Link>
+  );
+}
+
+export function CreateResourceModal({ orgId }: { orgId: string }) {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <>
+      <button
+        className="rounded-md bg-rose-500 px-4 py-2 text-rose-50 font-bold tracking-wide"
+        onClick={() => setShowModal(true)}
+      >
+        Add Resource
+      </button>
+      <ReactModal className="w-fit" isOpen={showModal} onRequestClose={() => setShowModal(false)}>
+        <CreateResourceForm orgId={orgId} />
+      </ReactModal>
+    </>
   );
 }
 
@@ -170,7 +189,7 @@ export function ResourceItem({
       key={resource.id}
       className="m-6 flex max-w-5xl items-center justify-between rounded border border-stone-300 p-2 text-stone-600 shadow"
     >
-      <div className="basis-80 ml-2">
+      <div className="ml-2 basis-80">
         {showOrg && (
           <Link href={`/org/${resource.organizationId}`}>
             <h3 className="text-lg font-light leading-4 hover:text-rose-600">
@@ -199,7 +218,7 @@ export function ResourceItem({
         <TagList tags={resource.tags} />
       </div>
       <Link
-        className="flex basis-32 py-1.5 mr-2 justify-center rounded border border-rose-500 bg-rose-500 font-bold text-white shadow-md"
+        className="mr-2 flex basis-32 justify-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md"
         href={`/resource/${resource.id}`}
       >
         More Info
