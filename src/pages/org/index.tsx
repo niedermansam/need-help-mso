@@ -10,7 +10,8 @@ import {
   isValidCategory,
 } from "../../components/Selectors";
 import { useRouter } from "next/router";
-import { encodeTag, prettyWebsite } from "../../utils/manageUrl";
+import { encodeTag} from "../../utils/manageUrl";
+import { getRawPhoneNumber, prettyUrl } from "../../utils";
 import {
   faEnvelope,
   faGlobe,
@@ -216,9 +217,69 @@ function CreateOrganizationForm() {
   );
 }
 
-type OrgProps = Organization & { tags: Tag[] } ;
+type OrgProps = Organization & { tags: Tag[] };
 
-export function OrganizationItem({ org, admin }: { org: OrgProps , admin: boolean }) {
+type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
+
+export function ContactInfo({ phone, email, website, shortUrl }: ContactInfo & { shortUrl?: boolean }) {
+  const shortenUrl= shortUrl ?? false;
+  return (
+    <>
+      {phone && (
+        <a
+          className="text-sm text-stone-500 hover:text-cyan-700"
+          href={getRawPhoneNumber(phone, true) || undefined}
+        >
+          <FontAwesomeIcon className="mr-2 " icon={faPhone} /> {phone}
+        </a>
+      )}
+      {email && (
+        <a
+          className="text-sm text-stone-500 hover:text-cyan-700"
+          href={`mailto:${email}`}
+        >
+          <FontAwesomeIcon className="mr-2 " icon={faEnvelope} /> {email}
+        </a>
+      )}
+
+      {website && (
+        <Link
+          className="text-sm uppercase text-stone-500 hover:text-cyan-700"
+          href={website}
+        >
+          <FontAwesomeIcon className="mr-2 " icon={faGlobe} />
+          <span className="text-xs font-semibold tracking-wide">
+            {prettyUrl(website, shortenUrl)}
+          </span>
+        </Link>
+      )}
+    </>
+  );
+}
+
+export function TagList({ tags }: { tags: Tag[] }) {
+  return (
+    <div className="flex flex-wrap">
+      {tags.map((tag) => (
+        <Link
+          key={tag.tag}
+          href={`/tag/${encodeTag(tag.tag)}`}
+          className="mr-2 mb-2 text-xs text-stone-600 bg-stone-200 px-1 py-0.5 rounded-sm hover:bg-rose-300 hover:text-stone-800"
+        >
+          {tag.tag}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+export function OrganizationItem({
+  org,
+  admin,
+}: {
+  org: OrgProps;
+  admin: boolean;
+}) {
   return (
     <div className="m-3  flex w-full max-w-5xl rounded-lg  border border-stone-300 p-3 px-4 text-stone-700 transition-colors">
       <div className="mr-6 w-96">
@@ -235,31 +296,7 @@ export function OrganizationItem({ org, admin }: { org: OrgProps , admin: boolea
             </Link>
           )}
         </h2>
-
-        {org.phone && (
-          <p className="text-sm">
-            <FontAwesomeIcon className="mr-2 text-stone-500" icon={faPhone} />{" "}
-            {org.phone}
-          </p>
-        )}
-        {org.email && (
-          <p className="text-sm">
-            <FontAwesomeIcon
-              className="mr-2 text-stone-500"
-              icon={faEnvelope}
-            />{" "}
-            {org.email}
-          </p>
-        )}
-
-        {org.website && (
-          <Link className="text-sm uppercase text-stone-500" href={org.website}>
-            <FontAwesomeIcon className="mr-2 text-stone-500" icon={faGlobe} />
-            <span className="text-xs font-semibold tracking-wide">
-              {prettyWebsite(org.website)}
-            </span>
-          </Link>
-        )}
+        <ContactInfo {...org} />
       </div>
       <div className="flex h-fit basis-80 flex-col flex-wrap text-xs">
         <p className="mb-2 text-base">
@@ -271,26 +308,19 @@ export function OrganizationItem({ org, admin }: { org: OrgProps , admin: boolea
             {org.category}
           </Link>
         </p>
-        <div className="w-36">
-          {org.tags.map((tag) => (
-            <Link
-              href={`/tag/${encodeTag(tag.tag)}`}
-              key={tag.tag}
-              className="my-0.5 mr-2 rounded bg-stone-300 px-2 py-0.5 capitalize text-stone-800 hover:bg-stone-200"
-              dangerouslySetInnerHTML={{
-                __html: tag.tag.replaceAll(" ", "&nbsp;"),
-              }}
-            >
-              {}
-            </Link>
-          ))}
-        </div>
+        <TagList tags={org.tags} />
       </div>
     </div>
   );
 }
 
-function OrganizationSection({ orgs, admin }: { orgs: OrgProps[], admin: boolean }) {
+function OrganizationSection({
+  orgs,
+  admin,
+}: {
+  orgs: OrgProps[];
+  admin: boolean;
+}) {
   const [displayOrgs, setDisplayOrgs] = useState(orgs);
   const [strict, setStrict] = useState(false);
 
@@ -352,7 +382,9 @@ function OrganizationSection({ orgs, admin }: { orgs: OrgProps[], admin: boolean
   );
 }
 
-export default function OrganizationsPage({userSession} : InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function OrganizationsPage({
+  userSession,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { data: orgs } = api.organization.getAll.useQuery();
   const admin = userSession?.user?.admin || false;
   return (
@@ -366,16 +398,16 @@ export default function OrganizationsPage({userSession} : InferGetServerSideProp
 
 type ServerSideProps = {
   userSession: Session | null;
-}
+};
 
-export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (context) => {
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
+  context
+) => {
   const session = await getSession(context);
-  
-
 
   return {
     props: {
       userSession: session,
     },
-  }
-}
+  };
+};

@@ -1,19 +1,22 @@
 import NavBar from "../../components/Nav";
 import Link from "next/link";
-import type { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
+import type {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+} from "next/types";
 import { getSession } from "next-auth/react";
 import { prisma } from "../../server/db";
-import type { Community, Organization, Resource, Tag } from "@prisma/client";
+import type { Category, Community, Organization, Resource, Tag } from "@prisma/client";
 import type { Session } from "next-auth";
+import { ResourceItem } from "../resource";
 
 export default function OrganizationDetailsPage({
   orgData,
-  userSession
-}: 
-InferGetServerSidePropsType<typeof getServerSideProps>) {
+  userSession,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   if (!orgData) return <p>no data</p>;
 
-  console.log(userSession)
+  console.log(userSession);
 
   return (
     <div>
@@ -28,21 +31,16 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       </div>
       {orgData.resources.map((resource) => {
         return (
-          <div key={resource.id} className="m-4 border border-gray-200 p-4">
-            <Link href={`/resource/${resource.id}`}>
-              <h2>{resource.name}</h2>
-            </Link>
-          </div>
+          <ResourceItem
+            resource={{ ...resource, organization: { ...orgData } }}
+            key={resource.id}
+            showOrg={false}
+          />
         );
       })}
-      {
-        userSession.user.admin && (
-          <Link href={`/org/${orgData.id}/edit`}>
-            Edit
-          </Link>
-        )
-        
-      }
+      {userSession.user.admin && (
+        <Link href={`/org/${orgData.id}/edit`}>Edit</Link>
+      )}
     </div>
   );
 }
@@ -51,7 +49,10 @@ export type OrgReturnProps = Organization & {
   tags: Tag[];
   exclusiveToCommunities: Community[];
   helpfulToCommunities: Community[];
-  resources: Resource[];
+  resources: (Resource & {
+    tags: Tag[];
+    categoryMeta: Category;
+  })[];
 };
 
 export type OrgProps = Omit<OrgReturnProps, "createdAt" | "updatedAt"> & {
@@ -64,7 +65,9 @@ export type OrgServerSideProps = {
   userSession: Session;
 };
 
-export const getServerSideProps: GetServerSideProps<OrgServerSideProps> = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  OrgServerSideProps
+> = async (context) => {
   const session = await getSession(context);
 
   if (!session) {
@@ -83,7 +86,12 @@ export const getServerSideProps: GetServerSideProps<OrgServerSideProps> = async 
       id: orgId,
     },
     include: {
-      resources: true,
+      resources: {
+        include: {
+          tags: true,
+          categoryMeta: true,
+        },
+      },
       exclusiveToCommunities: true,
       helpfulToCommunities: true,
       tags: true,
@@ -105,8 +113,8 @@ export const getServerSideProps: GetServerSideProps<OrgServerSideProps> = async 
 
   return {
     props: {
-     orgData: propsData,
-     userSession: session,
+      orgData: propsData,
+      userSession: session,
     },
   };
 };

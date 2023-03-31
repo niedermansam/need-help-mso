@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link, { LinkProps } from "next/link";
 import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
 import type { Resource, Category, Tag } from "@prisma/client";
@@ -6,12 +6,10 @@ import OptionalLink from "../../components/OptionalLink";
 import { useEffect, useState } from "react";
 import type { MultiValue, SingleValue } from "react-select";
 import { encodeTag } from "../../utils/manageUrl";
-import type {
-  CategorySelectItem} from "../../components/Selectors";
-import {
-  CategorySelect,
-  TagSelect,
-} from "../../components/Selectors";
+import type { CategorySelectItem } from "../../components/Selectors";
+import { CategorySelect, TagSelect } from "../../components/Selectors";
+import { ContactInfo, TagList } from "../org";
+import { prettyPhoneNumber } from "../../utils";
 
 type CreateResourceProps = {
   name: string;
@@ -20,6 +18,33 @@ type CreateResourceProps = {
   tags: string[];
   category: string;
 };
+/**
+ * 
+ * 
+ * 
+      <Link
+        className="basis-32"
+        href={`/cat/${encodeTag(resource.categoryMeta.category)}`}
+      >
+        {resource.categoryMeta.category}
+      </Link> */
+
+type LinkType = ReturnType<typeof Link>;
+
+export function CategoryLink({
+  category,
+  className,
+  ...props
+}: Omit<LinkProps, "href"> & {
+  category: string;
+  className?: HTMLDivElement["className"];
+}) {
+  return (
+    <Link className={className} {...props} href={`/cat/${encodeTag(category)}`}>
+      {category}
+    </Link>
+  );
+}
 
 export function CreateResourceForm({ orgId }: { orgId: string }) {
   const INIT_RESOURCE: CreateResourceProps = {
@@ -33,10 +58,11 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
   const [formData, setFormData] = useState({ ...INIT_RESOURCE });
 
   const addResource = api.resource.create.useMutation({
-    onSuccess: () => setFormData({ ...INIT_RESOURCE, category: formData.category }),
+    onSuccess: () =>
+      setFormData({ ...INIT_RESOURCE, category: formData.category }),
   });
 
-  const { data: tags } = api.tag.getAll.useQuery()
+  const { data: tags } = api.tag.getAll.useQuery();
 
   return (
     <form className="m-6 flex max-w-md flex-col bg-gray-100 p-6">
@@ -67,14 +93,15 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
         onChange={(e) => setFormData({ ...formData, url: e.target.value })}
       />
 
-      
       <CategorySelect
         onChange={(value) => {
-          const newValue = value as SingleValue<{ value: string; label: string }>;
+          const newValue = value as SingleValue<{
+            value: string;
+            label: string;
+          }>;
           setFormData({ ...formData, category: newValue?.value ?? "" });
         }}
-
-      /> 
+      />
 
       <TagSelect
         options={tags?.map((tag) => {
@@ -86,8 +113,10 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
         className="capitalize"
         isMulti={true}
         onChange={(value) => {
-
-          const newValue = value as MultiValue<{ value: string; label: string }>;
+          const newValue = value as MultiValue<{
+            value: string;
+            label: string;
+          }>;
 
           setFormData({
             ...formData,
@@ -129,45 +158,50 @@ type ResourceProps = Resource & {
   tags: Tag[];
 };
 
-export function ResourceItem({ resource }: { resource: ResourceProps }) {
+export function ResourceItem({
+  resource,
+  showOrg = true,
+}: {
+  resource: ResourceProps;
+  showOrg?: boolean;
+}) {
   return (
     <div
       key={resource.id}
-      className="m-6 flex max-w-5xl items-end justify-between text-stone-600"
+      className="m-6 flex max-w-5xl items-center justify-between rounded border border-stone-300 p-2 text-stone-600 shadow"
     >
-      <div className="basis-80">
-        <Link href={`/org/${resource.organizationId}`}>
-          <h2 className="text-lg font-light leading-4">
-            {resource.organization.name}
-          </h2>
-        </Link>
-        <Link href={`/resource/${resource.id}`}>
-          <h1 className="text-lg font-semibold">{resource.name}</h1>
+      <div className="basis-80 ml-2">
+        {showOrg && (
+          <Link href={`/org/${resource.organizationId}`}>
+            <h3 className="text-lg font-light leading-4 hover:text-rose-600">
+              {resource.organization.name}
+            </h3>
+          </Link>
+        )}
+        <Link href={`/resource/${resource.id}`} className="hover:text-rose-400">
+          <h2 className="text-lg font-semibold">{resource.name}</h2>
         </Link>
       </div>
-      <div>
-        <p>{resource.organization.phone}</p>
+
+      <div className="flex w-96 flex-col">
+        <ContactInfo
+          phone={prettyPhoneNumber(resource.organization.phone)}
+          email={resource.organization.email}
+          website={resource.url}
+          shortUrl={true}
+        />
       </div>
-      <div className="flex basis-60 flex-wrap">
-        {resource.tags.map((x) => (
-          <p
-            key={x.tag}
-            className="mx-1 my-0.5 w-fit rounded-lg bg-gray-100 px-1 text-xs"
-          >
-            {x.tag}
-          </p>
-        ))}
+      <div className="flex basis-60 flex-col flex-wrap">
+        <CategoryLink
+          category={resource.category}
+          className="mb-2 font-bold text-stone-500 hover:text-rose-400"
+        />
+        <TagList tags={resource.tags} />
       </div>
       <Link
-        className="basis-32"
-        href={`/cat/${encodeTag(resource.categoryMeta.category)}`}
+        className="flex basis-32 py-1.5 mr-2 justify-center rounded border border-rose-500 bg-rose-500 font-bold text-white shadow-md"
+        href={`/resource/${resource.id}`}
       >
-        {resource.categoryMeta.category}
-      </Link>
-      <OptionalLink className="basis-32" href={resource.url}>
-        Website
-      </OptionalLink>
-      <Link className="basis-32" href={`/resource/${resource.id}`}>
         More Info
       </Link>
     </div>
@@ -179,7 +213,7 @@ export function ResourceSection({ resources }: { resources: ResourceProps[] }) {
   const [visibleResources, setVisibleResources] =
     useState<ResourceProps[]>(resources);
 
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const [strict, setStrict] = useState(false);
 
@@ -194,7 +228,6 @@ export function ResourceSection({ resources }: { resources: ResourceProps[] }) {
       setVisibleResources(resources);
     }
   };
-
 
   useEffect(() => {
     if (selectedTags.length === 0) {
@@ -224,14 +257,24 @@ export function ResourceSection({ resources }: { resources: ResourceProps[] }) {
       />
       <TagSelect
         className="w-64 cursor-pointer"
-        onChange={
-          (selected) => {
-            const selectedTags = (selected as CategorySelectItem[]).map((tag) => tag.value);
-            setSelectedTags(selectedTags);
-          }
-        }
+        onChange={(selected) => {
+          const selectedTags = (selected as CategorySelectItem[]).map(
+            (tag) => tag.value
+          );
+          setSelectedTags(selectedTags);
+        }}
       />
-      <input type="checkbox" checked={strict} onChange={() => {setStrict(!strict)}} /><label>Strict</label><br /><br /><br />
+      <input
+        type="checkbox"
+        checked={strict}
+        onChange={() => {
+          setStrict(!strict);
+        }}
+      />
+      <label>Strict</label>
+      <br />
+      <br />
+      <br />
       {visibleResources.map((resource) => (
         <ResourceItem key={resource.id} resource={resource} />
       ))}
