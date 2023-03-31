@@ -3,6 +3,7 @@ import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
 import { decodeTag, encodeTag } from "../../utils/manageUrl";
 import { trimString } from "../../utils";
+import { OrganizationItem } from "../org";
 
 export default function TagPage({tag}:InferGetServerSidePropsType<typeof getServerSideProps>) {
 
@@ -14,7 +15,7 @@ export default function TagPage({tag}:InferGetServerSidePropsType<typeof getServ
       <NavBar />
       <h1 className="pt-20 capitalize">Tag: {decodeTag(tag)}</h1>
       <div>
-        {data && data?.map((resource) => {
+        {data && data?.resources.map((resource) => {
           return (
             <div key={resource.id}>
               <h2>{resource.name}</h2>
@@ -22,6 +23,11 @@ export default function TagPage({tag}:InferGetServerSidePropsType<typeof getServ
             </div>
           );
         }) }
+      </div>
+      <div>
+        {data && data?.organizations.map((org) => {
+          return (
+            <OrganizationItem org={org} key={org.id} admin={false} />)})}
       </div>
     </div>
   );
@@ -40,6 +46,8 @@ export const getServerSideProps: GetServerSideProps<{tag: string}> = async (cont
     }
 
     const tag = encodeTag(query.tag) ;
+
+    console.log(tag)
 
 
 

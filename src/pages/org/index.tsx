@@ -10,6 +10,17 @@ import {
   isValidCategory,
 } from "../../components/Selectors";
 import { useRouter } from "next/router";
+import { encodeTag, prettyWebsite } from "../../utils/manageUrl";
+import {
+  faEnvelope,
+  faGlobe,
+  faPhone,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
+import { getSession } from "next-auth/react";
+import { Session } from "next-auth/core/types";
+import { faEdit } from "@fortawesome/free-regular-svg-icons";
 
 export type OrganizationProps = {
   name: string;
@@ -33,24 +44,26 @@ function CreateOrganizationForm() {
     category: "",
     tags: [],
     exclusiveCommunities: [],
-    helpfulToCommunities: []
+    helpfulToCommunities: [],
   };
 
   const [formData, setFormData] = useState(INITIAL_STATE);
   const router = useRouter();
   const addOrg = api.organization.create.useMutation({
     onSuccess: async (results) => {
-      if(!results) return console.error("No results returned from mutation");
+      if (!results) return console.error("No results returned from mutation");
       await router.push(`/org/${results.id}/edit`);
     },
   });
   return (
     <div className="mx-6  mb-16 flex justify-center pt-20">
       <div className=" min-w-[90%] max-w-7xl rounded-lg border border-stone-300 bg-stone-50 p-6 shadow-xl">
-        <h3 className="mb-6 text-5xl font-extrabold text-stone-600">Create Organization</h3>
+        <h3 className="mb-6 text-5xl font-extrabold text-stone-600">
+          Create Organization
+        </h3>
         <form className="">
           <div className="flex w-full">
-            <div className="flex w-4/12 flex-col mr-4">
+            <div className="mr-4 flex w-4/12 flex-col">
               <label htmlFor="name" className="text-lg font-light">
                 Name
               </label>
@@ -79,7 +92,7 @@ function CreateOrganizationForm() {
 
               <button
                 type="button"
-                className="w-full mt-4 rounded bg-rose-500 p-2 font-bold text-white"
+                className="mt-4 w-full rounded bg-rose-500 p-2 font-bold text-white"
                 onClick={() =>
                   addOrg.mutate({
                     ...formData,
@@ -87,7 +100,7 @@ function CreateOrganizationForm() {
                   })
                 }
               >
-                Create Organization
+                Submit
               </button>
             </div>
             <div className="mx-4 flex w-3/12 flex-col">
@@ -157,7 +170,6 @@ function CreateOrganizationForm() {
             </div>
 
             <div className="mx-4 flex w-3/12 flex-col">
-              
               <CommunitySelect
                 title="Exclusive to Communities"
                 onChange={(communities) => {
@@ -204,36 +216,81 @@ function CreateOrganizationForm() {
   );
 }
 
-type OrgProps = Organization & { tags: Tag[] };
+type OrgProps = Organization & { tags: Tag[] } ;
 
-function OrganizationItem({ org }: { org: OrgProps }) {
+export function OrganizationItem({ org, admin }: { org: OrgProps , admin: boolean }) {
   return (
-    <div className="m-6 flex w-full max-w-5xl  border border-gray-200 p-6">
-      <div className="mr-6 basis-80">
-        {" "}
-        <Link href={`/org/${org.id}`}>
-          <h2 className="text-xl">{org.name}</h2>
-        </Link>
-        <p>{org.phone}</p>
-        <p>{org.email}</p>
-      </div>{" "}
-      <div className="flex h-fit basis-80 flex-wrap text-xs">
-        {org.tags.map((tag) => (
-          <p
-            key={tag.tag}
-            className="mx-2 my-0.5 rounded bg-stone-300 px-2 py-0.5 capitalize text-stone-800 hover:bg-stone-200"
-          >
-            {tag.tag}
+    <div className="m-3  flex w-full max-w-5xl rounded-lg  border border-stone-300 p-3 px-4 text-stone-700 transition-colors">
+      <div className="mr-6 w-96">
+        <h2 className="text-xl  font-bold text-stone-500 transition-colors  duration-75 ">
+          <Link href={`/org/${org.id}`} className="hover:text-rose-400">
+            {org.name}
+          </Link>{" "}
+          {admin && (
+            <Link href={`/org/${org.id}/edit`} className="">
+              <FontAwesomeIcon
+                className="text-stone-500 hover:text-rose-400"
+                icon={faEdit}
+              />
+            </Link>
+          )}
+        </h2>
+
+        {org.phone && (
+          <p className="text-sm">
+            <FontAwesomeIcon className="mr-2 text-stone-500" icon={faPhone} />{" "}
+            {org.phone}
           </p>
-        ))}
+        )}
+        {org.email && (
+          <p className="text-sm">
+            <FontAwesomeIcon
+              className="mr-2 text-stone-500"
+              icon={faEnvelope}
+            />{" "}
+            {org.email}
+          </p>
+        )}
+
+        {org.website && (
+          <Link className="text-sm uppercase text-stone-500" href={org.website}>
+            <FontAwesomeIcon className="mr-2 text-stone-500" icon={faGlobe} />
+            <span className="text-xs font-semibold tracking-wide">
+              {prettyWebsite(org.website)}
+            </span>
+          </Link>
+        )}
       </div>
-      <p className="basis-32">{org.category}</p>
-      <p>{org.website}</p>
+      <div className="flex h-fit basis-80 flex-col flex-wrap text-xs">
+        <p className="mb-2 text-base">
+          <span> Category: </span>
+          <Link
+            href={`/cat/${org.category}`}
+            className="font-bold text-stone-500 hover:text-rose-400"
+          >
+            {org.category}
+          </Link>
+        </p>
+        <div className="w-36">
+          {org.tags.map((tag) => (
+            <Link
+              href={`/tag/${encodeTag(tag.tag)}`}
+              key={tag.tag}
+              className="my-0.5 mr-2 rounded bg-stone-300 px-2 py-0.5 capitalize text-stone-800 hover:bg-stone-200"
+              dangerouslySetInnerHTML={{
+                __html: tag.tag.replaceAll(" ", "&nbsp;"),
+              }}
+            >
+              {}
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
-function OrganizationSection({ orgs }: { orgs: OrgProps[] }) {
+function OrganizationSection({ orgs, admin }: { orgs: OrgProps[], admin: boolean }) {
   const [displayOrgs, setDisplayOrgs] = useState(orgs);
   const [strict, setStrict] = useState(false);
 
@@ -289,19 +346,36 @@ function OrganizationSection({ orgs }: { orgs: OrgProps[] }) {
         Strict Search
       </div>
       {displayOrgs.map((org) => (
-        <OrganizationItem key={org.id} org={org} />
+        <OrganizationItem admin={admin} key={org.id} org={org} />
       ))}
     </div>
   );
 }
 
-export default function OrganizationsPage() {
+export default function OrganizationsPage({userSession} : InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { data: orgs } = api.organization.getAll.useQuery();
+  const admin = userSession?.user?.admin || false;
   return (
     <div>
       <NavBar />
-      <CreateOrganizationForm />
-      {orgs && <OrganizationSection orgs={orgs} />}
+      {admin && <CreateOrganizationForm />}
+      {orgs && <OrganizationSection orgs={orgs} admin={admin} />}
     </div>
   );
+}
+
+type ServerSideProps = {
+  userSession: Session | null;
+}
+
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (context) => {
+  const session = await getSession(context);
+  
+
+
+  return {
+    props: {
+      userSession: session,
+    },
+  }
 }

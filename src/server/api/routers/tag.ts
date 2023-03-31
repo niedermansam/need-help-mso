@@ -5,18 +5,16 @@ import { decodeTag } from "../../../utils/manageUrl";
 import type { Resource, Organization, Tag, Category } from "@prisma/client";
 
 type ResourceArray = (Resource & {
-    organization: Organization;
-    tags: Tag[];
-    categoryMeta: Category;
-})[]
+  organization: Organization;
+  tags: Tag[];
+  categoryMeta: Category;
+})[];
 
-
-export const getTagsFromResources = (resources: ResourceArray ) => {
+export const getTagsFromResources = (resources: ResourceArray) => {
   const tags = resources.map((resource) => resource.tags).flat();
   const uniqueTags = [...new Set(tags.map((tag) => tag.tag))];
   return uniqueTags;
 };
-
 
 export const tagRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -130,14 +128,23 @@ export const tagRouter = createTRPCRouter({
               mode: "insensitive",
             },
           },
-          include: { resources: true },
+          include: { resources: 
+            {
+              include: {
+                tags: true,
+              }
+            }, organizations: 
+          {
+            include: {
+              tags: true,
+            }
+          } },
         });
 
         const resources = tagArray.map((tag) => tag.resources).flat();
+        const organizations = tagArray.map((tag) => tag.organizations).flat();
 
-      
-
-        return resources;
+        return {resources, organizations};
       } catch (err) {
         console.log(err);
       }
