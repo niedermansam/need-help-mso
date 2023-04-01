@@ -162,6 +162,7 @@ model Resource {
     speedOfAid             SpeedOfAid[]
     speedOfAidDetails      String?
     lists                  FavoritesList[]
+    free                  Boolean           @default(false)
 }
 
 model ResourceContact {

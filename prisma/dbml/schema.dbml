@@ -40,8 +40,11 @@ Table User {
   sessions Session [not null]
   adminOf Organization [not null]
   resources ResourceContact [not null]
+  organizations OrganizationContact [not null]
   roles OrganizationRole [not null]
   admin Boolean [not null, default: false]
+  lists FavoritesList [not null]
+  createdLists FavoritesList [not null]
 }
 
 Table VerificationToken {
@@ -99,6 +102,8 @@ Table Organization {
   exclusiveToCommunities Community [not null]
   helpfulToCommunities Community [not null]
   roles OrganizationRole [not null]
+  contacts OrganizationContact [not null]
+  lists FavoritesList [not null]
 }
 
 Table OrganizationRole {
@@ -130,6 +135,8 @@ Table Resource {
   barriersToEntryDetails String
   speedOfAid SpeedOfAid[] [not null]
   speedOfAidDetails String
+  lists FavoritesList [not null]
+  free Boolean [not null, default: false]
 }
 
 Table ResourceContact {
@@ -137,10 +144,39 @@ Table ResourceContact {
   resourceId String [not null]
   user User [not null]
   resource Resource [not null]
+  phone String
+  email String
 
   indexes {
     (userId, resourceId) [pk]
   }
+}
+
+Table OrganizationContact {
+  userId String [not null]
+  orgId String [not null]
+  user User [not null]
+  organization Organization [not null]
+  phone String
+  email String
+
+  indexes {
+    (userId, orgId) [pk]
+  }
+}
+
+Table FavoritesList {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  adminId String [not null]
+  admin User [not null]
+  authorizedUsers User [not null]
+  name String [not null, default: 'Favorites']
+  notes String
+  resources Resource [not null]
+  organizations Organization [not null]
+  public Boolean [not null, default: true]
 }
 
 Enum BarriersToEntry {
@@ -175,3 +211,9 @@ Ref: Resource.category > Category.category
 Ref: ResourceContact.userId > User.id [delete: Cascade]
 
 Ref: ResourceContact.resourceId > Resource.id [delete: Cascade]
+
+Ref: OrganizationContact.userId > User.id [delete: Cascade]
+
+Ref: OrganizationContact.orgId > Organization.id [delete: Cascade]
+
+Ref: FavoritesList.adminId > User.id [delete: Cascade]

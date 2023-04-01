@@ -11,10 +11,16 @@ export const resourceRouter = createTRPCRouter({
         description: z.string(),
         category: z.string(),
         orgId: z.string(),
+        helpingOrganizations: z.array(z.string()).optional(),
         url: z.string().nullish(),
         tags: z.array(z.string()).optional(),
         exclusiveToCommunities: z.array(z.string()).optional(),
         helpfulToCommunities: z.array(z.string()).optional(),
+        barriersToEntry: z.enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"]),
+        barriersToEntryDetails: z.string().optional(),
+        speedOfAid: z.array(z.enum(["IMMEDIATE", "DAYS", "WEEKS", "MONTHS", "YEARS"])).optional(),
+        speedOfAidDetails: z.string().optional(),
+        free: z.boolean().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -23,16 +29,23 @@ export const resourceRouter = createTRPCRouter({
         description,
         category,
         orgId,
+        helpingOrganizations,
         url,
         tags,
         exclusiveToCommunities,
         helpfulToCommunities,
+        barriersToEntry,
+         barriersToEntryDetails,
+        speedOfAid,
+        speedOfAidDetails,
+        free,
       } = input;
 
       const newResource = await ctx.prisma.resource.create({
         data: {
           name: name,
           description: description,
+          url: url,
           categoryMeta: {
             connectOrCreate: {
               where: { category: category },
@@ -46,6 +59,12 @@ export const resourceRouter = createTRPCRouter({
               id: orgId,
             },
           },
+          helpingOrganizations: helpingOrganizations && {
+            connect : helpingOrganizations?.map((org) => ({
+              id: org,
+            })),
+          },
+
 
           tags: {
             connectOrCreate: tags
@@ -80,7 +99,15 @@ export const resourceRouter = createTRPCRouter({
               }
             : undefined,
 
-          url: url,
+          barriersToEntry: barriersToEntry,
+          barriersToEntryDetails: barriersToEntryDetails,
+
+          speedOfAid: speedOfAid,
+          speedOfAidDetails: speedOfAidDetails,
+
+          free: free,
+
+
         },
       });
       return newResource;
@@ -155,10 +182,25 @@ export const resourceRouter = createTRPCRouter({
         tags: z.array(z.string()).optional(),
         helpfulTo: z.array(z.string()).optional(),
         exclusiveTo: z.array(z.string()).optional(),
+        barriersToEntry: z.enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"]).optional(),
+        barriersToEntryDetails: z.string().optional(),
+
+        speedOfAid: z.array(z.enum(["IMMEDIATE", "DAYS", "WEEKS", "MONTHS", "YEARS"])).optional(),
+        speedOfAidDetails: z.string().optional(),
+        free: z.boolean().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { id, name, description, category, orgId, url, tags } = input;
+      const { id, name, description, category, orgId, url, tags,
+        helpfulTo,
+        exclusiveTo,
+        barriersToEntry,
+        barriersToEntryDetails,
+        speedOfAid,
+        speedOfAidDetails,
+        free,
+
+      } = input;
 
       const resource = await ctx.prisma.resource.update({
         where: {
@@ -197,8 +239,8 @@ export const resourceRouter = createTRPCRouter({
           },
           url: url,
           helpfulToCommunities: {
-            connectOrCreate: input.helpfulTo
-              ? input.helpfulTo.map((community) => ({
+            connectOrCreate: helpfulTo
+              ? helpfulTo.map((community) => ({
                   where: { name: community },
                   create: {
                     name: community,
@@ -208,8 +250,8 @@ export const resourceRouter = createTRPCRouter({
           },
 
           exclusiveToCommunities: {
-            connectOrCreate: input.exclusiveTo
-              ? input.exclusiveTo.map((community) => ({
+            connectOrCreate: exclusiveTo
+              ? exclusiveTo.map((community) => ({
                   where: { name: community },
                   create: {
                     name: community,
@@ -217,6 +259,14 @@ export const resourceRouter = createTRPCRouter({
                 }))
               : [],
           },
+
+          barriersToEntry: barriersToEntry,
+          barriersToEntryDetails: barriersToEntryDetails,
+
+          speedOfAid: speedOfAid,
+          speedOfAidDetails: speedOfAidDetails,
+
+          free: free,
         },
       });
       return resource;
