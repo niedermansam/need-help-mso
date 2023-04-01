@@ -13,10 +13,21 @@ export const resourceRouter = createTRPCRouter({
         orgId: z.string(),
         url: z.string().nullish(),
         tags: z.array(z.string()).optional(),
+        exclusiveToCommunities: z.array(z.string()).optional(),
+        helpfulToCommunities: z.array(z.string()).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { name, description, category, orgId, url, tags } = input;
+      const {
+        name,
+        description,
+        category,
+        orgId,
+        url,
+        tags,
+        exclusiveToCommunities,
+        helpfulToCommunities,
+      } = input;
 
       const newResource = await ctx.prisma.resource.create({
         data: {
@@ -46,6 +57,28 @@ export const resourceRouter = createTRPCRouter({
                 }))
               : [],
           },
+
+          exclusiveToCommunities: exclusiveToCommunities
+            ? {
+                connectOrCreate: exclusiveToCommunities.map((community) => ({
+                  where: { name: community },
+                  create: {
+                    name: community,
+                  },
+                })),
+              }
+            : undefined,
+
+          helpfulToCommunities: helpfulToCommunities
+            ? {
+                connectOrCreate: helpfulToCommunities.map((community) => ({
+                  where: { name: community },
+                  create: {
+                    name: community,
+                  },
+                })),
+              }
+            : undefined,
 
           url: url,
         },
@@ -102,12 +135,9 @@ export const resourceRouter = createTRPCRouter({
           },
         });
 
+        const uniqueTags = getTagsFromResources(resources);
 
-
-        const uniqueTags = getTagsFromResources(resources)
-
-
-        return {resources, tags: uniqueTags};
+        return { resources, tags: uniqueTags };
       } catch (e) {
         console.log(e);
       }

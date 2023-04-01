@@ -27,7 +27,6 @@ import type { Session } from "next-auth/core/types";
 import { faEdit } from "@fortawesome/free-regular-svg-icons";
 import ReactModal from "react-modal";
 
-ReactModal.setAppElement("#__next");
 
 export type OrganizationProps = {
   name: string;

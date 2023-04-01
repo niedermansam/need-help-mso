@@ -9,6 +9,10 @@ config.autoAddCss = false;
 import { api } from "../utils/api";
 
 import "../styles/globals.css";
+import ReactModal from "react-modal";
+
+
+ReactModal.setAppElement("#__next");
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,

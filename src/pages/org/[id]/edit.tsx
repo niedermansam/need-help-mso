@@ -1,7 +1,7 @@
 import { useState } from "react";
 import NavBar from "../../../components/Nav";
 import { api } from "../../../utils/api";
-import { CreateResourceForm, CreateResourceModal } from "../../resource";
+import { CreateResourceModal } from "../../resource";
 import {
   CategorySelect,
   CommunitySelect,
@@ -81,7 +81,7 @@ function CreateOrganizationForm({ orgData }: ServerSideProps) {
 
             <button
               type="button"
-              className="mb-6 rounded bg-rose-500 px-2 py-1.5 text-rose-50 font-bold uppercase tracking-wider"
+              className="mb-6 rounded bg-rose-500 px-2 py-1.5 font-bold uppercase tracking-wider text-rose-50"
               onClick={() =>
                 addOrg.mutate({
                   ...INITIAL_STATE,
@@ -135,6 +135,8 @@ function CreateOrganizationForm({ orgData }: ServerSideProps) {
                 setFormData({ ...formData, phone: e.target.value })
               }
             />
+            <div className="flex h-full flex-col justify-end items-center mb-6">
+            <CreateResourceModal orgId={orgData.id} /></div>
           </div>
 
           <div className="mx-3 flex w-4/12 flex-col">
@@ -246,8 +248,6 @@ export default function EditOrgPage({
       <NavBar />
       <p>Edit Organization</p>
       {orgData ? <CreateOrganizationForm userSession={userSession} orgData={orgData}  /> : null}
-      <h2>Add Resource</h2>
-      {orgData ? <CreateResourceModal orgId={orgData.id} /> : null}
     </div>
   );
 }

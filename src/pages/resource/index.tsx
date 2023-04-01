@@ -1,17 +1,18 @@
-import Link, {type  LinkProps } from "next/link";
+import Link, { type LinkProps } from "next/link";
 import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
 import type { Resource, Category, Tag } from "@prisma/client";
 import { useEffect, useState } from "react";
 import type { MultiValue, SingleValue } from "react-select";
 import { encodeTag } from "../../utils/manageUrl";
-import type { CategorySelectItem } from "../../components/Selectors";
+import {
+  CategorySelectItem,
+  CommunitySelect,
+} from "../../components/Selectors";
 import { CategorySelect, TagSelect } from "../../components/Selectors";
 import { ContactInfo, TagList } from "../org";
 import { prettyPhoneNumber } from "../../utils";
 import ReactModal from "react-modal";
-
-ReactModal.setAppElement("#__next");
 
 type CreateResourceProps = {
   name: string;
@@ -19,6 +20,8 @@ type CreateResourceProps = {
   url: string;
   tags: string[];
   category: string;
+  exclusiveToCommunities: string[];
+  helpfulToCommunities: string[];
 };
 /**
  * 
@@ -30,7 +33,6 @@ type CreateResourceProps = {
       >
         {resource.categoryMeta.category}
       </Link> */
-
 
 export function CategoryLink({
   category,
@@ -53,12 +55,25 @@ export function CreateResourceModal({ orgId }: { orgId: string }) {
   return (
     <>
       <button
-        className="rounded-md bg-rose-500 px-4 py-2 text-rose-50 font-bold tracking-wide"
+        className="w-full rounded bg-rose-500 px-2 py-1.5 font-bold tracking-wide text-rose-50"
         onClick={() => setShowModal(true)}
+        type="button"
       >
         Add Resource
       </button>
-      <ReactModal className="w-fit" isOpen={showModal} onRequestClose={() => setShowModal(false)}>
+      <ReactModal
+        className="w-fit"
+        isOpen={showModal}
+        onRequestClose={() => setShowModal(false)}
+        style={{
+          overlay: {
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        }}
+      >
         <CreateResourceForm orgId={orgId} />
       </ReactModal>
     </>
@@ -72,6 +87,8 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
     url: "",
     tags: [],
     category: "",
+    exclusiveToCommunities: [],
+    helpfulToCommunities: [],
   };
 
   const [formData, setFormData] = useState({ ...INIT_RESOURCE });
@@ -84,85 +101,151 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
   const { data: tags } = api.tag.getAll.useQuery();
 
   return (
-    <form className="m-6 flex max-w-md flex-col bg-gray-100 p-6">
-      <label htmlFor="name">Name</label>
-      <input
-        type="text"
-        name="name"
-        id="name"
-        value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-      />
-      <label htmlFor="description">Description</label>
-      <textarea
-        name="description"
-        id="description"
-        value={formData.description}
-        onChange={(e) =>
-          setFormData({ ...formData, description: e.target.value })
-        }
-      />
+    <div className="m-6 flex flex-col rounded-lg border border-stone-300 w-fit bg-stone-50 p-6">
+      <h1 className="text-center text-5xl max-w-full font-extrabold flex-grow text-stone-600" >Create New Resource</h1>
+      <form className="flex  justify-center">
+        <div className="m-2 flex w-80 flex-col">
+          <label className="text-lg font-light" htmlFor="name">
+            Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            className=" mb-2 rounded border border-stone-300 px-2 py-1.5"
+            id="name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+          <label className="text-lg font-light" htmlFor="description">
+            Description
+          </label>
+          <textarea
+            name="description"
+            id="description"
+            className="mb-2 h-28 mt-0.5 rounded border border-stone-300 px-2 py-1.5"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+          />
 
-      <label htmlFor="url">URL</label>
-      <input
-        type="text"
-        name="url"
-        id="url"
-        value={formData.url}
-        onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-      />
+          <label className="text-lg font-light" htmlFor="url">
+            URL
+          </label>
+          <input
+            type="text"
+            name="url"
+            id="url"
+            className=" rounded border border-stone-300 px-2 py-1.5 mb-4"
+            value={formData.url}
+            onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+          />
+          <button
+            className="w-full rounded bg-rose-500 px-2 py-1.5 font-bold tracking-wide text-rose-50"
+            onClick={() =>
+              addResource.mutate({
+                name: formData.name,
+                description: formData.description,
+                url: formData.url,
+                tags: formData.tags,
+                category: formData.category,
+                orgId: orgId,
+                exclusiveToCommunities: formData.exclusiveToCommunities,
+                helpfulToCommunities: formData.helpfulToCommunities,
+              })
+            }
+            type="button"
+          >
+            Submit
+          </button>
+        </div>
+        <div className="m-2 flex h-full w-80 flex-col justify-start">
+          <CategorySelect
+            onChange={(value) => {
+              const newValue = value as SingleValue<{
+                value: string;
+                label: string;
+              }>;
+              setFormData({ ...formData, category: newValue?.value ?? "" });
+            }}
+          />
 
-      <CategorySelect
-        onChange={(value) => {
-          const newValue = value as SingleValue<{
-            value: string;
-            label: string;
-          }>;
-          setFormData({ ...formData, category: newValue?.value ?? "" });
-        }}
-      />
+          <TagSelect
+            options={tags?.map((tag) => {
+              return {
+                value: tag.tag,
+                label: tag.tag,
+              };
+            })}
+            className="capitalize mb-2"
+            isMulti={true}
+            onChange={(value) => {
+              const newValue = value as MultiValue<{
+                value: string;
+                label: string;
+              }>;
 
-      <TagSelect
-        options={tags?.map((tag) => {
-          return {
-            value: tag.tag,
-            label: tag.tag,
-          };
-        })}
-        className="capitalize"
-        isMulti={true}
-        onChange={(value) => {
-          const newValue = value as MultiValue<{
-            value: string;
-            label: string;
-          }>;
+              setFormData({
+                ...formData,
+                tags: newValue.map((x) => {
+                  return x.value;
+                }),
+              });
+              console.log(formData);
+            }}
+          />
 
-          setFormData({
-            ...formData,
-            tags: newValue.map((x) => {
-              return x.value;
-            }),
-          });
-          console.log(formData);
-        }}
-      />
 
-      <button
-        onClick={() =>
-          addResource.mutate({
-            name: formData.name,
-            description: formData.description,
-            url: formData.url,
-            tags: formData.tags,
-            category: formData.category,
-            orgId: orgId,
-          })
-        }
-        type="button"
-      >
-        Submit
-      </button>
-    </form>
+          <CommunitySelect
+            title="Exclusive to Communities"
+            className="mb-2"
+            onChange={(value) => {
+              const newValue = value as MultiValue<{
+                value: string;
+                label: string;
+              }>;
+
+              setFormData({
+                ...formData,
+                exclusiveToCommunities: newValue.map((x) => {
+                  return x.value;
+                }),
+              });
+              console.log(formData);
+            }}
+            value={formData.exclusiveToCommunities.map((x) => {
+              return {
+                value: x,
+                label: x,
+              };
+            })}
+          />
+          <CommunitySelect
+            title="Helpful to Communities"
+            onChange={(value) => {
+              const newValue = value as MultiValue<{
+                value: string;
+                label: string;
+              }>;
+
+              setFormData({
+                ...formData,
+                helpfulToCommunities: newValue.map((x) => {
+                  return x.value;
+                }),
+              });
+              console.log(formData);
+            }}
+            value={formData.helpfulToCommunities.map((x) => {
+              return {
+                value: x,
+                label: x,
+              };
+            })}
+          />
+        </div>
+      </form>
+    </div>
   );
 }
 
