@@ -4,6 +4,7 @@ import { api } from "../../utils/api";
 import { decodeTag, encodeTag } from "../../utils/manageUrl";
 import { trimString } from "../../utils";
 import { OrganizationItem } from "../org";
+import { ResourceItem } from "../resource";
 
 export default function TagPage({tag}:InferGetServerSidePropsType<typeof getServerSideProps>) {
 
@@ -11,23 +12,28 @@ export default function TagPage({tag}:InferGetServerSidePropsType<typeof getServ
 
     
   return (
-    <div>
+    <div className="text-stone-700">
       <NavBar />
-      <h1 className="pt-20 capitalize">Tag: {decodeTag(tag)}</h1>
+      <h1 className="mx-6 mb-4 pt-20 text-4xl font-extrabold capitalize">
+        Tag: {decodeTag(tag)}
+      </h1>
       <div>
-        {data && data?.resources.map((resource) => {
-          return (
-            <div key={resource.id}>
-              <h2>{resource.name}</h2>
-              <p>{trimString(resource.description,25)}</p>
-            </div>
-          );
-        }) }
+        <h2 className="mx-6 -mb-4 text-2xl font-extrabold text-stone-500">
+          Resources
+        </h2>
+        {data &&
+          data?.resources.map((resource) => {
+            return <ResourceItem resource={resource} key={resource.id} />;
+          })}
       </div>
       <div>
-        {data && data?.organizations.map((org) => {
-          return (
-            <OrganizationItem org={org} key={org.id} admin={false} />)})}
+        <h2 className="mx-6 -mb-3 text-2xl font-extrabold text-stone-500">
+          Organizations
+        </h2>
+        {data &&
+          data?.organizations.map((org) => {
+            return <OrganizationItem org={org} key={org.id} admin={false} />;
+          })}
       </div>
     </div>
   );

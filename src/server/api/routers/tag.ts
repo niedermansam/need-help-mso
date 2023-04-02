@@ -132,6 +132,9 @@ export const tagRouter = createTRPCRouter({
             {
               include: {
                 tags: true,
+                categoryMeta: true,
+                organization: true,
+                
               }
             }, organizations: 
           {

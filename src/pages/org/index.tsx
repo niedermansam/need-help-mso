@@ -316,16 +316,16 @@ export function OrganizationItem({
   admin: boolean;
 }) {
   return (
-    <div className="m-3  flex w-full max-w-5xl rounded-lg  border border-stone-300 p-3 px-4 text-stone-700 transition-colors">
+    <div className="m-6  flex w-full max-w-5xl rounded shadow  border border-stone-300 p-3 px-4 text-stone-700 transition-colors">
       <div className="mr-6 w-96">
         <h2 className="text-xl  font-bold text-stone-500 transition-colors  duration-75 ">
-          <Link href={`/org/${org.id}`} className="hover:text-rose-400">
+          <Link href={`/org/${org.id}`} className="hover:text-rose-500">
             {org.name}
           </Link>{" "}
           {admin && (
             <Link href={`/org/${org.id}/edit`} className="">
               <FontAwesomeIcon
-                className="text-stone-500 hover:text-rose-400"
+                className="text-stone-500 hover:text-rose-500"
                 icon={faEdit}
               />
             </Link>
@@ -340,7 +340,7 @@ export function OrganizationItem({
           <span> Category: </span>
           <Link
             href={`/cat/${org.category}`}
-            className="font-bold text-stone-500 hover:text-rose-400"
+            className="font-bold text-stone-500 hover:text-rose-500"
           >
             {org.category}
           </Link>
