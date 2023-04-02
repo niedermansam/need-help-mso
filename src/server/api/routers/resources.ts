@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { adminProcedure, createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { getTagsFromResources } from "./tag";
 
 export const resourceRouter = createTRPCRouter({
@@ -16,7 +16,7 @@ export const resourceRouter = createTRPCRouter({
         tags: z.array(z.string()).optional(),
         exclusiveToCommunities: z.array(z.string()).optional(),
         helpfulToCommunities: z.array(z.string()).optional(),
-        barriersToEntry: z.enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"]),
+        barriersToEntry: z.enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"]).optional(),
         barriersToEntryDetails: z.string().optional(),
         speedOfAid: z.array(z.enum(["IMMEDIATE", "DAYS", "WEEKS", "MONTHS", "YEARS"])).optional(),
         speedOfAidDetails: z.string().optional(),
@@ -140,6 +140,7 @@ export const resourceRouter = createTRPCRouter({
         tags: true,
         helpfulToCommunities: true,
         exclusiveToCommunities: true,
+        helpingOrganizations: true,
       },
     });
     return resource;
@@ -177,7 +178,6 @@ export const resourceRouter = createTRPCRouter({
         name: z.string().nullish(),
         description: z.string().nullish(),
         category: z.string().nullish(),
-        orgId: z.string().nullish(),
         url: z.string().nullish(),
         tags: z.array(z.string()).optional(),
         helpfulTo: z.array(z.string()).optional(),
@@ -188,10 +188,11 @@ export const resourceRouter = createTRPCRouter({
         speedOfAid: z.array(z.enum(["IMMEDIATE", "DAYS", "WEEKS", "MONTHS", "YEARS"])).optional(),
         speedOfAidDetails: z.string().optional(),
         free: z.boolean().optional(),
+        helpingOrganizations: z.array(z.string()).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { id, name, description, category, orgId, url, tags,
+      const { id, name, description, category,  url, tags,
         helpfulTo,
         exclusiveTo,
         barriersToEntry,
@@ -199,14 +200,18 @@ export const resourceRouter = createTRPCRouter({
         speedOfAid,
         speedOfAidDetails,
         free,
+        helpingOrganizations,
 
       } = input;
+
+      console.log(helpingOrganizations)
 
       const resource = await ctx.prisma.resource.update({
         where: {
           id: id,
         },
         data: {
+
           name: name || undefined,
           description: description || undefined,
           categoryMeta: category
@@ -219,13 +224,12 @@ export const resourceRouter = createTRPCRouter({
                 },
               }
             : undefined,
-          organization: orgId
-            ? {
-                connect: {
-                  id: orgId,
-                },
-              }
-            : undefined,
+          helpingOrganizations: helpingOrganizations && {
+            connect : helpingOrganizations.map((org) => ({
+              id: org,
+            })),
+          },
+
 
           tags: {
             connectOrCreate: tags
@@ -271,4 +275,28 @@ export const resourceRouter = createTRPCRouter({
       });
       return resource;
     }),
+
+    reassignAdministeringOrg: adminProcedure.input(z.object({
+      resourceId: z.string(),
+      orgId: z.string(),
+    })).mutation(async ({ input, ctx }) => {
+      const { resourceId, orgId } = input;
+
+      const resource = await ctx.prisma.resource.update({
+        where: {
+          id: resourceId,
+        },
+        data: {
+          organization: {
+            connect: {
+              id: orgId,
+            },
+          },
+        },
+      });
+      return resource;
+
+    }),
 });
+
+

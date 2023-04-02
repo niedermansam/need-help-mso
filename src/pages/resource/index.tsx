@@ -1,13 +1,21 @@
 import Link, { type LinkProps } from "next/link";
 import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
-import type { Resource, Category, Tag } from "@prisma/client";
+import type {
+  Resource,
+  Category,
+  Tag,
+  BarriersToEntry,
+  SpeedOfAid,
+} from "@prisma/client";
 import { useEffect, useState } from "react";
 import type { MultiValue, SingleValue } from "react-select";
 import { encodeTag } from "../../utils/manageUrl";
 import {
+  BarriersToEntrySelect,
   CategorySelectItem,
   CommunitySelect,
+  SpeedOfAidSelect,
 } from "../../components/Selectors";
 import { CategorySelect, TagSelect } from "../../components/Selectors";
 import { ContactInfo, TagList } from "../org";
@@ -22,6 +30,11 @@ type CreateResourceProps = {
   category: string;
   exclusiveToCommunities: string[];
   helpfulToCommunities: string[];
+  barriersToEntry: BarriersToEntry | undefined;
+  barriersToEntryDetails: string;
+  speedOfAid: SpeedOfAid[];
+  speedOfAidDetails: string;
+  free: boolean;
 };
 /**
  * 
@@ -89,6 +102,11 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
     category: "",
     exclusiveToCommunities: [],
     helpfulToCommunities: [],
+    barriersToEntry: undefined,
+    barriersToEntryDetails: "",
+    speedOfAid: [],
+    speedOfAidDetails: "",
+    free: false,
   };
 
   const [formData, setFormData] = useState({ ...INIT_RESOURCE });
@@ -101,8 +119,10 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
   const { data: tags } = api.tag.getAll.useQuery();
 
   return (
-    <div className="m-6 flex flex-col rounded-lg border border-stone-300 w-fit bg-stone-50 p-6">
-      <h1 className="text-center text-5xl max-w-full font-extrabold flex-grow text-stone-600" >Create New Resource</h1>
+    <div className="m-6 flex w-fit flex-col rounded-lg border border-stone-300 bg-stone-50 p-6">
+      <h1 className="max-w-full flex-grow text-center text-5xl font-extrabold text-stone-600">
+        Create New Resource
+      </h1>
       <form className="flex  justify-center">
         <div className="m-2 flex w-80 flex-col">
           <label className="text-lg font-light" htmlFor="name">
@@ -116,13 +136,28 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
+
+          <div className=" flex items-center text-xl capitalize text-stone-600 mb-3">
+            <input
+              type="checkbox"
+              name="free"
+              id="free"
+              className="mr-2 h-5 w-5 cursor-pointer rounded border border-stone-300 px-2 py-1.5"
+              value={formData.free ? "true" : "false"}
+              checked={formData.free}
+              onChange={(e) =>
+                setFormData({ ...formData, free: e.target.checked })
+              }
+            />
+            <label>Free Resource</label>
+          </div>
           <label className="text-lg font-light" htmlFor="description">
             Description
           </label>
           <textarea
             name="description"
             id="description"
-            className="mb-2 h-28 mt-0.5 rounded border border-stone-300 px-2 py-1.5"
+            className="mb-2 mt-0.5 h-28 rounded border border-stone-300 px-2 py-1.5"
             value={formData.description}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
@@ -136,7 +171,7 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
             type="text"
             name="url"
             id="url"
-            className=" rounded border border-stone-300 px-2 py-1.5 mb-4"
+            className=" mb-4 rounded border border-stone-300 px-2 py-1.5"
             value={formData.url}
             onChange={(e) => setFormData({ ...formData, url: e.target.value })}
           />
@@ -152,6 +187,11 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
                 orgId: orgId,
                 exclusiveToCommunities: formData.exclusiveToCommunities,
                 helpfulToCommunities: formData.helpfulToCommunities,
+                barriersToEntry: formData.barriersToEntry,
+                barriersToEntryDetails: formData.barriersToEntryDetails,
+                speedOfAid: formData.speedOfAid || undefined,
+                speedOfAidDetails: formData.speedOfAidDetails,
+                free: formData.free,
               })
             }
             type="button"
@@ -177,7 +217,7 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
                 label: tag.tag,
               };
             })}
-            className="capitalize mb-2"
+            className="mb-2 capitalize"
             isMulti={true}
             onChange={(value) => {
               const newValue = value as MultiValue<{
@@ -194,7 +234,6 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
               console.log(formData);
             }}
           />
-
 
           <CommunitySelect
             title="Exclusive to Communities"
@@ -244,6 +283,80 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
             })}
           />
         </div>
+
+        <div className="m-2 flex h-full w-80 flex-col justify-start">
+          <BarriersToEntrySelect
+            onChange={(value) => {
+              const newValue = value as SingleValue<{
+                value: BarriersToEntry;
+                label: string;
+              }>;
+
+              setFormData({
+                ...formData,
+                barriersToEntry: newValue?.value || undefined,
+              });
+              console.log(formData.barriersToEntry);
+            }}
+          />
+          <label
+            className="text-lg font-light"
+            htmlFor="barriersToEntryDetails"
+          >
+            Barriers to Entry Details
+          </label>
+          <textarea
+            name="barriersToEntryDetails"
+            id="barriersToEntryDetails"
+            className="mb-2 mt-0.5 h-28 rounded border border-stone-300 px-2 py-1.5"
+            value={formData.barriersToEntryDetails}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                barriersToEntryDetails: e.target.value,
+              })
+            }
+          />
+        </div>
+        <div className="m-2 flex h-full w-80 flex-col justify-start">
+          <SpeedOfAidSelect
+            onChange={(value) => {
+              const newValue = value as MultiValue<{
+                value: SpeedOfAid;
+                label: string;
+              }>;
+
+              setFormData({
+                ...formData,
+                speedOfAid: newValue.map((x) => {
+                  return x.value;
+                }),
+              });
+              console.log(formData);
+            }}
+            value={formData.speedOfAid.map((x) => {
+              return {
+                value: x,
+                label: x,
+              };
+            })}
+          />
+          <label className="text-lg font-light" htmlFor="speedOfAidDetails">
+            Speed of Aid Details
+          </label>
+          <textarea
+            name="speedOfAidDetails"
+            id="speedOfAidDetails"
+            className="mb-2 mt-0.5 h-28 rounded border border-stone-300 px-2 py-1.5"
+            value={formData.speedOfAidDetails}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                speedOfAidDetails: e.target.value,
+              })
+            }
+          />
+        </div>
       </form>
     </div>
   );
@@ -280,7 +393,7 @@ export function ResourceItem({
             </h3>
           </Link>
         )}
-        <Link href={`/resource/${resource.id}`} className="hover:text-rose-400">
+        <Link href={`/resource/${resource.id}`} className="hover:text-rose-500">
           <h2 className="text-lg font-semibold">{resource.name}</h2>
         </Link>
       </div>
@@ -293,11 +406,13 @@ export function ResourceItem({
           shortUrl={true}
         />
       </div>
-      <div className="flex basis-60 flex-col flex-wrap">
+      <div className="flex w-96 flex-col flex-wrap mr-4">
+        <span className="font-light mb-2">
+          Category:{" "}
         <CategoryLink
           category={resource.category}
-          className="mb-2 font-bold text-stone-500 hover:text-rose-400"
-        />
+          className="mb-2 font-bold text-stone-500 hover:text-rose-500"
+        /></span>
         <TagList tags={resource.tags} />
       </div>
       <Link

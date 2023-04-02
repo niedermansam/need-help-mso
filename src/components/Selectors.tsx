@@ -2,6 +2,8 @@ import type { StateManagerProps } from "react-select/dist/declarations/src/useSt
 import { api } from "../utils/api";
 import type { MultiValue, SingleValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
+import { BarriersToEntry, SpeedOfAid } from "@prisma/client";
+import Select from "react-select";
 
 export type CategorySelectItem = {
   value: string;
@@ -35,7 +37,7 @@ export const getCategoryString = (
     return category.value;
   }
   return "";
-}
+};
 
 export function CategorySelect({ title, ...attributes }: CategorySelectProps) {
   const { data } = api.getCategoryList.useQuery();
@@ -57,19 +59,20 @@ export function CategorySelect({ title, ...attributes }: CategorySelectProps) {
   );
 }
 
-export const isValidTagArray = ( tags: SingleValue<CategorySelectItem> | MultiValue<CategorySelectItem> ): tags is MultiValue<CategorySelectItem> => {
-  const tagIsValid = 
-    tags !== null &&
-    tags !== undefined &&
-    Array.isArray(tags)
+export const isValidTagArray = (
+  tags: SingleValue<CategorySelectItem> | MultiValue<CategorySelectItem>
+): tags is MultiValue<CategorySelectItem> => {
+  const tagIsValid = tags !== null && tags !== undefined && Array.isArray(tags);
 
-  return tagIsValid
-}
+  return tagIsValid;
+};
 
-export const getTagArray = ( tags: SingleValue<CategorySelectItem> | MultiValue<CategorySelectItem> ): string[] => {
-  if (!isValidTagArray(tags)) return []
-    return tags.map(tag => tag.value)
-}
+export const getTagArray = (
+  tags: SingleValue<CategorySelectItem> | MultiValue<CategorySelectItem>
+): string[] => {
+  if (!isValidTagArray(tags)) return [];
+  return tags.map((tag) => tag.value);
+};
 
 export function TagSelect({ title, ...attributes }: CategorySelectProps) {
   const { options } = attributes;
@@ -96,11 +99,15 @@ export function TagSelect({ title, ...attributes }: CategorySelectProps) {
   );
 }
 
-export function CommunitySelect({ title, options, ...attributes }: CategorySelectProps) {
+export function CommunitySelect({
+  title,
+  options,
+  ...attributes
+}: CategorySelectProps) {
   const { data } = api.community.getAll.useQuery(undefined, {
     enabled: !options,
   });
-  
+
   return (
     <>
       <label className="text-lg font-light">{title || "Community"}</label>
@@ -121,3 +128,145 @@ export function CommunitySelect({ title, options, ...attributes }: CategorySelec
     </>
   );
 }
+
+export function SpeedOfAidSelect({
+  title,
+  options,
+  ...attributes
+}: CategorySelectProps) {
+  type SpeedOfAidOption = {
+    value: SpeedOfAid;
+    label: string;
+  };
+
+  const optionList: SpeedOfAidOption[] = [
+    { value: SpeedOfAid.IMMEDIATE, label: "Immediate" },
+    { value: SpeedOfAid.DAYS, label: "Days" },
+    { value: SpeedOfAid.WEEKS, label: "Weeks" },
+    { value: SpeedOfAid.MONTHS, label: "Months" },
+    { value: SpeedOfAid.YEARS, label: "Years" },
+  ];
+
+  return (
+    <>
+      <label className="text-lg font-light">{title || "Speed of Aid"}</label>
+      <Select
+        className="mb-2.5"
+        {...attributes}
+        isClearable
+        options={options ? options : optionList}
+      />
+    </>
+  );
+}
+
+export function BarriersToEntrySelect({
+  title,
+  options,
+  ...attributes
+}: CategorySelectProps) {
+  type BarriersToEntryOption = {
+    value: BarriersToEntry;
+    label: string;
+  };
+
+  const optionList: BarriersToEntryOption[] = [
+    { value: BarriersToEntry.MINIMAL, label: "Minimal" },
+    { value: BarriersToEntry.LOW, label: "Low" },
+    { value: BarriersToEntry.MEDIUM, label: "Medium" },
+    { value: BarriersToEntry.HIGH, label: "High" },
+  ];
+
+  return (
+    <>
+      <label className="text-lg font-light">
+        {title || "Barriers to Entry"}
+      </label>
+      <Select
+        className="mb-2.5"
+        {...attributes}
+        isClearable
+        options={options ? options : optionList}
+      />
+    </>
+  );
+}
+
+export const validateMultivalueArray = (
+  array: MultiValue<CategorySelectItem> | CategorySelectItem[  ]
+): array is MultiValue<CategorySelectItem> => {
+  return array !== null && array !== undefined && Array.isArray(array);
+};
+
+export const getValidatedMultivalueArray = (
+  array: MultiValue<CategorySelectItem> | CategorySelectItem[  ]
+): MultiValue<CategorySelectItem> => {
+  if (validateMultivalueArray(array)) {
+    return array;
+  }
+  return [];
+};
+
+
+
+export function OrganizationMultiSelect({
+  title,
+  options,
+  ...attributes
+}: CategorySelectProps) {
+  const { data } = api.organization.getAll.useQuery(undefined, {
+    enabled: !options,
+  });
+
+  return (
+    <>
+      <label className="text-lg font-light">
+        {title || "Organization(s)"}
+      </label>
+      <Select
+        className="mb-2.5"
+        {...attributes}
+        isMulti={true}
+        isClearable
+        options={
+          options
+            ? options
+            : data?.map((organization) => ({
+                value: organization.id,
+                label: organization.name,
+              })) ?? []
+        }
+      />
+    </>
+  );
+}
+
+export function OrganizationSingleSelect({
+  title,
+  options,
+  ...attributes
+  }: CategorySelectProps) {
+  const { data } = api.organization.getAll.useQuery(undefined, {
+    enabled: !options,
+  });
+
+  return (
+    <>
+
+      <label className="text-lg font-light">
+        {title || "Organization"}
+      </label>
+      <Select
+        className="mb-2.5"
+        {...attributes}
+        options={
+          options
+            ? options
+            : data?.map((organization) => ({
+                value: organization.id,
+                label: organization.name,
+              })) ?? []
+        }
+      />
+
+        </>)}

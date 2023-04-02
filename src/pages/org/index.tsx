@@ -26,6 +26,7 @@ import { getSession } from "next-auth/react";
 import type { Session } from "next-auth/core/types";
 import { faEdit } from "@fortawesome/free-regular-svg-icons";
 import ReactModal from "react-modal";
+import { TagLink } from "../../components/Tags";
 
 
 export type OrganizationProps = {
@@ -301,13 +302,7 @@ export function TagList({ tags }: { tags: Tag[] }) {
   return (
     <div className="flex flex-wrap">
       {tags.map((tag) => (
-        <Link
-          key={tag.tag}
-          href={`/tag/${encodeTag(tag.tag)}`}
-          className="mr-2 mb-2 rounded-sm bg-stone-200 px-1 py-0.5 text-xs text-stone-600 hover:bg-rose-300 hover:text-stone-800"
-        >
-          {tag.tag}
-        </Link>
+        <TagLink key={tag.tag} tag={tag.tag} />
       ))}
     </div>
   );

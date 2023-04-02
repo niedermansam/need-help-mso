@@ -13,7 +13,6 @@ import type {
 import { getSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import { CategoryLink } from "..";
-import { encodeTag } from "../../../utils/manageUrl";
 import { ContactInfo } from "../../org";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
