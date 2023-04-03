@@ -4,7 +4,6 @@ import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpc";
 import { getTagsFromResources } from "./tag";
 
 export const resourceRouter = createTRPCRouter({
-
   getAll: publicProcedure.query(async ({ ctx }) => {
     const resources = await ctx.prisma.resource.findMany({
       include: {
@@ -104,8 +103,44 @@ export const resourceRouter = createTRPCRouter({
         free,
       } = input;
 
+      let newName = name.replace(/\s/g, "-").toLowerCase();
+
+      const newNameIsUnique =
+        (await ctx.prisma.resource.findUnique({
+          where: {
+            id: newName,
+          },
+          select: {
+            id: true,
+          },
+        })) === null;
+
+      if (!newNameIsUnique) {
+        const orgName = await ctx.prisma.organization.findUnique({
+          where: {
+            id: orgId,
+          },
+          select: {
+            name: true,
+          },
+        });
+
+        // remove any punctuation and get organization initials
+        const orgInitials = orgName
+          ? orgName.name
+              .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+              .split(" ")
+              .map((word) => word[0])
+              .join("")
+              .toLowerCase()
+          : Math.random().toString(36).substring(10);
+
+        newName = `${newName}-${orgInitials}`;
+      }
+
       const newResource = await ctx.prisma.resource.create({
         data: {
+          id: newName,
           name: name,
           description: description,
           url: url,
@@ -309,5 +344,3 @@ export const resourceRouter = createTRPCRouter({
       return resource;
     }),
 });
-
-

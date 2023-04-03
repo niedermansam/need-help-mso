@@ -71,6 +71,7 @@ export const organizationRouter = createTRPCRouter({
     try {
       return await ctx.prisma.organization.create({
         data: {
+          id: input.name.replace(/\s/g, "-").toLowerCase(),
           name: input.name,
           description: input.description,
           email: input.email,
