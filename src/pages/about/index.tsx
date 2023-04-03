@@ -2,6 +2,7 @@ import Link from "next/link";
 import NavBar from "../../components/Nav";
 
 export default function AboutPage() {
+  
   return (
     <div>
       <NavBar />
@@ -20,10 +21,13 @@ export default function AboutPage() {
           be a useful tool for them, and that it can help people who need a
           helping hand find the resources they need.
         </p>
-        <p className="mb-2">Check out the development timeline for more information on when this application will be publicly available!</p>
+        <p className="mb-2">
+          Check out the development timeline for more information on when this
+          application will be publicly available!
+        </p>
         <Link
           href="/timeline"
-          className="flex basis-32 py-1.5 mr-2 justify-center rounded border border-rose-500 bg-rose-500 font-bold text-white shadow-md mb-6"
+          className="umami--click--timeline mr-2 mb-6 flex basis-32 justify-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md"
         >
           Development Timeline
         </Link>
@@ -69,15 +73,14 @@ export default function AboutPage() {
           There&apos;s a thousand different directories of resources and
           nonprofits, but most public facing versions are geared towards
           fundraising, not care providers. Need Help Missoula is a directory for
-          people in need, and the professionals who help those people. As
-          such, the app will have features that similar directories don&apos;t
-          or can&apos;t. For example, the app will allow users to save
-          resources, and share them with other people. It will also allow users
-          to filter and sort resources by a variety of criteria like funding
-          type, communities served, and specific services provided. Eventually,
-          I hope to integrate a form to allow users to inform the maintainers of
-          the application that there is old or bad data or information on a
-          page.
+          people in need, and the professionals who help those people. As such,
+          the app will have features that similar directories don&apos;t or
+          can&apos;t. For example, the app will allow users to save resources,
+          and share them with other people. It will also allow users to filter
+          and sort resources by a variety of criteria like funding type,
+          communities served, and specific services provided. Eventually, I hope
+          to integrate a form to allow users to inform the maintainers of the
+          application that there is old or bad data or information on a page.
         </p>
       </div>
     </div>

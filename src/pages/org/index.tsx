@@ -297,7 +297,7 @@ export function ContactInfo({
   );
 }
 
-export function TagList({ tags }: { tags: Tag[] }) {
+export function TagList({ tags }: { tags: Pick<Tag, "tag">[] }) {
   return (
     <div className="flex flex-wrap">
       {tags.map((tag) => (

@@ -12,10 +12,7 @@ import "../styles/globals.css";
 import ReactModal from "react-modal";
 import Script from "next/script";
 
-
-
-ReactModal.setAppElement("#__next")
-
+ReactModal.setAppElement("#__next");
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -25,8 +22,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <SessionProvider session={session}>
       <Script
         src="https://umami-sepia.vercel.app/umami.js"
-        data-website-id={"ef3e6196-b4b5-4103-8bc2-68db63433e81"
-        }
+        data-website-id={"ef3e6196-b4b5-4103-8bc2-68db63433e81"}
         id="umami-script"
         async
         defer

@@ -369,8 +369,7 @@ type ResourceProps = Resource & {
     email: string | null;
     website: string | null;
   };
-  categoryMeta: Category;
-  tags: Tag[];
+  tags: Pick<Tag, 'tag' >[] ;
 };
 
 export function ResourceItem({
@@ -438,7 +437,7 @@ export function ResourceSection({ resources }: { resources: ResourceProps[] }) {
     if (selected && typeof selected === "object" && "value" in selected) {
       setVisibleResources(
         resources.filter(
-          (resource) => resource.categoryMeta.category === selected.value
+          (resource) => resource.category === selected.value
         )
       );
     } else {

@@ -5,23 +5,25 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 import NavBar from "../components/Nav";
 
+
+
 const CallToAction: React.FC = () => {
   return (
     <div className="m-4 mt-4 flex w-full flex-col justify-around md:flex-row">
       <Link
-        className="my-2 rounded-lg bg-rose-600 px-4 py-2 font-bold text-white shadow-lg transition-all  hover:bg-rose-700 hover:shadow-xl focus:bg-rose-700 focus:shadow-xl"
+        className="umami--click--patreon my-2 rounded-lg bg-rose-600 px-4 py-2 font-bold text-white shadow-lg transition-all  hover:bg-rose-700 hover:shadow-xl focus:bg-rose-700 focus:shadow-xl"
         href="https://www.patreon.com/NeedHelpMissoula"
       >
         Support on Patreon
       </Link>
       <Link
-        className="fous:bg-rose-300 my-2 rounded-lg bg-rose-200 px-4 py-2 font-bold text-rose-600 shadow transition-all hover:bg-rose-300 hover:shadow-lg focus:shadow-lg"
+        className="umami--click--timeline focus:bg-rose-300 my-2 rounded-lg bg-rose-200 px-4 py-2 font-bold text-rose-600 shadow transition-all hover:bg-rose-300 hover:shadow-lg focus:shadow-lg"
         href="/timeline"
       >
         Project Timeline
       </Link>
       <Link
-        className="my-2 rounded-lg bg-stone-200 px-4 py-2 font-bold text-stone-500 transition-all hover:bg-stone-300 hover:shadow-sm focus:bg-stone-300 focus:shadow-sm"
+        className="umami--click--github my-2 rounded-lg bg-stone-200 px-4 py-2 font-bold text-stone-500 transition-all hover:bg-stone-300 hover:shadow-sm focus:bg-stone-300 focus:shadow-sm"
         href="https://github.com/niedermansam/need-help-mso"
       >
         View on Github
@@ -66,6 +68,8 @@ const Description = () => {
 };
 
 const Home: NextPage = () => {
+  
+  
   return (
     <>
       <Head>
