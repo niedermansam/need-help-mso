@@ -15,9 +15,8 @@ import { getSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import { CategoryLink } from "..";
 import { ContactInfo } from "../../org";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { TagLink } from "../../../components/Tags";
+import { EditLink } from "../../../components";
 
 export default function ResourcePage({
   resource,
@@ -30,13 +29,9 @@ export default function ResourcePage({
         <h1 className="text-3xl font-bold">
           {resource.name}
           {admin && (
-            <Link href={`/resource/${resource.id}/edit`}>
-              <FontAwesomeIcon
-                icon={faEdit}
-                className="mx-2 text-rose-800 hover:text-rose-500"
-              />
-            </Link>
-          )}
+            <EditLink 
+            
+             href={`/resource/${resource.id}/edit`}/>)}
         </h1>
         <div className="mb-2 text-lg font-bold">
           Help With&nbsp;

@@ -1,5 +1,4 @@
 import NavBar from "../../components/Nav";
-import Link from "next/link";
 import type {
   GetServerSideProps,
   InferGetServerSidePropsType,
@@ -9,6 +8,8 @@ import { prisma } from "../../server/db";
 import type { Category, Community, Organization, Resource, Tag } from "@prisma/client";
 import type { Session } from "next-auth";
 import { ResourceItem } from "../resource";
+import { ContactInfo } from ".";
+import { EditLink } from "../../components";
 
 export default function OrganizationDetailsPage({
   orgData,
@@ -19,16 +20,27 @@ export default function OrganizationDetailsPage({
   const isAdmin = userSession?.user.admin || false;
 
   return (
-    <div>
+    <div className="text-stone-600">
       <NavBar />
-      <div className="p-2">
-        <div className="m-4">
-          <h1 className="pt-20 text-3xl">{orgData?.name}</h1>
-          <p>{orgData.email}</p>
-          <p>{orgData.phone}</p>
+      <div className="p-2 ">
+        <div className="mx-6">
+          <h1 className="mb-4 pt-12 text-3xl font-bold">
+            {orgData?.name}
+            {isAdmin && <EditLink href={`${orgData.id}/edit`} />}
+          </h1>
+          <div className="mb-6 flex flex-col">
+            <h3 className="font-semibold text-stone-500">Contact Info:</h3>
+            <ContactInfo
+              phone={orgData.phone}
+              email={orgData.email}
+              website={orgData.website}
+            />
+          </div>
+          <h3 className="font-semibold text-stone-500">Description:</h3>
           <p>{orgData.description}</p>
         </div>
       </div>
+      <h2 className="mx-6 mt-6 text-2xl font-bold">Available Resources</h2>
       {orgData.resources.map((resource) => {
         return (
           <ResourceItem
@@ -38,9 +50,6 @@ export default function OrganizationDetailsPage({
           />
         );
       })}
-      {isAdmin && (
-        <Link href={`/org/${orgData.id}/edit`}>Edit</Link>
-      )}
     </div>
   );
 }
