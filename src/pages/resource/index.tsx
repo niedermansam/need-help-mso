@@ -3,7 +3,6 @@ import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
 import type {
   Resource,
-  Category,
   Tag,
   BarriersToEntry,
   SpeedOfAid,
