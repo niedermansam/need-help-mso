@@ -1,35 +1,56 @@
 import { useRouter } from "next/router";
 import NavBar from "../../components/Nav";
-import { api } from "../../utils/api";
 import { ResourceItem } from "../resource";
 import { decodeTag } from "../../utils/manageUrl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TagSelect } from "../../components/Selectors";
+import { prisma } from "../../server/db";
+import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import type { BarriersToEntry, SpeedOfAid } from "@prisma/client";
 
-export default function CategoryPage() {
+export default function CategoryPage({
+  resources,
+  tags: allTags
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  
   const { category: URI } = useRouter().query;
   const category = decodeTag(URI as string);
 
-  const {
-    data: returnData,
-    isLoading,
-    isError,
-  } = api.resource.getByCategory.useQuery(category, {
-    enabled: !!category,
-  });
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
 
-  const [selectedTags, setSelectedTags] = useState<string[]>([
-  ]);
+  const [visibleResources, setVisibleResources] =
+    useState<typeof resources>(resources);
+
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const [strictFilter, setStrictFilter] = useState<boolean>(false);
 
-  if (isLoading) {
-    return <div>loading...</div>;
-  }
+  useEffect(() => {
+    console.log("dammit");
+    const filteredResources = resources.filter((resource) => {
+      if (selectedTags.length === 0) return true;
+      const resourceTags = resource.tags.map((tag) => tag.tag);
+      if (strictFilter) {
+        return selectedTags.every((tag) => resourceTags.includes(tag));
+      } else {
+        return selectedTags.some((tag) => resourceTags.includes(tag));
+      }
+    });
+    setVisibleResources(filteredResources);
 
-  if (isError) {
-    return <div>failed to load</div>;
-  }
+    const tagsInVisibleResources = filteredResources.map((resource) =>
+      resource.tags.map((tag) => tag.tag)
+    ).flat();
+
+    if (strictFilter === false) {
+      return setAvailableTags(allTags);
+    } else {
+      return setAvailableTags(tagsInVisibleResources);
+    }
+
+    
+  }, [selectedTags, strictFilter, resources, allTags]);
+
 
   return (
     <div>
@@ -38,13 +59,17 @@ export default function CategoryPage() {
         {category}
       </div>
       <TagSelect
-        options={returnData?.tags?.map((tag) => {
-          return { value: tag, label: tag };
-        })}
+        options={availableTags.map((tag) => ({ value: tag, label: tag }))}
         onChange={(selected) => {
           if (!selected) setSelectedTags([]);
           const selectedTags = selected as { value: string; label: string }[];
-          setSelectedTags(selectedTags.map((tag) => tag.value));
+          const selectedTagsValues = selectedTags.map((tag) => tag.value);
+          setSelectedTags(selectedTagsValues);
+
+          umami.trackEvent("filter", {
+            type: "tag",
+            tags: selectedTagsValues.join(","),
+          });
         }}
       />
       <div>
@@ -54,20 +79,106 @@ export default function CategoryPage() {
           id="strictFilter"
           checked={strictFilter}
           className="mr-2"
-          onChange={() => setStrictFilter(!strictFilter)}
+          onChange={() => {
+            const newFilterState = !strictFilter;
+            setStrictFilter(newFilterState);
+            umami.trackEvent("filter", {
+              type: "tag",
+              details: `strict-${newFilterState.toString()}`,
+            });
+          }}
         />
         <label htmlFor="strictFilter">Strict Filter?</label>
       </div>
-      {returnData?.resources
-        ?.filter((resource) => {
-          if (selectedTags.length === 0) return true;
-          const resourceTags = resource.tags.map((tag) => tag.tag);
-          if(!strictFilter) return selectedTags.some((tag) => resourceTags.includes(tag));
-          if(strictFilter) return selectedTags.every((tag) => resourceTags.includes(tag));
-        })
-        .map((resource) => (
-          <ResourceItem resource={resource} key={resource.id} />
-        ))}
+      {visibleResources.map((resource) => (
+        <ResourceItem resource={resource} key={resource.id} />
+      ))}
     </div>
   );
 }
+
+type ServerSideProps = {
+  resources: ResourceReturn;
+  category: string;
+  tags: string[];
+};
+
+type ResourceReturn = {
+  category: string;
+  organization: {
+    name: string;
+    email: string | null;
+    website: string | null;
+    phone: string | null;
+  };
+  id: string;
+  name: string;
+  tags: {
+    tag: string;
+  }[];
+  description: string;
+  url: string | null;
+  organizationId: string;
+  barriersToEntry: BarriersToEntry | null;
+  barriersToEntryDetails: string | null;
+  speedOfAid: SpeedOfAid[];
+  speedOfAidDetails: string | null;
+  free: boolean;
+}[];
+
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
+  context
+) => {
+  const category = context.query.category as string;
+
+
+  const resources = await prisma.resource.findMany({
+    where: {
+      category: {
+        mode: "insensitive",
+        equals: category,
+      },
+    },
+    select: {
+      category: true,
+      organization: {
+        select: {
+          name: true,
+          email: true,
+          website: true,
+          phone: true,
+        },  
+      },
+      id: true,
+      name: true,
+      tags: {
+        select: {
+          tag: true,
+        },
+      },
+      description: true,
+      url: true,
+      organizationId: true,
+      barriersToEntry: true,
+      barriersToEntryDetails: true,
+      speedOfAid: true,
+      speedOfAidDetails: true,
+      free: true,
+    },
+
+  });
+
+
+
+  const tags = resources.map((resource) => resource.tags.map((tag) => tag.tag)).flat();
+
+  const uniqueTags = [...new Set(tags)];
+
+  return {
+    props: {
+      category: category,
+      resources: resources,
+      tags: uniqueTags,
+    },
+  };
+};
