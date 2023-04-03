@@ -15,8 +15,8 @@ export default function OrganizationDetailsPage({
   userSession,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   if (!orgData) return <p>no data</p>;
-
-  console.log(userSession);
+  
+  const isAdmin = userSession?.user.admin || false;
 
   return (
     <div>
@@ -38,7 +38,7 @@ export default function OrganizationDetailsPage({
           />
         );
       })}
-      {userSession.user.admin && (
+      {isAdmin && (
         <Link href={`/org/${orgData.id}/edit`}>Edit</Link>
       )}
     </div>
@@ -62,7 +62,7 @@ export type OrgProps = Omit<OrgReturnProps, "createdAt" | "updatedAt"> & {
 
 export type OrgServerSideProps = {
   orgData: OrgProps;
-  userSession: Session;
+  userSession: Session | null;
 };
 
 export const getServerSideProps: GetServerSideProps<
@@ -70,14 +70,7 @@ export const getServerSideProps: GetServerSideProps<
 > = async (context) => {
   const session = await getSession(context);
 
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
+
 
   const orgId = context.query.id as string;
 

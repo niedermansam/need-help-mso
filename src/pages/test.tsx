@@ -1,7 +1,8 @@
+import { LoadingSpinner } from "../components";
 
 
 export default function TestPage() {
 
 
-  return <p>Syncing Airtable data...</p>;
+  return <LoadingSpinner />;
 }
