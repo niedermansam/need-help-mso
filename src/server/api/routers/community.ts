@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpc";
 
 export const communityRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -12,7 +12,7 @@ export const communityRouter = createTRPCRouter({
         where: { name: input.community },
       });
     }),
-  create: publicProcedure
+  create: adminProcedure
     .input(
       z.object({
         name: z.string(),
@@ -66,7 +66,7 @@ export const communityRouter = createTRPCRouter({
       });
     }),
 
-  connectResource: publicProcedure
+  connectResource: adminProcedure
     .input(
       z.object({
         community: z.string(),
@@ -86,7 +86,7 @@ export const communityRouter = createTRPCRouter({
       });
     }),
 
-  connectOrg: publicProcedure
+  connectOrg: adminProcedure
     .input(
       z.object({
         community: z.string(),
@@ -106,7 +106,7 @@ export const communityRouter = createTRPCRouter({
       });
     }),
 
-  disconnectResource: publicProcedure
+  disconnectResource: adminProcedure
     .input(
       z.object({
         community: z.string(),
@@ -126,7 +126,7 @@ export const communityRouter = createTRPCRouter({
       });
     }),
 
-  disconnectOrg: publicProcedure
+  disconnectOrg: adminProcedure
     .input(
       z.object({
         community: z.string(),

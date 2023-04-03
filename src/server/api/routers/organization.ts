@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure, protectedProcedure, adminProcedure } from "../trpc";
 //import Airtable from "airtable";
 
 export interface OrganizationSchema {
@@ -67,70 +67,68 @@ const orgUpdateInput = z.object({
 });
 
 export const organizationRouter = createTRPCRouter({
-  create: protectedProcedure
-    .input(orgInput)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await ctx.prisma.organization.create({
-          data: {
-            name: input.name,
-            description: input.description,
-            email: input.email,
-            phone: input.phone,
-            website: input.website,
-            tags: {
-              connectOrCreate: input.tags
-                ? input.tags.map((tag) => ({
-                    where: { tag },
+  create: adminProcedure.input(orgInput).mutation(async ({ input, ctx }) => {
+    try {
+      return await ctx.prisma.organization.create({
+        data: {
+          name: input.name,
+          description: input.description,
+          email: input.email,
+          phone: input.phone,
+          website: input.website,
+          tags: {
+            connectOrCreate: input.tags
+              ? input.tags.map((tag) => ({
+                  where: { tag },
+                  create: {
+                    tag,
+                  },
+                }))
+              : [],
+          },
+
+          helpfulToCommunities: input.helpfulToCommunities
+            ? {
+                connectOrCreate: input.helpfulToCommunities.map(
+                  (community) => ({
+                    where: { name: community },
                     create: {
-                      tag,
+                      name: community,
                     },
-                  }))
-                : [],
-            },
+                  })
+                ),
+              }
+            : undefined,
 
-            helpfulToCommunities: input.helpfulToCommunities
-              ? {
-                  connectOrCreate: input.helpfulToCommunities.map(
-                    (community) => ({
-                      where: { name: community },
-                      create: {
-                        name: community,
-                      },
-                    })
-                  ),
-                }
-              : undefined,
+          exclusiveToCommunities: input.exclusiveToCommunities
+            ? {
+                connectOrCreate: input.exclusiveToCommunities.map(
+                  (community) => ({
+                    where: { name: community },
+                    create: {
+                      name: community,
+                    },
+                  })
+                ),
+              }
+            : undefined,
 
-            exclusiveToCommunities: input.exclusiveToCommunities
-              ? {
-                  connectOrCreate: input.exclusiveToCommunities.map(
-                    (community) => ({
-                      where: { name: community },
-                      create: {
-                        name: community,
-                      },
-                    })
-                  ),
-                }
-              : undefined,
-
-            categoryMeta: {
-              connectOrCreate: {
-                where: { category: input.category },
-                create: {
-                  category: input.category,
-                },
+          categoryMeta: {
+            connectOrCreate: {
+              where: { category: input.category },
+              create: {
+                category: input.category,
               },
             },
           },
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    }),
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }),
 
-  update: protectedProcedure
+  update: adminProcedure
     .input(orgUpdateInput)
     .mutation(async ({ input, ctx }) => {
       try {
@@ -202,28 +200,31 @@ export const organizationRouter = createTRPCRouter({
           },
         });
 
-        if (input.exclusiveToCommunities && input.exclusiveToCommunities.length > 0) {
-          
+        if (
+          input.exclusiveToCommunities &&
+          input.exclusiveToCommunities.length > 0
+        ) {
           updatedOrg.resources.map(async (resource) => {
             await ctx.prisma.resource.update({
               where: {
                 id: resource.id,
               },
               data: {
-                exclusiveToCommunities: input.exclusiveToCommunities ? {
-                  connectOrCreate: input.exclusiveToCommunities.map(
-                    (community) => ({
-                      where: { name: community },
-                      create: {
-                        name: community,
-                      },
-                    })
-                  ),
-                } : undefined,
+                exclusiveToCommunities: input.exclusiveToCommunities
+                  ? {
+                      connectOrCreate: input.exclusiveToCommunities.map(
+                        (community) => ({
+                          where: { name: community },
+                          create: {
+                            name: community,
+                          },
+                        })
+                      ),
+                    }
+                  : undefined,
               },
             });
           });
-
         }
 
         return updatedOrg;
@@ -265,27 +266,26 @@ export const organizationRouter = createTRPCRouter({
       }
     }),
 
-  disconnectTag: protectedProcedure.input(z.object({orgId: z.string(), tag: z.string()})).mutation(async ({input, ctx}) => {
-
-    try {
-      return await ctx.prisma.organization.update({
-        where: {
-          id: input.orgId,
-        },
-        data: {
-          tags: {
-            disconnect: {
-              tag: input.tag
-            }
-          }
-        }
-      })
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  ),
-
+  disconnectTag: adminProcedure
+    .input(z.object({ orgId: z.string(), tag: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        return await ctx.prisma.organization.update({
+          where: {
+            id: input.orgId,
+          },
+          data: {
+            tags: {
+              disconnect: {
+                tag: input.tag,
+              },
+            },
+          },
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }),
 });
 
 

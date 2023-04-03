@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpc";
 import { decodeTag } from "../../../utils/manageUrl";
 import type { Resource, Organization, Tag, Category } from "@prisma/client";
 
@@ -25,7 +25,7 @@ export const tagRouter = createTRPCRouter({
       console.log(err);
     }
   }),
-  connectCategories: publicProcedure.mutation(async ({ ctx }) => {
+  connectCategories: adminProcedure.mutation(async ({ ctx }) => {
     const resources = await ctx.prisma.resource.findMany({
       include: { tags: true },
     });
@@ -66,7 +66,7 @@ export const tagRouter = createTRPCRouter({
 
     return true;
   }),
-  connectOrganization: publicProcedure
+  connectOrganization: adminProcedure
     .input(z.object({ orgId: z.string(), tag: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.tag.upsert({
@@ -91,7 +91,7 @@ export const tagRouter = createTRPCRouter({
       return true;
     }),
 
-  connectResource: publicProcedure
+  connectResource: adminProcedure
     .input(z.object({ resourceId: z.string(), tag: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.tag.upsert({
@@ -128,26 +128,26 @@ export const tagRouter = createTRPCRouter({
               mode: "insensitive",
             },
           },
-          include: { resources: 
-            {
+          include: {
+            resources: {
               include: {
                 tags: true,
                 categoryMeta: true,
                 organization: true,
-                
-              }
-            }, organizations: 
-          {
-            include: {
-              tags: true,
-            }
-          } },
+              },
+            },
+            organizations: {
+              include: {
+                tags: true,
+              },
+            },
+          },
         });
 
         const resources = tagArray.map((tag) => tag.resources).flat();
         const organizations = tagArray.map((tag) => tag.organizations).flat();
 
-        return {resources, organizations};
+        return { resources, organizations };
       } catch (err) {
         console.log(err);
       }

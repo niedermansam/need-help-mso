@@ -4,114 +4,7 @@ import { adminProcedure, createTRPCRouter, protectedProcedure, publicProcedure }
 import { getTagsFromResources } from "./tag";
 
 export const resourceRouter = createTRPCRouter({
-  create: protectedProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        description: z.string(),
-        category: z.string(),
-        orgId: z.string(),
-        helpingOrganizations: z.array(z.string()).optional(),
-        url: z.string().nullish(),
-        tags: z.array(z.string()).optional(),
-        exclusiveToCommunities: z.array(z.string()).optional(),
-        helpfulToCommunities: z.array(z.string()).optional(),
-        barriersToEntry: z.enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"]).optional(),
-        barriersToEntryDetails: z.string().optional(),
-        speedOfAid: z.array(z.enum(["IMMEDIATE", "DAYS", "WEEKS", "MONTHS", "YEARS"])).optional(),
-        speedOfAidDetails: z.string().optional(),
-        free: z.boolean().optional(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const {
-        name,
-        description,
-        category,
-        orgId,
-        helpingOrganizations,
-        url,
-        tags,
-        exclusiveToCommunities,
-        helpfulToCommunities,
-        barriersToEntry,
-         barriersToEntryDetails,
-        speedOfAid,
-        speedOfAidDetails,
-        free,
-      } = input;
 
-      const newResource = await ctx.prisma.resource.create({
-        data: {
-          name: name,
-          description: description,
-          url: url,
-          categoryMeta: {
-            connectOrCreate: {
-              where: { category: category },
-              create: {
-                category: category,
-              },
-            },
-          },
-          organization: {
-            connect: {
-              id: orgId,
-            },
-          },
-          helpingOrganizations: helpingOrganizations && {
-            connect : helpingOrganizations?.map((org) => ({
-              id: org,
-            })),
-          },
-
-
-          tags: {
-            connectOrCreate: tags
-              ? tags.map((tag) => ({
-                  where: { tag },
-                  create: {
-                    tag,
-                  },
-                }))
-              : [],
-          },
-
-          exclusiveToCommunities: exclusiveToCommunities
-            ? {
-                connectOrCreate: exclusiveToCommunities.map((community) => ({
-                  where: { name: community },
-                  create: {
-                    name: community,
-                  },
-                })),
-              }
-            : undefined,
-
-          helpfulToCommunities: helpfulToCommunities
-            ? {
-                connectOrCreate: helpfulToCommunities.map((community) => ({
-                  where: { name: community },
-                  create: {
-                    name: community,
-                  },
-                })),
-              }
-            : undefined,
-
-          barriersToEntry: barriersToEntry,
-          barriersToEntryDetails: barriersToEntryDetails,
-
-          speedOfAid: speedOfAid,
-          speedOfAidDetails: speedOfAidDetails,
-
-          free: free,
-
-
-        },
-      });
-      return newResource;
-    }),
   getAll: publicProcedure.query(async ({ ctx }) => {
     const resources = await ctx.prisma.resource.findMany({
       include: {
@@ -170,8 +63,116 @@ export const resourceRouter = createTRPCRouter({
         console.log(e);
       }
     }),
+  create: adminProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        description: z.string(),
+        category: z.string(),
+        orgId: z.string(),
+        helpingOrganizations: z.array(z.string()).optional(),
+        url: z.string().nullish(),
+        tags: z.array(z.string()).optional(),
+        exclusiveToCommunities: z.array(z.string()).optional(),
+        helpfulToCommunities: z.array(z.string()).optional(),
+        barriersToEntry: z
+          .enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"])
+          .optional(),
+        barriersToEntryDetails: z.string().optional(),
+        speedOfAid: z
+          .array(z.enum(["IMMEDIATE", "DAYS", "WEEKS", "MONTHS", "YEARS"]))
+          .optional(),
+        speedOfAidDetails: z.string().optional(),
+        free: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const {
+        name,
+        description,
+        category,
+        orgId,
+        helpingOrganizations,
+        url,
+        tags,
+        exclusiveToCommunities,
+        helpfulToCommunities,
+        barriersToEntry,
+        barriersToEntryDetails,
+        speedOfAid,
+        speedOfAidDetails,
+        free,
+      } = input;
 
-  update: publicProcedure
+      const newResource = await ctx.prisma.resource.create({
+        data: {
+          name: name,
+          description: description,
+          url: url,
+          categoryMeta: {
+            connectOrCreate: {
+              where: { category: category },
+              create: {
+                category: category,
+              },
+            },
+          },
+          organization: {
+            connect: {
+              id: orgId,
+            },
+          },
+          helpingOrganizations: helpingOrganizations && {
+            connect: helpingOrganizations?.map((org) => ({
+              id: org,
+            })),
+          },
+
+          tags: {
+            connectOrCreate: tags
+              ? tags.map((tag) => ({
+                  where: { tag },
+                  create: {
+                    tag,
+                  },
+                }))
+              : [],
+          },
+
+          exclusiveToCommunities: exclusiveToCommunities
+            ? {
+                connectOrCreate: exclusiveToCommunities.map((community) => ({
+                  where: { name: community },
+                  create: {
+                    name: community,
+                  },
+                })),
+              }
+            : undefined,
+
+          helpfulToCommunities: helpfulToCommunities
+            ? {
+                connectOrCreate: helpfulToCommunities.map((community) => ({
+                  where: { name: community },
+                  create: {
+                    name: community,
+                  },
+                })),
+              }
+            : undefined,
+
+          barriersToEntry: barriersToEntry,
+          barriersToEntryDetails: barriersToEntryDetails,
+
+          speedOfAid: speedOfAid,
+          speedOfAidDetails: speedOfAidDetails,
+
+          free: free,
+        },
+      });
+      return newResource;
+    }),
+  update: adminProcedure
     .input(
       z.object({
         id: z.string(),
@@ -182,17 +183,27 @@ export const resourceRouter = createTRPCRouter({
         tags: z.array(z.string()).optional(),
         helpfulTo: z.array(z.string()).optional(),
         exclusiveTo: z.array(z.string()).optional(),
-        barriersToEntry: z.enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"]).optional(),
+        barriersToEntry: z
+          .enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"])
+          .optional(),
         barriersToEntryDetails: z.string().optional(),
 
-        speedOfAid: z.array(z.enum(["IMMEDIATE", "DAYS", "WEEKS", "MONTHS", "YEARS"])).optional(),
+        speedOfAid: z
+          .array(z.enum(["IMMEDIATE", "DAYS", "WEEKS", "MONTHS", "YEARS"]))
+          .optional(),
         speedOfAidDetails: z.string().optional(),
         free: z.boolean().optional(),
         helpingOrganizations: z.array(z.string()).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { id, name, description, category,  url, tags,
+      const {
+        id,
+        name,
+        description,
+        category,
+        url,
+        tags,
         helpfulTo,
         exclusiveTo,
         barriersToEntry,
@@ -201,17 +212,15 @@ export const resourceRouter = createTRPCRouter({
         speedOfAidDetails,
         free,
         helpingOrganizations,
-
       } = input;
 
-      console.log(helpingOrganizations)
+      console.log(helpingOrganizations);
 
       const resource = await ctx.prisma.resource.update({
         where: {
           id: id,
         },
         data: {
-
           name: name || undefined,
           description: description || undefined,
           categoryMeta: category
@@ -225,11 +234,10 @@ export const resourceRouter = createTRPCRouter({
               }
             : undefined,
           helpingOrganizations: helpingOrganizations && {
-            connect : helpingOrganizations.map((org) => ({
+            connect: helpingOrganizations.map((org) => ({
               id: org,
             })),
           },
-
 
           tags: {
             connectOrCreate: tags
@@ -276,10 +284,14 @@ export const resourceRouter = createTRPCRouter({
       return resource;
     }),
 
-    reassignAdministeringOrg: adminProcedure.input(z.object({
-      resourceId: z.string(),
-      orgId: z.string(),
-    })).mutation(async ({ input, ctx }) => {
+  reassignAdministeringOrg: adminProcedure
+    .input(
+      z.object({
+        resourceId: z.string(),
+        orgId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
       const { resourceId, orgId } = input;
 
       const resource = await ctx.prisma.resource.update({
@@ -295,7 +307,6 @@ export const resourceRouter = createTRPCRouter({
         },
       });
       return resource;
-
     }),
 });
 
