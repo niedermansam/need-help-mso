@@ -10,7 +10,6 @@ import {
   isValidCategory,
 } from "../../components/Selectors";
 import { useRouter } from "next/router";
-import { encodeTag } from "../../utils/manageUrl";
 import { getRawPhoneNumber, prettyUrl } from "../../utils";
 import {
   faEnvelope,

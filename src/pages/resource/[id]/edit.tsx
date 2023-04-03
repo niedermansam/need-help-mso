@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import NavBar from "../../../components/Nav";
 import {
   CategorySelect,
@@ -7,23 +6,22 @@ import {
   CommunitySelect,
   OrganizationMultiSelect,
   OrganizationSingleSelect,
-  validateMultivalueArray,
   getValidatedMultivalueArray,
 } from "../../../components/Selectors";
 import { api } from "../../../utils/api";
 import { useState } from "react";
-import {
+import type {
   Category,
   Community,
   Organization,
   Resource,
   Tag,
 } from "@prisma/client";
-import { MultiValue, MultiValueProps, SingleValue } from "react-select";
-import { GetServerSideProps } from "next";
+import type { MultiValue} from "react-select";
+import type { GetServerSideProps } from "next";
 import { prisma } from "../../../server/db";
 import { getSession } from "next-auth/react";
-import { Session } from "next-auth";
+import type { Session } from "next-auth";
 
 type ResourceReturn =
   | (Resource & {
@@ -37,7 +35,7 @@ type ResourceReturn =
   | null
   | undefined;
 
-function getPartnerOrgArray(resource: ResourceReturn) {
+export function getPartnerOrgArray(resource: ResourceReturn) {
   if (!resource) return [];
   return resource.helpingOrganizations.map((org) => ({
     value: org.name,

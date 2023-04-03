@@ -11,9 +11,10 @@ import type {
 import { useEffect, useState } from "react";
 import type { MultiValue, SingleValue } from "react-select";
 import { encodeTag } from "../../utils/manageUrl";
+import type {
+  CategorySelectItem} from "../../components/Selectors";
 import {
   BarriersToEntrySelect,
-  CategorySelectItem,
   CommunitySelect,
   SpeedOfAidSelect,
 } from "../../components/Selectors";

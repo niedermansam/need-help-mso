@@ -2,7 +2,6 @@ import type { GetServerSideProps, InferGetServerSidePropsType } from "next/types
 import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
 import { decodeTag, encodeTag } from "../../utils/manageUrl";
-import { trimString } from "../../utils";
 import { OrganizationItem } from "../org";
 import { ResourceItem } from "../resource";
 
