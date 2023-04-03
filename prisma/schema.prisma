@@ -46,16 +46,20 @@ model Session {
 }
 
 model User {
-    id            String             @id @default(cuid())
+    id            String                @id @default(cuid())
     name          String?
-    email         String?            @unique
+    email         String?               @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
     adminOf       Organization[]
     resources     ResourceContact[]
+    organizations OrganizationContact[]
     roles         OrganizationRole[]
+    admin         Boolean               @default(false)
+    lists         FavoritesList[]       @relation("AuthorizedUsers")
+    createdLists  FavoritesList[]       @relation("Admin")
 }
 
 model VerificationToken {
@@ -71,6 +75,7 @@ model Category {
     description   String?
     organizations Organization[]
     resources     Resource[]
+    tags          Tag[]
 }
 
 model Tag {
@@ -78,37 +83,40 @@ model Tag {
     description   String?
     organizations Organization[]
     resources     Resource[]
+    categories    Category[]
 }
 
 model Community {
     name               String         @id @unique
-    exclusiveOrgs      Organization[]
-    exclusiveResources Resource[]
-    helpfulOrgs        Organization[] @relation("Helpful")
-    helpfulResources   Resource[]     @relation("Helpful")
+    exclusiveOrgs      Organization[] @relation("ExclusiveOrg")
+    exclusiveResources Resource[]     @relation("ExclusiveResource")
+    helpfulOrgs        Organization[] @relation("HelpfulOrg")
+    helpfulResources   Resource[]     @relation("HelpfulResource")
 }
 
 model Organization {
-    id                     String             @id @default(cuid())
-    name                   String             @unique
-    createdAt              DateTime           @default(now())
-    updatedAt              DateTime           @updatedAt
+    id                     String                @id @unique @default(cuid())
+    name                   String                @unique
+    createdAt              DateTime              @default(now())
+    updatedAt              DateTime              @updatedAt
     admins                 User[]
     description            String
     category               String
-    categoryMeta           Category           @relation(fields: [category], references: [category])
+    categoryMeta           Category              @relation(fields: [category], references: [category])
     tags                   Tag[]
     website                String?
     logo                   String?
     phone                  String?
     email                  String?
-    adminOf                Organization[]     @relation("AffiliatedOrgs")
-    administeringOrg       Organization[]     @relation("AffiliatedOrgs")
+    adminOf                Organization[]        @relation("AffiliatedOrgs")
+    administeringOrg       Organization[]        @relation("AffiliatedOrgs")
     resources              Resource[]
-    assistsWith            Resource[]         @relation("HelpingOrgs")
-    exclusiveToCommunities Community[]
-    helpfulToCommunities   Community[]        @relation("Helpful")
+    assistsWith            Resource[]            @relation("HelpingOrgs")
+    exclusiveToCommunities Community[]           @relation("ExclusiveOrg")
+    helpfulToCommunities   Community[]           @relation("HelpfulOrg")
     roles                  OrganizationRole[]
+    contacts               OrganizationContact[]
+    lists                  FavoritesList[]
 }
 
 model OrganizationRole {
@@ -120,20 +128,41 @@ model OrganizationRole {
     @@id([userId, orgId])
 }
 
+enum BarriersToEntry {
+    MINIMAL
+    LOW
+    MEDIUM
+    HIGH
+}
+
+enum SpeedOfAid {
+    IMMEDIATE
+    DAYS
+    WEEKS
+    MONTHS
+    YEARS
+}
+
 model Resource {
-    id                     String            @id @default(cuid())
+    id                     String            @id @unique @default(cuid())
     name                   String
     description            String
-    url                    String ?
+    url                    String?
     organizationId         String
     organization           Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
     helpingOrganizations   Organization[]    @relation("HelpingOrgs")
     category               String
     categoryMeta           Category          @relation(fields: [category], references: [category])
     tags                   Tag[]
-    exclusiveToCommunities Community[]
-    helpfulToCommunities   Community[]       @relation("Helpful")
+    exclusiveToCommunities Community[]       @relation("ExclusiveResource")
+    helpfulToCommunities   Community[]       @relation("HelpfulResource")
     contacts               ResourceContact[]
+    barriersToEntry        BarriersToEntry?
+    barriersToEntryDetails String?
+    speedOfAid             SpeedOfAid[]
+    speedOfAidDetails      String?
+    lists                  FavoritesList[]
+    free                  Boolean           @default(false)
 }
 
 model ResourceContact {
@@ -142,5 +171,34 @@ model ResourceContact {
     user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
 
+    phone String?
+    email String?
+
     @@id([userId, resourceId])
+}
+
+model OrganizationContact {
+    userId       String
+    orgId        String
+    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+    phone String?
+    email String?
+
+    @@id([userId, orgId])
+}
+
+model FavoritesList {
+    id              Int            @id @default(autoincrement())
+    createdAt       DateTime       @default(now())
+    updatedAt       DateTime       @updatedAt
+    adminId         String
+    admin           User           @relation(fields: [adminId], references: [id], onDelete: Cascade, name: "Admin")
+    authorizedUsers User[]         @relation("AuthorizedUsers")
+    name            String         @default("Favorites")
+    notes           String?
+    resources       Resource[]
+    organizations   Organization[]
+    public          Boolean        @default(true)
 }

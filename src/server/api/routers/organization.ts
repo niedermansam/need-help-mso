@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import Airtable from "airtable";
+import { createTRPCRouter, publicProcedure,  adminProcedure } from "../trpc";
 //import Airtable from "airtable";
 
 export interface OrganizationSchema {
@@ -50,6 +49,8 @@ const orgInput = z.object({
   phone: z.string().optional(),
   tags: z.array(z.string()).optional(),
   website: z.string().optional(),
+  helpfulToCommunities: z.array(z.string()).optional(),
+  exclusiveToCommunities: z.array(z.string()).optional(),
 });
 
 const orgUpdateInput = z.object({
@@ -61,12 +62,13 @@ const orgUpdateInput = z.object({
   phone: z.string().nullish(),
   tags: z.array(z.string()).nullish(),
   website: z.string().nullish(),
+  helpfulToCommunities: z.array(z.string()).nullish(),
+  exclusiveToCommunities: z.array(z.string()).nullish(),
 });
 
 export const organizationRouter = createTRPCRouter({
-  create: protectedProcedure
-    .input(orgInput)
-    .mutation(async ({ input, ctx }) => {
+  create: adminProcedure.input(orgInput).mutation(async ({ input, ctx }) => {
+    try {
       return await ctx.prisma.organization.create({
         data: {
           name: input.name,
@@ -85,6 +87,32 @@ export const organizationRouter = createTRPCRouter({
               : [],
           },
 
+          helpfulToCommunities: input.helpfulToCommunities
+            ? {
+                connectOrCreate: input.helpfulToCommunities.map(
+                  (community) => ({
+                    where: { name: community },
+                    create: {
+                      name: community,
+                    },
+                  })
+                ),
+              }
+            : undefined,
+
+          exclusiveToCommunities: input.exclusiveToCommunities
+            ? {
+                connectOrCreate: input.exclusiveToCommunities.map(
+                  (community) => ({
+                    where: { name: community },
+                    create: {
+                      name: community,
+                    },
+                  })
+                ),
+              }
+            : undefined,
+
           categoryMeta: {
             connectOrCreate: {
               where: { category: input.category },
@@ -95,48 +123,122 @@ export const organizationRouter = createTRPCRouter({
           },
         },
       });
-    }),
+    } catch (err) {
+      console.log(err);
+    }
+  }),
 
-  update: protectedProcedure
+  update: adminProcedure
     .input(orgUpdateInput)
     .mutation(async ({ input, ctx }) => {
-      return await ctx.prisma.organization.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          name: input.name || undefined,
-          description: input.description || undefined,
-          email: input.email,
-          phone: input.phone,
-          website: input.website,
-          tags: {
-            connectOrCreate: input.tags
-              ? input.tags.map((tag) => ({
-                  where: { tag },
-                  create: {
-                    tag,
-                  },
-                }))
-              : [],
+      try {
+        const updatedOrg = await ctx.prisma.organization.update({
+          where: {
+            id: input.id,
           },
+          include: {
+            exclusiveToCommunities: true,
+            resources: {
+              select: {
+                id: true,
+              },
+            },
+          },
+          data: {
+            name: input.name || undefined,
+            description: input.description || undefined,
+            email: input.email,
+            phone: input.phone,
+            website: input.website,
+            tags: {
+              connectOrCreate: input.tags
+                ? input.tags.map((tag) => ({
+                    where: { tag },
+                    create: {
+                      tag,
+                    },
+                  }))
+                : [],
+            },
 
-          categoryMeta: {
-            connectOrCreate: input.category
+            categoryMeta: {
+              connectOrCreate: input.category
+                ? {
+                    where: { category: input.category },
+                    create: {
+                      category: input.category,
+                    },
+                  }
+                : undefined,
+            },
+
+            helpfulToCommunities: input.helpfulToCommunities
               ? {
-                  where: { category: input.category },
-                  create: {
-                    category: input.category,
-                  },
+                  connectOrCreate: input.helpfulToCommunities.map(
+                    (community) => ({
+                      where: { name: community },
+                      create: {
+                        name: community,
+                      },
+                    })
+                  ),
+                }
+              : undefined,
+
+            exclusiveToCommunities: input.exclusiveToCommunities
+              ? {
+                  connectOrCreate: input.exclusiveToCommunities.map(
+                    (community) => ({
+                      where: { name: community },
+                      create: {
+                        name: community,
+                      },
+                    })
+                  ),
                 }
               : undefined,
           },
-        },
-      });
+        });
+
+        if (
+          input.exclusiveToCommunities &&
+          input.exclusiveToCommunities.length > 0
+        ) {
+          updatedOrg.resources.map(async (resource) => {
+            await ctx.prisma.resource.update({
+              where: {
+                id: resource.id,
+              },
+              data: {
+                exclusiveToCommunities: input.exclusiveToCommunities
+                  ? {
+                      connectOrCreate: input.exclusiveToCommunities.map(
+                        (community) => ({
+                          where: { name: community },
+                          create: {
+                            name: community,
+                          },
+                        })
+                      ),
+                    }
+                  : undefined,
+              },
+            });
+          });
+        }
+
+        return updatedOrg;
+      } catch (err) {
+        console.log(err);
+      }
     }),
 
   getAll: publicProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.organization.findMany();
+    return await ctx.prisma.organization.findMany({
+      include: {
+        tags: true,
+      },
+    });
   }),
 
   getById: publicProcedure
@@ -155,6 +257,29 @@ export const organizationRouter = createTRPCRouter({
             resources: true,
             tags: true,
             categoryMeta: true,
+            helpfulToCommunities: true,
+            exclusiveToCommunities: true,
+          },
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }),
+
+  disconnectTag: adminProcedure
+    .input(z.object({ orgId: z.string(), tag: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        return await ctx.prisma.organization.update({
+          where: {
+            id: input.orgId,
+          },
+          data: {
+            tags: {
+              disconnect: {
+                tag: input.tag,
+              },
+            },
           },
         });
       } catch (err) {
@@ -162,3 +287,5 @@ export const organizationRouter = createTRPCRouter({
       }
     }),
 });
+
+
