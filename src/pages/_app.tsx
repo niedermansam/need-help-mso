@@ -15,8 +15,6 @@ import { env } from "process";
 
 
 
-ReactModal.setAppElement("#__next");
-
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
