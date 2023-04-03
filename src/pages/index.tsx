@@ -83,13 +83,7 @@ const Home: NextPage = () => {
             <Title />
             <Description />
             <CallToAction />
-            <Link
-              href="https://niedermansam.github.io/need-help-missoula/#/resources"
-              target="_blank"
-              className="hover:rose-60 focus: rose-60 mx-4 mt-4 w-full font-light text-rose-400"
-            >
-              Check out the Prototype →
-            </Link>
+            
           </div>
         </div>
       </main>
