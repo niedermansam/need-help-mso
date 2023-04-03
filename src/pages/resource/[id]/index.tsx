@@ -71,17 +71,11 @@ export default function ResourcePage({
           </div>
         </div>
         <div className="mb-6 rounded border border-stone-200 p-4 shadow-md">
-          <h3 className="font-semibold leading-4 text-stone-500">
+          <h3 className="font-semibold leading-4 text-stone-500 mb-2">
             Description:
           </h3>
-          <p className=" leading-loose">{resource.description}</p>
-          <h4 className="mt-2 font-semibold text-stone-500">Internal Links</h4>
-          <Link
-            className="text-rose-500 hover:text-rose-700"
-            href={`/org/${resource.organization.id}`}
-          >
-            {resource.organization.name}
-          </Link>
+          <p className="mb-2">{resource.description}</p>
+          
         </div>
       </div>
     </div>
