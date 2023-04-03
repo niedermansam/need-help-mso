@@ -1,10 +1,11 @@
-
 import NavBar from "../../../components/Nav";
 import Link from "next/link";
-import type { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
+import type {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+} from "next/types";
 import { prisma } from "../../../server/db";
 import type {
-  Category,
   Community,
   Organization,
   Resource,
@@ -17,7 +18,6 @@ import { ContactInfo } from "../../org";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { TagLink } from "../../../components/Tags";
-
 
 export default function ResourcePage({
   resource,
@@ -88,13 +88,18 @@ export default function ResourcePage({
   );
 }
 
+type CommunityPick = Pick<Community, "name">;
+
 type ServerSideProps = {
-  resource: Resource & {
-    organization: Pick<Organization, "name" | "id" | "phone" | "email" | "website">;
-    tags: Tag[];
-    categoryMeta: Category;
-    exclusiveToCommunities: Community[];
-    helpfulToCommunities: Community[];
+  resource: Pick<Resource, "name" | "id" | "category" | 
+  "organizationId" | "url" | "description"> & {
+    organization: Pick<
+      Organization,
+      "name" | "id" | "phone" | "email" | "website"
+    >;
+    tags: Pick<Tag, "tag">[];
+    exclusiveToCommunities:  CommunityPick[];
+    helpfulToCommunities: CommunityPick[];
   };
   session: Session | null;
   admin: boolean;
@@ -113,7 +118,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     where: {
       id: id as string,
     },
-    include: {
+    select: {
       organization: {
         select: {
           name: true,
@@ -123,11 +128,30 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
           website: true,
         },
       },
-      categoryMeta: true,
-      tags: true,
-      exclusiveToCommunities: true,
-      helpfulToCommunities: true,
-    },
+      organizationId: true,
+      url: true,
+
+      name: true,
+      id: true,
+      description: true,
+      category: true,
+      tags: {
+        select: {
+          tag: true,
+        },
+      },
+      exclusiveToCommunities: {
+        select: {
+          name: true,
+        },
+      },
+      helpfulToCommunities: {
+        select: {
+          name: true,
+        },
+      },
+      
+    }
   });
 
   if (!returnResource) {
@@ -135,6 +159,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
       notFound: true,
     };
   }
+  
 
   const resource = {
     ...returnResource,

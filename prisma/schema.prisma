@@ -76,6 +76,8 @@ model Category {
     organizations Organization[]
     resources     Resource[]
     tags          Tag[]
+
+    @@index([category])
 }
 
 model Tag {
@@ -84,6 +86,8 @@ model Tag {
     organizations Organization[]
     resources     Resource[]
     categories    Category[]
+
+    @@index([tag])
 }
 
 model Community {
@@ -92,6 +96,8 @@ model Community {
     exclusiveResources Resource[]     @relation("ExclusiveResource")
     helpfulOrgs        Organization[] @relation("HelpfulOrg")
     helpfulResources   Resource[]     @relation("HelpfulResource")
+
+    @@index([name])
 }
 
 model Organization {
@@ -117,6 +123,11 @@ model Organization {
     roles                  OrganizationRole[]
     contacts               OrganizationContact[]
     lists                  FavoritesList[]
+
+    @@index([name])
+    @@index([id])
+    @@index([category])
+    @@index([phone, email, website])
 }
 
 model OrganizationRole {
@@ -162,7 +173,12 @@ model Resource {
     speedOfAid             SpeedOfAid[]
     speedOfAidDetails      String?
     lists                  FavoritesList[]
-    free                  Boolean           @default(false)
+    free                   Boolean           @default(false)
+
+    @@index([name])
+    @@index([id])
+    @@index([category])
+    @@index([organizationId])
 }
 
 model ResourceContact {
