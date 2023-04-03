@@ -438,7 +438,8 @@ function FeatureCarousel({ featureArray }: { featureArray: PhaseDetails[] }) {
         className="cursor-pointer leading-3 text-stone-600 hover:text-stone-400"
         onClick={handlePreviousFeatures}
       >
-        <button className="text-3xl font-bold leading-3">←</button>
+        <button className="umami--click--previous-features text-3xl font-bold leading-3 ">←</button>
+
         <p className="mx-0.5 text-xs font-light">back</p>
       </div>
       <div className="h-[600px] w-[500px] overflow-hidden rounded-lg border border-stone-200 p-6 shadow-lg">
@@ -451,6 +452,7 @@ function FeatureCarousel({ featureArray }: { featureArray: PhaseDetails[] }) {
         onClick={handleNextFeatures}
       >
         <button className="text-3xl font-bold leading-3 ">→</button>
+
         <p className="mx-0.5 text-xs font-light ">next</p>
       </div>
     </div>

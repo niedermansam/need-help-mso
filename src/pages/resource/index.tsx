@@ -60,8 +60,6 @@ export function CategoryLink({
       {category}
     </Link>
   );
-}
-
 export function CreateResourceModal({ orgId }: { orgId: string }) {
   const [showModal, setShowModal] = useState(false);
 

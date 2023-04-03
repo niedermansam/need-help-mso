@@ -69,8 +69,8 @@ export default function AboutPage() {
           There&apos;s a thousand different directories of resources and
           nonprofits, but most public facing versions are geared towards
           fundraising, not care providers. Need Help Missoula is a directory for
-          people in need, and the professional&apos;s who help those people. As
-          such, the app will have features that similar directories don&apos;s
+          people in need, and the professionals who help those people. As
+          such, the app will have features that similar directories don&apos;t
           or can&apos;t. For example, the app will allow users to save
           resources, and share them with other people. It will also allow users
           to filter and sort resources by a variety of criteria like funding
