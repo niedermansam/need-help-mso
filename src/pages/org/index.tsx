@@ -17,6 +17,7 @@ import {
   isValidCategory,
 } from "../../components/Selectors";
 import { api } from "../../utils/api";
+import { useMemo } from "react";
 
 import { OrganizationCard } from "../../components/DisplayCard";
 
@@ -260,11 +261,12 @@ function OrganizationSection({
 }) {
   const [displayOrgs, setDisplayOrgs] = useState(orgs);
 
-  const allTags = [
-    ...new Set(orgs.flatMap((org) => org.tags.map((tag) => tag.tag))),
-  ];
+  const allTagsMemo =  useMemo(() => {
+    return [...new Set(orgs.flatMap((org) => org.tags.map((tag) => tag.tag)))];
+  }, [orgs]) 
+  
 
-  const [displayTags, setDisplayTags] = useState<string[]>(allTags);
+  const [displayTags, setDisplayTags] = useState<string[]>(allTagsMemo);
   const [strict, setStrict] = useState(false);
 
   const [selectedTags, setSelectedTags] = useState<
@@ -277,7 +279,7 @@ function OrganizationSection({
 
   useEffect(() => {
     if (selectedTags.length === 0 && !selectedCategory) {
-      setDisplayTags(allTags);
+      setDisplayTags(allTagsMemo);
       setDisplayOrgs(orgs);
       return;
     }
@@ -317,7 +319,7 @@ function OrganizationSection({
 
       setDisplayTags(uniqueTags);
     }
-  }, [selectedTags, strict, selectedCategory, orgs]);
+  }, [selectedTags, strict, selectedCategory, orgs, allTagsMemo]);
 
   return (
     <div className="flex flex-wrap">
