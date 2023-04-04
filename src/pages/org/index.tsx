@@ -323,8 +323,8 @@ function OrganizationSection({
 
   return (
     <div className="flex flex-wrap">
-      <div className="mx-6 flex w-full">
-        <div className="mx-2 w-96">
+      <div className="mx-4 flex w-full">
+        <div className="mr-2 w-96">
           <CategorySelect
             onChange={(value) => {
               setSelectedCategory(getValidSingleValue(value));
@@ -352,9 +352,11 @@ function OrganizationSection({
             }));*/
             }}
           />
+          <div
+            className="-mt-2">
           <input
             type="checkbox"
-            name="category"
+            name="strict-tag-search"
             value="strict"
             checked={strict}
             onChange={(e) => {
@@ -362,8 +364,13 @@ function OrganizationSection({
               setStrict(e.target.checked);
             }}
           />{" "}
-          Strict Search
-        </div>
+          <label
+            htmlFor="strict-tag-search"
+            className="ml-1 text-xs font-bold text-stone-500"
+          >
+            Strict
+          </label>
+        </div></div>
       </div>
       {displayOrgs.map((org) => (
         <OrganizationCard admin={admin} key={org.id} org={org} />
@@ -382,7 +389,7 @@ export default function OrganizationsPage({
       <NavBar />
       <div className="pt-12">
         <div>
-          <h1 className="my-2 mx-6 text-4xl font-bold text-stone-700">
+          <h1 className="my-2 mx-4 text-4xl font-bold text-stone-700">
             Organizations
           </h1>
         </div>
