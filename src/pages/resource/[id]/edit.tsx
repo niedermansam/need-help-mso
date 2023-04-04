@@ -244,6 +244,7 @@ export default function EditResourcePage(props: ServerSideProps) {
               console.log(formData);
               updateResource.mutate({
                 id: resource.id,
+                orgId: resource.organization.id,
                 tags: formData.tags
                   ? formData.tags.map((tag) => {
                       return tag.tag;

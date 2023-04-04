@@ -66,12 +66,16 @@ const orgUpdateInput = z.object({
   exclusiveToCommunities: z.array(z.string()).nullish(),
 });
 
+const createOrgId = (name: string) => {
+  return name.replace(/\s/g, "-").toLowerCase();
+};
+
 export const organizationRouter = createTRPCRouter({
   create: adminProcedure.input(orgInput).mutation(async ({ input, ctx }) => {
     try {
       return await ctx.prisma.organization.create({
         data: {
-          id: input.name.replace(/\s/g, "-").toLowerCase(),
+          id: createOrgId(input.name),
           name: input.name,
           description: input.description,
           email: input.email,
@@ -146,6 +150,7 @@ export const organizationRouter = createTRPCRouter({
             },
           },
           data: {
+            id: input.name ? createOrgId(input.name) : undefined,
             name: input.name || undefined,
             description: input.description || undefined,
             email: input.email,

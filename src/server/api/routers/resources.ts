@@ -2,6 +2,48 @@ import { z } from "zod";
 
 import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpc";
 import { getTagsFromResources } from "./tag";
+import type { PrismaClient, Prisma } from "@prisma/client";
+
+const createResourceId = async (name: string, orgId: string, prisma:  PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>
+  ) => {
+  let newId = name.replace(/\s/g, "-").toLowerCase();
+
+  const newIdIsUnique = (await prisma.resource.findUnique({
+    where: {
+      id: newId,
+    },
+    select: {
+      id: true,
+    },
+  })) === null;
+
+  if (!newIdIsUnique) {
+    const orgName = await prisma.organization.findUnique({
+      where: {
+        id: orgId,
+      },
+      select: {
+        name: true,
+      },
+    });
+
+    // remove any punctuation and get organization initials
+    const orgInitials = orgName
+      ? orgName.name
+          .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+          .split(" ")
+          .map((word) => word[0])
+          .join("")
+          .toLowerCase()
+      : Math.random().toString(36).substring(10);
+
+    newId = `${newId}-${orgInitials}`;
+  }
+
+
+  return `${newId}-${orgId}`;
+};
+
 
 export const resourceRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -103,19 +145,19 @@ export const resourceRouter = createTRPCRouter({
         free,
       } = input;
 
-      let newName = name.replace(/\s/g, "-").toLowerCase();
+      let newId = name.replace(/\s/g, "-").toLowerCase();
 
-      const newNameIsUnique =
+      const newIdIsUnique =
         (await ctx.prisma.resource.findUnique({
           where: {
-            id: newName,
+            id: newId,
           },
           select: {
             id: true,
           },
         })) === null;
 
-      if (!newNameIsUnique) {
+      if (!newIdIsUnique) {
         const orgName = await ctx.prisma.organization.findUnique({
           where: {
             id: orgId,
@@ -135,12 +177,12 @@ export const resourceRouter = createTRPCRouter({
               .toLowerCase()
           : Math.random().toString(36).substring(10);
 
-        newName = `${newName}-${orgInitials}`;
+        newId = `${newId}-${orgInitials}`;
       }
 
       const newResource = await ctx.prisma.resource.create({
         data: {
-          id: newName,
+          id:  await createResourceId(name, orgId, ctx.prisma) ,
           name: name,
           description: description,
           url: url,
@@ -229,6 +271,7 @@ export const resourceRouter = createTRPCRouter({
         speedOfAidDetails: z.string().optional(),
         free: z.boolean().optional(),
         helpingOrganizations: z.array(z.string()).optional(),
+        orgId: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -247,15 +290,16 @@ export const resourceRouter = createTRPCRouter({
         speedOfAidDetails,
         free,
         helpingOrganizations,
+        orgId,
       } = input;
 
-      console.log(helpingOrganizations);
 
       const resource = await ctx.prisma.resource.update({
         where: {
           id: id,
         },
         data: {
+          id: name ? await createResourceId(name, orgId, ctx.prisma) : undefined,
           name: name || undefined,
           description: description || undefined,
           categoryMeta: category
