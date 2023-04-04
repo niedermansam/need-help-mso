@@ -13,9 +13,9 @@ import {
   CategorySelect,
   CommunitySelect,
   TagSelect,
+  getValidSingleValue,
   isValidCategory,
 } from "../../components/Selectors";
-import { TagLink } from "../../components/Tags";
 import { api } from "../../utils/api";
 
 import { OrganizationCard } from "../../components/DisplayCard";
@@ -251,20 +251,6 @@ export type OrgProps = Omit<
   tags: Pick<Tag, "tag">[];
 };
 
-interface TagListProps extends React.ComponentPropsWithoutRef<"div"> {
-  tags: Pick<Tag, "tag">[];
-}
-
-export function TagList({ tags, className, ...props }: TagListProps) {
-  return (
-    <div {...props} className={`flex flex-wrap ${className || ''}`}>
-      {tags.map((tag) => (
-        <TagLink key={tag.tag} tag={tag.tag} />
-      ))}
-    </div>
-  );
-}
-
 function OrganizationSection({
   orgs,
   admin,
@@ -273,38 +259,88 @@ function OrganizationSection({
   admin: boolean;
 }) {
   const [displayOrgs, setDisplayOrgs] = useState(orgs);
+
+  const allTags = [
+    ...new Set(orgs.flatMap((org) => org.tags.map((tag) => tag.tag))),
+  ];
+
+  const [displayTags, setDisplayTags] = useState<string[]>(allTags);
   const [strict, setStrict] = useState(false);
 
-  const [selectedTags, setTags] = useState<{ value: string; label: string }[]>(
-    []
+  const [selectedTags, setSelectedTags] = useState<
+    { value: string; label: string }[]
+  >([]);
+
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
+    undefined
   );
 
   useEffect(() => {
-    if (selectedTags.length === 0) return setDisplayOrgs(orgs);
-    setDisplayOrgs(
-      orgs.filter((org) => {
-        const orgTags = org.tags.map((tag) => tag.tag);
-        if (strict)
-          return selectedTags.every((tag) => orgTags.includes(tag.value));
-        else return selectedTags.some((tag) => orgTags.includes(tag.value));
-      })
-    );
-  }, [selectedTags, strict, orgs]);
+    if (selectedTags.length === 0 && !selectedCategory) {
+      setDisplayTags(allTags);
+      setDisplayOrgs(orgs);
+      return;
+    }
+
+    console.log(selectedTags.length);
+    const filteredByCategory = orgs.filter((org) => {
+      const orgCategory = org["category"];
+      if (selectedCategory && orgCategory !== selectedCategory) return false;
+      return true;
+    });
+
+    const newOrgList = filteredByCategory.filter((org) => {
+      const orgTags = org.tags.map((tag) => tag.tag);
+      if (selectedTags.length === 0) return true;
+      if (strict)
+        return selectedTags.every((tag) => orgTags.includes(tag.value));
+      else return selectedTags.some((tag) => orgTags.includes(tag.value));
+    });
+
+    setDisplayOrgs(newOrgList);
+
+    if (strict) {
+      // create a list of available tags
+      const availableTags = newOrgList.flatMap((org) =>
+        org.tags.map((tag) => tag.tag)
+      );
+
+      const uniqueTags = [...new Set(availableTags)];
+
+      setDisplayTags(uniqueTags);
+    } else {
+      const availableTags = filteredByCategory.flatMap((org) =>
+        org.tags.map((tag) => tag.tag)
+      );
+
+      const uniqueTags = [...new Set(availableTags)];
+
+      setDisplayTags(uniqueTags);
+    }
+  }, [selectedTags, strict, selectedCategory, orgs]);
 
   return (
     <div className="flex flex-wrap">
-      <div className="w-full">
-        <TagSelect
-          className="w-96"
-          onChange={(value) => {
-            const tagArray = value as { value: string; label: string }[];
-            if (tagArray.length === 0) {
-              setTags([]);
-            } else {
-              setTags(tagArray);
-            }
+      <div className="mx-6 flex w-full">
+        <div className="mx-2 w-96">
+          <CategorySelect
+            onChange={(value) => {
+              setSelectedCategory(getValidSingleValue(value));
+            }}
+          />
+        </div>
+        <div className="mx-2 w-96">
+          <TagSelect
+            options={displayTags.map((tag) => ({ value: tag, label: tag }))}
+            onChange={(value) => {
+              const tagArray = value as { value: string; label: string }[];
+              if (tagArray.length === 0) {
+                setSelectedTags([]);
+              } else {
+                setSelectedTags(tagArray);
+              }
 
-            /*
+              /*
             const tagArray =  value as { value: string, label: string }[] 
             if(tagArray.length === 0) return setDisplayOrgs(orgs)
             setDisplayOrgs(orgs.filter((org) => {
@@ -312,19 +348,20 @@ function OrganizationSection({
               if(strict) return tagArray.every((tag) => orgTags.includes(tag.value));
               else return tagArray.some((tag) => orgTags.includes(tag.value));
             }));*/
-          }}
-        />
-        <input
-          type="checkbox"
-          name="category"
-          value="strict"
-          checked={strict}
-          onChange={(e) => {
-            console.log(strict);
-            setStrict(e.target.checked);
-          }}
-        />{" "}
-        Strict Search
+            }}
+          />
+          <input
+            type="checkbox"
+            name="category"
+            value="strict"
+            checked={strict}
+            onChange={(e) => {
+              console.log(strict);
+              setStrict(e.target.checked);
+            }}
+          />{" "}
+          Strict Search
+        </div>
       </div>
       {displayOrgs.map((org) => (
         <OrganizationCard admin={admin} key={org.id} org={org} />
@@ -339,9 +376,14 @@ export default function OrganizationsPage({
   const { data: orgs } = api.organization.getAll.useQuery();
   const admin = userSession?.user?.admin || false;
   return (
-    <div id="AppElement">
+    <div>
       <NavBar />
-      <div className="pt-16">
+      <div className="pt-12">
+        <div>
+          <h1 className="my-2 mx-6 text-4xl font-bold text-stone-700">
+            Organizations
+          </h1>
+        </div>
         {admin && <CreateOrganizationModal />}
         {orgs && <OrganizationSection orgs={orgs} admin={admin} />}
       </div>

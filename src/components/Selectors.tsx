@@ -193,13 +193,13 @@ export function BarriersToEntrySelect({
 }
 
 export const validateMultivalueArray = (
-  array: MultiValue<CategorySelectItem> | CategorySelectItem[  ]
+  array: MultiValue<CategorySelectItem> | CategorySelectItem[]
 ): array is MultiValue<CategorySelectItem> => {
   return array !== null && array !== undefined && Array.isArray(array);
 };
 
-export const getValidatedMultivalueArray = (
-  array: MultiValue<CategorySelectItem> | CategorySelectItem[  ]
+export const getValidMultivalueArray = (
+  array: MultiValue<CategorySelectItem> | CategorySelectItem[]
 ): MultiValue<CategorySelectItem> => {
   if (validateMultivalueArray(array)) {
     return array;
@@ -207,6 +207,30 @@ export const getValidatedMultivalueArray = (
   return [];
 };
 
+export const validateSingleValue = (
+  value: unknown
+): value is SingleValue<CategorySelectItem> => {
+  return value !== null && value !== undefined && !Array.isArray(value) && typeof value === "object" && "value" in value && "label" in value;
+};
+
+export const getValidSingleValueObject = (
+  value: unknown
+): SingleValue<CategorySelectItem> => {
+  if (validateSingleValue(value)) {
+    return value;
+  }
+  return null;
+}
+
+export const getValidSingleValue = (
+  value: unknown
+): string | undefined => {
+  if(value === null || value === undefined) return undefined;
+  if (validateSingleValue(value)) {
+    return value.value;
+  }
+  return undefined;
+}
 
 
 export function OrganizationMultiSelect({
@@ -220,9 +244,7 @@ export function OrganizationMultiSelect({
 
   return (
     <>
-      <label className="text-lg font-light">
-        {title || "Organization(s)"}
-      </label>
+      <label className="text-lg font-light">{title || "Organization(s)"}</label>
       <Select
         className="mb-2.5"
         {...attributes}
@@ -245,17 +267,14 @@ export function OrganizationSingleSelect({
   title,
   options,
   ...attributes
-  }: CategorySelectProps) {
+}: CategorySelectProps) {
   const { data } = api.organization.getAll.useQuery(undefined, {
     enabled: !options,
   });
 
   return (
     <>
-
-      <label className="text-lg font-light">
-        {title || "Organization"}
-      </label>
+      <label className="text-lg font-light">{title || "Organization"}</label>
       <Select
         className="mb-2.5"
         {...attributes}
@@ -268,5 +287,6 @@ export function OrganizationSingleSelect({
               })) ?? []
         }
       />
-
-        </>)}
+    </>
+  );
+}

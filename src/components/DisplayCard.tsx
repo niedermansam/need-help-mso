@@ -1,9 +1,11 @@
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { type OrgProps, TagList } from "../pages/org";
+import { type OrgProps
+ } from "../pages/org";
 import { type ResourceProps } from "../pages/resource";
 import { ContactIcons, ContactInfo } from "./ContactInfo";
+import { TagList } from "./Tags";
 
 export function ResourceCard({
   resource,

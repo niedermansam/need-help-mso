@@ -6,7 +6,7 @@ import {
   CommunitySelect,
   OrganizationMultiSelect,
   OrganizationSingleSelect,
-  getValidatedMultivalueArray,
+  getValidMultivalueArray,
 } from "../../../components/Selectors";
 import { api } from "../../../utils/api";
 import { useState } from "react";
@@ -17,7 +17,7 @@ import type {
   Resource,
   Tag,
 } from "@prisma/client";
-import type { MultiValue} from "react-select";
+import type { MultiValue } from "react-select";
 import type { GetServerSideProps } from "next";
 import { prisma } from "../../../server/db";
 import { getSession } from "next-auth/react";
@@ -198,9 +198,7 @@ export default function EditResourcePage(props: ServerSideProps) {
             <OrganizationSingleSelect
               title="Administered By"
               value={adminOrg}
-
               options={orgList}
-
               onChange={(value) => {
                 const organization = value as { value: string; label: string };
 
@@ -217,7 +215,7 @@ export default function EditResourcePage(props: ServerSideProps) {
             <OrganizationMultiSelect
               title="Partner Organizations"
               options={orgList}
-              value={getValidatedMultivalueArray(
+              value={getValidMultivalueArray(
                 formData.helpingOrganizations.map((org) => {
                   return { value: org.name, label: org.name };
                 })
