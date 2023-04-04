@@ -1,17 +1,14 @@
 import type { GetServerSideProps } from "next/types";
-import { LoadingSpinner } from "../components";
+import { LoadingAnimation } from "../components";
 // import { prisma } from "../server/db";
 
-
 export default function TestPage() {
-
-
-  return <LoadingSpinner />;
+  return <LoadingAnimation />;
 }
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const getServerSideProps: GetServerSideProps = async () => {
-/* 
+  /* 
   const allOrgs = await prisma.organization.findMany({
     select: {
       id: true,
@@ -30,8 +27,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
     
   });
 }); */
-  
+
   return {
     props: {},
   };
-}
+};

@@ -1,32 +1,24 @@
-import { useEffect, useState } from "react";
-import NavBar from "../../components/Nav";
-import { api } from "../../utils/api";
 import type { Organization, Tag } from "@prisma/client";
-import Link from "next/link";
+import type { Session } from "next-auth/core/types";
+import { getSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import type {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+} from "next/types";
+import { useEffect, useState } from "react";
+import ReactModal from "react-modal";
+import NavBar from "../../components/Nav";
 import {
   CategorySelect,
   CommunitySelect,
   TagSelect,
   isValidCategory,
 } from "../../components/Selectors";
-import { useRouter } from "next/router";
-import { getRawPhoneNumber, prettyUrl } from "../../utils";
-import {
-  faEnvelope,
-  faGlobe,
-  faPhone,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type {
-  GetServerSideProps,
-  InferGetServerSidePropsType,
-} from "next/types";
-import { getSession } from "next-auth/react";
-import type { Session } from "next-auth/core/types";
-import { faEdit } from "@fortawesome/free-regular-svg-icons";
-import ReactModal from "react-modal";
 import { TagLink } from "../../components/Tags";
+import { api } from "../../utils/api";
 
+import { OrganizationCard } from "../../components/DisplayCard";
 
 export type OrganizationProps = {
   name: string;
@@ -227,10 +219,10 @@ function CreateOrganizationModal() {
   return (
     <>
       <button
-        className="rounded bg-rose-500 py-2 px-4 font-bold text-white"
+        className="fixed bottom-10 right-1/3 z-40 rounded bg-rose-500 py-2 px-4 font-bold text-white"
         onClick={() => setIsOpen(true)}
       >
-        Create Organization
+        New Organization
       </button>
       <ReactModal
         className="z-50 mx-auto w-fit min-w-[90%]"
@@ -241,7 +233,7 @@ function CreateOrganizationModal() {
           },
           content: {
             cursor: "default",
-          }
+          },
         }}
         isOpen={isOpen}
         onRequestClose={() => setIsOpen(false)}
@@ -252,50 +244,12 @@ function CreateOrganizationModal() {
   );
 }
 
-type OrgProps = Organization & { tags: Tag[] };
-
-type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
-
-export function ContactInfo({
-  phone,
-  email,
-  website,
-  shortUrl,
-}: ContactInfo & { shortUrl?: boolean }) {
-  const shortenUrl = shortUrl ?? false;
-  return (
-    <>
-      {phone && (
-        <a
-          className="text-sm text-stone-500 hover:text-cyan-700"
-          href={getRawPhoneNumber(phone, true) || undefined}
-        >
-          <FontAwesomeIcon className="mr-2 " icon={faPhone} /> {phone}
-        </a>
-      )}
-      {email && (
-        <a
-          className="text-sm text-stone-500 hover:text-cyan-700"
-          href={`mailto:${email}`}
-        >
-          <FontAwesomeIcon className="mr-2 " icon={faEnvelope} /> {email}
-        </a>
-      )}
-
-      {website && (
-        <Link
-          className="text-sm uppercase text-stone-500 hover:text-cyan-700"
-          href={website}
-        >
-          <FontAwesomeIcon className="mr-2 " icon={faGlobe} />
-          <span className="text-xs font-semibold tracking-wide">
-            {prettyUrl(website, shortenUrl)}
-          </span>
-        </Link>
-      )}
-    </>
-  );
-}
+export type OrgProps = Omit<
+  Organization,
+  "createdAt" | "updatedAt" | "logo"
+> & {
+  tags: Pick<Tag, "tag">[];
+};
 
 export function TagList({ tags }: { tags: Pick<Tag, "tag">[] }) {
   return (
@@ -303,49 +257,6 @@ export function TagList({ tags }: { tags: Pick<Tag, "tag">[] }) {
       {tags.map((tag) => (
         <TagLink key={tag.tag} tag={tag.tag} />
       ))}
-    </div>
-  );
-}
-
-export function OrganizationItem({
-  org,
-  admin,
-}: {
-  org: OrgProps;
-  admin: boolean;
-}) {
-  return (
-    <div className="m-6  flex w-full max-w-5xl rounded shadow  border border-stone-300 p-3 px-4 text-stone-700 transition-colors">
-      <div className="mr-6 w-96">
-        <h2 className="text-xl  font-bold text-stone-500 transition-colors  duration-75 ">
-          <Link href={`/org/${org.id}`} className="hover:text-rose-500">
-            {org.name}
-          </Link>{" "}
-          {admin && (
-            <Link href={`/org/${org.id}/edit`} className="">
-              <FontAwesomeIcon
-                className="text-stone-500 hover:text-rose-500"
-                icon={faEdit}
-              />
-            </Link>
-          )}
-        </h2>
-        <div className="flex flex-col">
-          <ContactInfo {...org} />
-        </div>
-      </div>
-      <div className="flex h-fit basis-80 flex-col flex-wrap text-xs">
-        <p className="mb-2 text-base">
-          <span> Category: </span>
-          <Link
-            href={`/cat/${org.category}`}
-            className="font-bold text-stone-500 hover:text-rose-500"
-          >
-            {org.category}
-          </Link>
-        </p>
-        <TagList tags={org.tags} />
-      </div>
     </div>
   );
 }
@@ -412,7 +323,7 @@ function OrganizationSection({
         Strict Search
       </div>
       {displayOrgs.map((org) => (
-        <OrganizationItem admin={admin} key={org.id} org={org} />
+        <OrganizationCard admin={admin} key={org.id} org={org} />
       ))}
     </div>
   );

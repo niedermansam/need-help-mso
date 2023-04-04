@@ -10,17 +10,15 @@ import type {
 import { useEffect, useState } from "react";
 import type { MultiValue, SingleValue } from "react-select";
 import { encodeTag } from "../../utils/manageUrl";
-import type {
-  CategorySelectItem} from "../../components/Selectors";
+import type { CategorySelectItem } from "../../components/Selectors";
 import {
   BarriersToEntrySelect,
   CommunitySelect,
   SpeedOfAidSelect,
 } from "../../components/Selectors";
 import { CategorySelect, TagSelect } from "../../components/Selectors";
-import { ContactInfo, TagList } from "../org";
-import { prettyPhoneNumber } from "../../utils";
 import ReactModal from "react-modal";
+import { ResourceCard } from "../../components/DisplayCard";
 
 type CreateResourceProps = {
   name: string;
@@ -136,7 +134,7 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
 
-          <div className=" flex items-center text-xl capitalize text-stone-600 mb-3">
+          <div className=" mb-3 flex items-center text-xl capitalize text-stone-600">
             <input
               type="checkbox"
               name="free"
@@ -361,67 +359,15 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
   );
 }
 
-type ResourceProps = Resource & {
+export type ResourceProps = Resource & {
   organization: {
     name: string;
     phone: string | null;
     email: string | null;
     website: string | null;
   };
-  tags: Pick<Tag, 'tag' >[] ;
+  tags: Pick<Tag, "tag">[];
 };
-
-export function ResourceItem({
-  resource,
-  showOrg = true,
-}: {
-  resource: ResourceProps;
-  showOrg?: boolean;
-}) {
-  return (
-    <div
-      key={resource.id}
-      className="m-6 flex max-w-5xl items-center justify-between rounded border border-stone-300 p-2 text-stone-600 shadow"
-    >
-      <div className="ml-2 basis-80">
-        {showOrg && (
-          <Link href={`/org/${resource.organizationId}`}>
-            <h3 className="text-lg font-light leading-4 hover:text-rose-600">
-              {resource.organization.name}
-            </h3>
-          </Link>
-        )}
-        <Link href={`/resource/${resource.id}`} className="hover:text-rose-500">
-          <h2 className="text-lg font-semibold">{resource.name}</h2>
-        </Link>
-      </div>
-
-      <div className="flex w-96 flex-col">
-        <ContactInfo
-          phone={prettyPhoneNumber(resource.organization.phone)}
-          email={resource.organization.email}
-          website={resource.url}
-          shortUrl={true}
-        />
-      </div>
-      <div className="flex w-96 flex-col flex-wrap mr-4">
-        <span className="font-light mb-2">
-          Category:{" "}
-        <CategoryLink
-          category={resource.category}
-          className="mb-2 font-bold text-stone-500 hover:text-rose-500"
-        /></span>
-        <TagList tags={resource.tags} />
-      </div>
-      <Link
-        className="mr-2 flex basis-32 justify-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md"
-        href={`/resource/${resource.id}`}
-      >
-        More Info
-      </Link>
-    </div>
-  );
-}
 
 export function ResourceSection({ resources }: { resources: ResourceProps[] }) {
   const allResources = resources;
@@ -435,9 +381,7 @@ export function ResourceSection({ resources }: { resources: ResourceProps[] }) {
   const handleCategoryChange = (selected: unknown) => {
     if (selected && typeof selected === "object" && "value" in selected) {
       setVisibleResources(
-        resources.filter(
-          (resource) => resource.category === selected.value
-        )
+        resources.filter((resource) => resource.category === selected.value)
       );
     } else {
       setVisibleResources(resources);
@@ -491,7 +435,7 @@ export function ResourceSection({ resources }: { resources: ResourceProps[] }) {
       <br />
       <br />
       {visibleResources.map((resource) => (
-        <ResourceItem key={resource.id} resource={resource} />
+        <ResourceCard key={resource.id} resource={resource} />
       ))}
     </div>
   );

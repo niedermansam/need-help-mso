@@ -5,16 +5,11 @@ import type {
   InferGetServerSidePropsType,
 } from "next/types";
 import { prisma } from "../../../server/db";
-import type {
-  Community,
-  Organization,
-  Resource,
-  Tag,
-} from "@prisma/client";
+import type { Community, Organization, Resource, Tag } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import { CategoryLink } from "..";
-import { ContactInfo } from "../../org";
+import { ContactInfo } from "../../../components/ContactInfo";
 import { TagLink } from "../../../components/Tags";
 import { EditLink } from "../../../components";
 
@@ -28,10 +23,7 @@ export default function ResourcePage({
       <div className="px-6 pt-16 text-stone-600">
         <h1 className="text-3xl font-bold">
           {resource.name}
-          {admin && (
-            <EditLink 
-            
-             href={`/resource/${resource.id}/edit`}/>)}
+          {admin && <EditLink href={`/resource/${resource.id}/edit`} />}
         </h1>
         <div className="mb-2 text-lg font-bold">
           Help With&nbsp;
@@ -47,7 +39,7 @@ export default function ResourcePage({
             {resource.organization.name}
           </Link>
         </div>
-        <div className="mb-6 flex flex-wrap">
+        <div className="mb-6  flex flex-wrap">
           <div className="flex flex-col">
             <h3 className="font-semibold text-stone-500">Contact Info:</h3>
             <ContactInfo
@@ -66,11 +58,10 @@ export default function ResourcePage({
           </div>
         </div>
         <div className="mb-6 rounded border border-stone-200 p-4 shadow-md">
-          <h3 className="font-semibold leading-4 text-stone-500 mb-2">
+          <h3 className="mb-2 font-semibold leading-4 text-stone-500">
             Description:
           </h3>
           <p className="mb-2">{resource.description}</p>
-          
         </div>
       </div>
     </div>
@@ -80,14 +71,16 @@ export default function ResourcePage({
 type CommunityPick = Pick<Community, "name">;
 
 type ServerSideProps = {
-  resource: Pick<Resource, "name" | "id" | "category" | 
-  "organizationId" | "url" | "description"> & {
+  resource: Pick<
+    Resource,
+    "name" | "id" | "category" | "organizationId" | "url" | "description"
+  > & {
     organization: Pick<
       Organization,
       "name" | "id" | "phone" | "email" | "website"
     >;
     tags: Pick<Tag, "tag">[];
-    exclusiveToCommunities:  CommunityPick[];
+    exclusiveToCommunities: CommunityPick[];
     helpfulToCommunities: CommunityPick[];
   };
   session: Session | null;
@@ -139,8 +132,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
           name: true,
         },
       },
-      
-    }
+    },
   });
 
   if (!returnResource) {
@@ -148,7 +140,6 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
       notFound: true,
     };
   }
-  
 
   const resource = {
     ...returnResource,

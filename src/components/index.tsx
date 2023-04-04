@@ -7,12 +7,12 @@ import {
   FontAwesomeIcon,
   type FontAwesomeIconProps,
 } from "@fortawesome/react-fontawesome";
-import Link, {type  LinkProps } from "next/link";
+import Link, { type LinkProps } from "next/link";
 
-
-export function LoadingSpinner() {
+export function LoadingAnimation({ className }: { className?: HTMLElement["className"]}) {
   return (
-    <div className="ellipsis">
+    <div className=
+    {`ellipsis ${className ||''}`}>
       <div></div>
       <div></div>
       <div></div>
@@ -22,7 +22,9 @@ export function LoadingSpinner() {
 }
 
 type EditLinkProps = LinkProps & { className?: HTMLElement["className"] } & {
-  iconProps?: Omit< FontAwesomeIconProps, 'icon'> & { icon?: FontAwesomeIconProps['icon'] | undefined | null; }
+  iconProps?: Omit<FontAwesomeIconProps, "icon"> & {
+    icon?: FontAwesomeIconProps["icon"] | undefined | null;
+  };
 };
 
 export function EditLink({

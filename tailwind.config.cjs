@@ -13,7 +13,10 @@ module.exports = {
       },
       animation: {
         "pulse-sm": "pulse-sm 2s ease-in-out infinite",
-      }
+      },
+    screens: {
+      xs: "480px",
+    },
     },
   },
   plugins: [],

@@ -5,18 +5,25 @@ import type {
 } from "next/types";
 import { getSession } from "next-auth/react";
 import { prisma } from "../../server/db";
-import type { Category, Community, Organization, Resource, Tag } from "@prisma/client";
+import type {
+  Category,
+  Community,
+  Organization,
+  Resource,
+  Tag,
+} from "@prisma/client";
 import type { Session } from "next-auth";
-import { ResourceItem } from "../resource";
-import { ContactInfo } from ".";
+
 import { EditLink } from "../../components";
+import { ContactInfo } from "../../components/ContactInfo";
+import { ResourceCard } from "../../components/DisplayCard";
 
 export default function OrganizationDetailsPage({
   orgData,
   userSession,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   if (!orgData) return <p>no data</p>;
-  
+
   const isAdmin = userSession?.user.admin || false;
 
   return (
@@ -43,7 +50,7 @@ export default function OrganizationDetailsPage({
       <h2 className="mx-6 mt-6 text-2xl font-bold">Available Resources</h2>
       {orgData.resources.map((resource) => {
         return (
-          <ResourceItem
+          <ResourceCard
             resource={{ ...resource, organization: { ...orgData } }}
             key={resource.id}
             showOrg={false}
@@ -78,8 +85,6 @@ export const getServerSideProps: GetServerSideProps<
   OrgServerSideProps
 > = async (context) => {
   const session = await getSession(context);
-
-
 
   const orgId = context.query.id as string;
 

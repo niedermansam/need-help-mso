@@ -1,18 +1,17 @@
 import { useRouter } from "next/router";
 import NavBar from "../../components/Nav";
-import { ResourceItem } from "../resource";
 import { decodeTag } from "../../utils/manageUrl";
 import { useEffect, useState } from "react";
 import { TagSelect } from "../../components/Selectors";
 import { prisma } from "../../server/db";
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import type { BarriersToEntry, SpeedOfAid } from "@prisma/client";
+import { ResourceCard } from "../../components/DisplayCard";
 
 export default function CategoryPage({
   resources,
-  tags: allTags
+  tags: allTags,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  
   const { category: URI } = useRouter().query;
   const category = decodeTag(URI as string);
 
@@ -38,19 +37,16 @@ export default function CategoryPage({
     });
     setVisibleResources(filteredResources);
 
-    const tagsInVisibleResources = filteredResources.map((resource) =>
-      resource.tags.map((tag) => tag.tag)
-    ).flat();
+    const tagsInVisibleResources = filteredResources
+      .map((resource) => resource.tags.map((tag) => tag.tag))
+      .flat();
 
     if (strictFilter === false) {
       return setAvailableTags(allTags);
     } else {
       return setAvailableTags(tagsInVisibleResources);
     }
-
-    
   }, [selectedTags, strictFilter, resources, allTags]);
-
 
   return (
     <div>
@@ -91,7 +87,7 @@ export default function CategoryPage({
         <label htmlFor="strictFilter">Strict Filter?</label>
       </div>
       {visibleResources.map((resource) => (
-        <ResourceItem resource={resource} key={resource.id} />
+        <ResourceCard resource={resource} key={resource.id} />
       ))}
     </div>
   );
@@ -131,7 +127,6 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 ) => {
   const category = context.query.category as string;
 
-
   const resources = await prisma.resource.findMany({
     where: {
       category: {
@@ -147,7 +142,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
           email: true,
           website: true,
           phone: true,
-        },  
+        },
       },
       id: true,
       name: true,
@@ -165,12 +160,11 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
       speedOfAidDetails: true,
       free: true,
     },
-
   });
 
-
-
-  const tags = resources.map((resource) => resource.tags.map((tag) => tag.tag)).flat();
+  const tags = resources
+    .map((resource) => resource.tags.map((tag) => tag.tag))
+    .flat();
 
   const uniqueTags = [...new Set(tags)];
 

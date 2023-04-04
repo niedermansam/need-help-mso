@@ -128,17 +128,46 @@ export const tagRouter = createTRPCRouter({
               mode: "insensitive",
             },
           },
-          include: {
+          select: {
             resources: {
-              include: {
-                tags: true,
-                categoryMeta: true,
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                url: true,
+                organizationId: true,
+                category: true,
                 organization: true,
+                categoryMeta: true,
+                barriersToEntry: true,
+                barriersToEntryDetails: true,
+                speedOfAid: true,
+                speedOfAidDetails: true,
+                free: true,
+                tags: {
+                  select: {
+                    tag: true,
+                  },
+                }
               },
             },
             organizations: {
-              include: {
-                tags: true,
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                website: true,
+                categoryMeta: true,
+                category: true,
+                phone: true,
+                email: true,
+                tags: {
+                  select: {
+                    tag: true,
+
+                  },
+                }
+
               },
             },
           },
