@@ -409,34 +409,46 @@ export function ResourceSection({ resources }: { resources: ResourceProps[] }) {
   }, [selectedTags, allResources, resources, strict]);
 
   return (
-    <div>
-      <CategorySelect
-        onChange={handleCategoryChange}
-        className="w-64 cursor-pointer"
-      />
-      <TagSelect
-        className="w-64 cursor-pointer"
-        onChange={(selected) => {
-          const selectedTags = (selected as CategorySelectItem[]).map(
-            (tag) => tag.value
-          );
-          setSelectedTags(selectedTags);
-        }}
-      />
-      <input
-        type="checkbox"
-        checked={strict}
-        onChange={() => {
-          setStrict(!strict);
-        }}
-      />
-      <label>Strict</label>
-      <br />
-      <br />
-      <br />
-      {visibleResources.map((resource) => (
-        <ResourceCard key={resource.id} resource={resource} />
-      ))}
+    <div className="mr-6 w-full">
+      <div className="flex flex-wrap">
+        <div className="mx-4">
+          <CategorySelect
+            onChange={handleCategoryChange}
+            className="w-64 cursor-pointer"
+          />
+        </div>
+        <div className="mx-4">
+          <TagSelect
+            className="w-64 cursor-pointer"
+            onChange={(selected) => {
+              const selectedTags = (selected as CategorySelectItem[]).map(
+                (tag) => tag.value
+              );
+              setSelectedTags(selectedTags);
+            }}
+          />
+          <input
+            type="checkbox"
+            className="cursor-pointer"
+            id="strict-tag-search"
+            checked={strict}
+            onChange={() => {
+              setStrict(!strict);
+            }}
+          />
+          <label
+            htmlFor="strict-tag-search"
+            className="ml-1 text-xs font-bold text-stone-500"
+          >
+            Strict
+          </label>
+        </div>
+      </div>
+      <div className="mr-6">
+        {visibleResources.map((resource) => (
+          <ResourceCard key={resource.id} resource={resource} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -449,9 +461,11 @@ export default function ResourcePage() {
 
   if (data)
     return (
-      <div>
+      <div className="w-screen text-stone-600">
         <NavBar />
-        <h1 className="pt-20 text-4xl">Resources</h1>
+        <div className="px-4 pt-12 text-4xl font-bold">
+          <h1 className="my-2">Resources</h1>
+        </div>
         <ResourceSection resources={data} />
       </div>
     );

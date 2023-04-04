@@ -360,6 +360,24 @@ export const resourceRouter = createTRPCRouter({
           free: free,
         },
       });
+
+      // update org with new tags 
+      if (tags) {
+        await ctx.prisma.organization.update({
+          where: {
+            id: orgId,
+          },
+          data: {
+            tags: {
+              connect: tags.map((tag) => ({
+                tag,
+              })),
+            },
+          },
+        });
+      }
+
+
       return resource;
     }),
 

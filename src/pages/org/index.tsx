@@ -251,9 +251,13 @@ export type OrgProps = Omit<
   tags: Pick<Tag, "tag">[];
 };
 
-export function TagList({ tags }: { tags: Pick<Tag, "tag">[] }) {
+interface TagListProps extends React.ComponentPropsWithoutRef<"div"> {
+  tags: Pick<Tag, "tag">[];
+}
+
+export function TagList({ tags, className, ...props }: TagListProps) {
   return (
-    <div className="flex flex-wrap">
+    <div {...props} className={`flex flex-wrap ${className || ''}`}>
       {tags.map((tag) => (
         <TagLink key={tag.tag} tag={tag.tag} />
       ))}
