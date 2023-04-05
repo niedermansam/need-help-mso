@@ -2,8 +2,6 @@ import Link, { type LinkProps } from "next/link";
 import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
 import type {
-  Resource,
-  Tag,
   BarriersToEntry,
   SpeedOfAid,
 } from "@prisma/client";
@@ -18,7 +16,7 @@ import {
 } from "../../components/Selectors";
 import { CategorySelect, TagSelect } from "../../components/Selectors";
 import ReactModal from "react-modal";
-import { ResourceCard } from "../../components/DisplayCard";
+import { ResourceCard, type ResourceCardProps } from "../../components/DisplayCard";
 
 type CreateResourceProps = {
   name: string;
@@ -359,20 +357,16 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
   );
 }
 
-export type ResourceProps = Resource & {
-  organization: {
-    name: string;
-    phone: string | null;
-    email: string | null;
-    website: string | null;
-  };
-  tags: Pick<Tag, "tag">[];
-};
 
-export function ResourceSection({ resources }: { resources: ResourceProps[] }) {
+
+export function ResourceSection({
+  resources,
+}: {
+  resources: ResourceCardProps[];
+}) {
   const allResources = resources;
   const [visibleResources, setVisibleResources] =
-    useState<ResourceProps[]>(resources);
+    useState<ResourceCardProps[]>(resources);
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 

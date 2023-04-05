@@ -92,6 +92,8 @@ model Tag {
 
 model Community {
     name               String         @id @unique
+    id                 String         @unique @default(cuid())
+    description        String?
     exclusiveOrgs      Organization[] @relation("ExclusiveOrg")
     exclusiveResources Resource[]     @relation("ExclusiveResource")
     helpfulOrgs        Organization[] @relation("HelpfulOrg")

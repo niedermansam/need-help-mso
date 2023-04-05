@@ -75,6 +75,8 @@ Table Tag {
 
 Table Community {
   name String [pk]
+  id String [unique, not null]
+  description String
   exclusiveOrgs Organization [not null]
   exclusiveResources Resource [not null]
   helpfulOrgs Organization [not null]

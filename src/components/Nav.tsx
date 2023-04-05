@@ -51,6 +51,12 @@ export default function NavBar() {
             className="mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block"
           >
             Organizations
+          </Link>{" "}
+          <Link
+            href="/community"
+            className="mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block"
+          >
+            Communities
           </Link>
         </div>
         <div className="flex">
@@ -64,7 +70,9 @@ export default function NavBar() {
           }
           <button
             onClick={userId ? () => void signOut() : () => void signIn()}
-            className={`${userId ?  'umami--click--sign-out' : 'umami--click-sign-in'} mt-4 inline-block rounded border border-white px-4 py-2 text-sm leading-none text-white hover:border-transparent hover:bg-white hover:text-indigo-800 md:mt-0`}
+            className={`${
+              userId ? "umami--click--sign-out" : "umami--click-sign-in"
+            } mt-4 inline-block rounded border border-white px-4 py-2 text-sm leading-none text-white hover:border-transparent hover:bg-white hover:text-indigo-800 md:mt-0`}
           >
             {userId ? "Sign Out" : "Sign In"}
           </button>
