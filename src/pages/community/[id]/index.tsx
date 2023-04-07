@@ -1,20 +1,20 @@
 import type { Session } from "next-auth";
-import NavBar from "../../components/Nav";
+import NavBar from "../../../components/Nav";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
-import { prisma } from "../../server/db";
+import { prisma } from "../../../server/db";
 import type { Community, Resource, Tag } from "@prisma/client";
 import {
  type OrgCardProps,
   OrganizationCard,
   ResourceCard,
-} from "../../components/DisplayCard";
+} from "../../../components/DisplayCard";
 import {
   CategorySelect,
   TagSelect,
   getValidMultivalueArray,
   getValidSingleValue,
-} from "../../components/Selectors";
+} from "../../../components/Selectors";
 import { useEffect, useMemo, useState } from "react";
 
 export default function CommunityResourcesPage(
@@ -254,8 +254,14 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
         },
       },
       helpfulOrgs: {
-        include: {
+        select: {
           tags: true,
+          id: true,
+          name: true,
+          website: true,
+          phone: true,
+          email: true,
+          category: true,
         },
       },
     },

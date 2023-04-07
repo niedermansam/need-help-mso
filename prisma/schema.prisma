@@ -91,13 +91,16 @@ model Tag {
 }
 
 model Community {
-    name               String         @id @unique
-    id                 String         @unique @default(cuid())
+    name               String          @unique @id
+    id                 String         @unique @default(cuid()) 
+    slug                 String         @default(cuid())  @unique
     description        String?
     exclusiveOrgs      Organization[] @relation("ExclusiveOrg")
     exclusiveResources Resource[]     @relation("ExclusiveResource")
     helpfulOrgs        Organization[] @relation("HelpfulOrg")
     helpfulResources   Resource[]     @relation("HelpfulResource")
+    parentCommunities Community[]    @relation("SubCommunity")
+    subCommunities     Community[]    @relation("SubCommunity")
 
     @@index([name])
 }

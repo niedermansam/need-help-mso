@@ -17,6 +17,8 @@ import {
 import { CategorySelect, TagSelect } from "../../components/Selectors";
 import ReactModal from "react-modal";
 import { ResourceCard, type ResourceCardProps } from "../../components/DisplayCard";
+import LoadingPage from "../../components/LoadingPage";
+import Custom404 from "../404";
 
 type CreateResourceProps = {
   name: string;
@@ -450,8 +452,8 @@ export function ResourceSection({
 export default function ResourcePage() {
   const { data, isLoading, isError } = api.resource.getAll.useQuery();
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error</div>;
+  if (isLoading) return <LoadingPage />;
+  if (isError) return  <Custom404 />;
 
   if (data)
     return (

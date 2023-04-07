@@ -1,7 +1,9 @@
 import Link from "next/link";
 import NavBar from "../components/Nav";
-import { useRouter } from "next/router";
+import { type NextRouter, useRouter } from "next/router";
 import Image from "next/image";
+
+
 
 export default function Custom404() {
   const router = useRouter();
@@ -15,22 +17,32 @@ export default function Custom404() {
         <h2 className="-mt-7 text-2xl font-extrabold">
           Sorry, we couldn&apos;t find what you were looking for.
         </h2>
-        <div className="mt-7 flex">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="rounded bg-rose-500 py-2 px-4 text-xl font-bold text-white hover:bg-rose-700"
-          >
-            Go Back
-          </button>
-          <Link
-            className="ml-4 rounded bg-rose-500 py-2 px-4 text-xl font-bold text-white hover:bg-rose-700"
-            href="/"
-          >
-            Go Home
-          </Link>
-        </div>
+        
+        <BackToSafetyButtons router={router} />
       </div>
     </div>
   );
 }
+
+interface BackToSafetyButtonsProps extends React.ComponentPropsWithoutRef<'div'> {
+  router: NextRouter;
+}
+
+export function BackToSafetyButtons({router, ...props}: BackToSafetyButtonsProps) {
+  return <div className="mt-7 flex" {...props}>
+    <button
+      type="button"
+      onClick={() => router.back()}
+      className="rounded bg-rose-500 py-2 px-4 text-xl font-bold text-white hover:bg-rose-700"
+    >
+      Go Back
+    </button>
+    <Link
+      className="ml-4 rounded bg-rose-500 py-2 px-4 text-xl font-bold text-white hover:bg-rose-700"
+      href="/"
+    >
+      Go Home
+    </Link>
+  </div>;
+}
+

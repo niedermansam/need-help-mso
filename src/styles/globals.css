@@ -6,16 +6,16 @@
     display: inline-block;
     position: relative;
     width: 80px;
-    height: 80px;
+    height: 20px;
 }
 
 .ellipsis div {
     position: absolute;
-    top: 33px;
+    top: 0px;
     width: 13px;
     height: 13px;
     border-radius: 50%;
-    background: #e43f3f;
+    background: rgb(225 29 72);
     animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
 

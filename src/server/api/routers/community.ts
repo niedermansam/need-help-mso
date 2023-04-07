@@ -9,11 +9,11 @@ export const communityRouter = createTRPCRouter({
     .input(z.object({ community: z.string() }))
     .query(async ({ input, ctx }) => {
       return await ctx.prisma.community.findFirst({
-        where: { name: {equals: input.community, mode: 'insensitive'} },
+        where: { name: { equals: input.community, mode: "insensitive" } },
       });
     }),
 
-    getById: publicProcedure
+  getById: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
       return await ctx.prisma.community.findUnique({
@@ -25,7 +25,7 @@ export const communityRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        id: z.string().optional(),
+        slug: z.string().optional(),
         exclusiveOrgs: z.string().array().optional(),
         helpfulOrgs: z.string().array().optional(),
         exclusiveResources: z.string().array().optional(),
@@ -35,18 +35,17 @@ export const communityRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const {
         name,
-        id,
+        slug,
         exclusiveOrgs,
         helpfulOrgs,
         exclusiveResources,
         helpfulResources,
       } = input;
 
-
       return await ctx.prisma.community.create({
         data: {
           name,
-          id: id || name.toLowerCase().replace(/ /g, "-"),
+          slug: slug || name.toLowerCase().replace(/ /g, "-"),
           exclusiveOrgs: {
             connect:
               exclusiveOrgs &&
@@ -75,6 +74,111 @@ export const communityRouter = createTRPCRouter({
               helpfulResources.map((resource) => {
                 return { id: resource };
               }),
+          },
+        },
+      });
+    }),
+
+  update: adminProcedure
+    .input(
+      z.object({
+        name: z.string().optional(),
+        id: z.string(),
+        slug: z.string().optional(),
+        exclusiveOrgs: z.string().array().optional(),
+        helpfulOrgs: z.string().array().optional(),
+        exclusiveResources: z.string().array().optional(),
+        helpfulResources: z.string().array().optional(),
+        parentCommunityIds: z.string().array().optional(),
+        subCommunityIds: z.string().array().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const {
+        name,
+        id,
+        slug,
+        exclusiveOrgs,
+        helpfulOrgs,
+        exclusiveResources,
+        helpfulResources,
+        parentCommunityIds,
+        subCommunityIds,
+      } = input;
+
+      return await ctx.prisma.community.update({
+        where: { id },
+        data: {
+          name: name,
+          slug: slug,
+          exclusiveOrgs: exclusiveOrgs
+            ? {
+                connect: exclusiveOrgs.map((org) => {
+                  return { id: org };
+                }),
+              }
+            : undefined,
+          helpfulOrgs: helpfulOrgs
+            ? {
+                connect: helpfulOrgs.map((org) => {
+                  return { id: org };
+                }),
+              }
+            : undefined,
+          exclusiveResources: exclusiveResources
+            ? {
+                connect: exclusiveResources.map((resource) => {
+                  return { id: resource };
+                }),
+              }
+            : undefined,
+
+
+          helpfulResources: helpfulResources
+            ? {
+                connect: helpfulResources.map((resource) => {
+                  return { id: resource };
+                }),
+              }
+            : undefined,
+
+          parentCommunities: parentCommunityIds
+            ? {
+                connect: parentCommunityIds.map((id) => {
+                  return { id: id };
+                }),
+              }
+            : undefined,
+
+          subCommunities: subCommunityIds
+            ? {
+                connect: subCommunityIds.map((id) => {
+                  return { id: id };
+                })
+              }
+              : undefined,
+                
+
+        },
+      });
+    }),
+
+
+    disconnectParentCommunity: adminProcedure
+    .input(
+      z.object({
+        communityId: z.string(),
+        parentId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.community.update({
+        where: { id: input.communityId },
+        data: {
+          parentCommunities: {
+            disconnect: {
+              id: input.parentId,
+            },
           },
         },
       });
@@ -188,7 +292,6 @@ export const communityRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-
       return await ctx.prisma.community.update({
         where: { name: input.community },
         data: {
@@ -199,8 +302,7 @@ export const communityRouter = createTRPCRouter({
           },
         },
       });
-    }
-    ),
+    }),
 
   disconnectHelpfulResource: adminProcedure
     .input(
@@ -220,6 +322,5 @@ export const communityRouter = createTRPCRouter({
           },
         },
       });
-    }
-    ),
+    }),
 });

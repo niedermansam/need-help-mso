@@ -1,7 +1,6 @@
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { type OrgProps } from "../pages/org";
 import { ContactIcons, ContactInfo } from "./ContactInfo";
 import { TagList } from "./Tags";
 import type { Organization, Resource, Tag } from "@prisma/client";

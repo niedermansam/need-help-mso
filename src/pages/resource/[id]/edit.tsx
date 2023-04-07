@@ -161,17 +161,18 @@ export default function EditResourcePage(props: ServerSideProps) {
                     })
                   : undefined
               }
-              onChange={(value) => {
+              onChange={(value, foo) => {
+
+                console.log(foo.action)
                 const communities = (
                   value as { value: string; label: string }[]
                 ).map((community) => {
-                  return { name: community.value };
+                  return { name: community.label, id: community.value };
                 });
-
                 setFormData({
                   ...formData,
                   exclusiveToCommunities: communities,
-                });
+                }); 
               }}
             />
             <CommunitySelect
@@ -189,7 +190,7 @@ export default function EditResourcePage(props: ServerSideProps) {
                 const communities = (
                   value as { value: string; label: string }[]
                 ).map((community) => {
-                  return { name: community.value };
+                  return { name: community.label, id: community.value };
                 });
 
                 setFormData({ ...formData, helpfulToCommunities: communities });
@@ -280,12 +281,14 @@ export default function EditResourcePage(props: ServerSideProps) {
 
 type SelectedOrgProps = Pick<Organization, "id" | "name">;
 
+type CommunityPick = Pick<Community, "name" | 'id'>;
+
 type ServerSideProps = {
   resource: Resource & {
     tags: Tag[];
     organization: SelectedOrgProps;
-    exclusiveToCommunities: Community[];
-    helpfulToCommunities: Community[];
+    exclusiveToCommunities: CommunityPick[];
+    helpfulToCommunities:  CommunityPick[];
     helpingOrganizations: SelectedOrgProps[];
   };
   resourceId: string;
