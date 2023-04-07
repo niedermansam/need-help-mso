@@ -39,7 +39,9 @@ export const getCategoryString = (
   return "";
 };
 
-export function CategorySelect({ title, ...attributes }: CategorySelectProps) {
+export function CategorySelect({ title, categories , ...attributes }: CategorySelectProps & {
+  categories?: string[];
+}) {
   const { data } = api.getCategoryList.useQuery();
   return (
     <>
@@ -49,7 +51,10 @@ export function CategorySelect({ title, ...attributes }: CategorySelectProps) {
         {...attributes}
         isClearable
         options={
-          data?.map((category) => ({
+          categories ? categories.map(cat => {return {
+            value: cat,
+            label: cat,
+          }}) : data?.map((category) => ({
             value: category.category,
             label: category.category,
           })) ?? []
@@ -120,7 +125,7 @@ export function CommunitySelect({
           options
             ? options
             : data?.map((community) => ({
-                value: community.name,
+                value: community.id,
                 label: community.name,
               })) ?? []
         }
@@ -193,13 +198,13 @@ export function BarriersToEntrySelect({
 }
 
 export const validateMultivalueArray = (
-  array: MultiValue<CategorySelectItem> | CategorySelectItem[]
+  array: MultiValue<CategorySelectItem> | CategorySelectItem
 ): array is MultiValue<CategorySelectItem> => {
   return array !== null && array !== undefined && Array.isArray(array);
 };
 
 export const getValidMultivalueArray = (
-  array: MultiValue<CategorySelectItem> | CategorySelectItem[]
+  array: MultiValue<CategorySelectItem> | CategorySelectItem
 ): MultiValue<CategorySelectItem> => {
   if (validateMultivalueArray(array)) {
     return array;

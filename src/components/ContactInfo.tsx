@@ -10,7 +10,7 @@ import type { OrgProps } from "../pages/org/[id]";
 import ReactModal from "react-modal";
 import { useState } from "react";
 
-type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
+export type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
 
 export function ContactInfo({
   phone,

@@ -1,18 +1,29 @@
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { type OrgProps
- } from "../pages/org";
-import { type ResourceProps } from "../pages/resource";
 import { ContactIcons, ContactInfo } from "./ContactInfo";
 import { TagList } from "./Tags";
+import type { Organization, Resource, Tag } from "@prisma/client";
+
+export type ResourceCardProps = Pick<
+  Resource,
+  "name" | "id" | "url" | "category" | "organizationId"
+> & {
+  organization: {
+    name: string;
+    phone: string | null;
+    email: string | null;
+    website: string | null;
+  };
+  tags: Pick<Tag, "tag">[];
+};
 
 export function ResourceCard({
   resource,
   showOrg = true,
   admin = false,
 }: {
-  resource: ResourceProps;
+  resource: ResourceCardProps;
   showOrg?: boolean;
   admin?: boolean;
 }) {
@@ -28,7 +39,7 @@ export function ResourceCard({
   return (
     <CardWrapper>
       <div className="flex w-full flex-wrap items-center justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left">
-        <h2 className="truncate">
+        <div className="truncate">
           {showOrg && (
             <Link href={`/org/${orgId}`}>
               <h3 className="truncate text-xl font-light hover:text-rose-600  md:text-lg">
@@ -36,34 +47,28 @@ export function ResourceCard({
               </h3>
             </Link>
           )}
-          <Link
-            href={`/resource/${resourceId}`}
-            className="hover:text-rose-500"
-          >
-            <h2 className="mb-2 truncate text-2xl font-bold tracking-tight md:text-xl">
-              {resourceName}
-            </h2>
-          </Link>
-          {admin && (
-            <Link href={`/resource/${resourceId}/edit`} className="">
-              <FontAwesomeIcon
-                className="text-stone-500 hover:text-rose-500"
-                icon={faEdit}
-              />
+          <div className="flex ">
+            {admin && (
+              <Link href={`/resource/${resourceId}/edit`} className="">
+                <FontAwesomeIcon
+                  className="text-stone-500 hover:text-rose-500 mr-1"
+                  icon={faEdit}
+                />
+              </Link>
+            )}
+            <Link
+              href={`/resource/${resourceId}`}
+              className="hover:text-rose-500"
+            >
+              <h2 className="mb-2 text-stone-600 truncate text-2xl font-bold tracking-tight md:text-xl">
+                {resourceName}
+              </h2>
             </Link>
-          )}
-        </h2>
-        <ContactIconSection
-          phone={phone}
-          email={email}
-          website={website}
-        />
+          </div>
+        </div>
+        <ContactIconSection phone={phone} email={email} website={website} />
       </div>
-      <DesktopContactInfo
-        phone={phone}
-        email={email}
-        website={website}
-      />
+      <DesktopContactInfo phone={phone} email={email} website={website} />
       <CategoryTagSection category={resource.category} tags={resource.tags} />
       <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
         <Link
@@ -94,7 +99,7 @@ const DesktopContactInfo = ({
 };
 const CardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="my-4 mx-4 py-2 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">
+    <div className="my-4 mx-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">
       {children}
     </div>
   );
@@ -111,7 +116,7 @@ const ContactIconSection = ({
   return (
     <div className="flex w-full items-center justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left">
       <ContactIcons
-        className="mt-2 md:mt-1 w-full justify-center lg:hidden"
+        className="mt-2 w-full justify-center md:mt-1 lg:hidden"
         phone={phone}
         email={email}
         website={website}
@@ -127,8 +132,8 @@ const CategoryTagSection = ({
   tags: { tag: string }[];
 }) => {
   return (
-    <div className="flex h-fit flex-col xs:row-span-2 xs:mt-4 md:mt-0 md:col-span-6 md:row-span-1 lg:col-span-5">
-      <p className=" my-2 md:mt-0 w-full px-4 text-base lg:mt-0">
+    <div className="flex h-fit flex-col xs:row-span-2 xs:mt-4 md:col-span-6 md:row-span-1 md:mt-0 lg:col-span-5">
+      <p className=" my-2 w-full px-4 text-base md:mt-0 lg:mt-0">
         <span className="mr-1 w-full text-center font-light"> Category: </span>
         <Link
           href={`/cat/${category}`}
@@ -137,7 +142,7 @@ const CategoryTagSection = ({
           {category}
         </Link>
       </p>
-      <div className="flex px-4 max-h-[48px]">
+      <div className="flex max-h-[48px] px-4">
         <p className="mb-0.5 mr-2 w-16 font-light"> Tags: </p>
         <TagList className="overflow-scroll" tags={tags} />
       </div>
@@ -145,34 +150,41 @@ const CategoryTagSection = ({
   );
 };
 
+export type OrgCardProps = Pick<
+  Organization,
+  "id" | "name" | "phone" | "email" | "website" | "category"
+> & {
+  tags: { tag: string }[];
+};
+
 export function OrganizationCard({
   org,
   admin,
 }: {
-  org: OrgProps;
+  org: OrgCardProps;
   admin: boolean;
 }) {
   return (
     <CardWrapper>
       <div className="flex w-full flex-wrap items-center justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left">
-        <h2 className="truncate ">
+        <div className="flex truncate">
+          {admin && (
+            <Link href={`/org/${org.id}/edit`} className="mr-1">
+              <FontAwesomeIcon
+                className="text-stone-500 hover:text-rose-500"
+                icon={faEdit}
+              />
+            </Link>
+          )}{" "}
           <Link
             className="flex items-center justify-center"
             href={`/org/${org.id}`}
           >
-            {admin && (
-              <Link href={`/org/${org.id}/edit`} className="mr-1">
-                <FontAwesomeIcon
-                  className="text-stone-500 hover:text-rose-500"
-                  icon={faEdit}
-                />
-              </Link>
-            )}
             <h3 className="truncate text-xl font-bold text-stone-600 hover:text-rose-600  md:text-lg">
               {org.name}
             </h3>
           </Link>
-        </h2>
+        </div>
         <ContactIconSection
           phone={org.phone}
           email={org.email}

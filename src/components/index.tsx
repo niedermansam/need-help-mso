@@ -43,9 +43,7 @@ export function EditLink({
       <FontAwesomeIcon
         {...iconProps}
         icon={iconProps?.icon || defaultIconProps.icon}
-        className={`${defaultIconProps.className} ${
-          iconProps?.className || ""
-        }`}
+        className={`${iconProps?.className || defaultIconProps.className}`}
       />
     </Link>
   );

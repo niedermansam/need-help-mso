@@ -261,10 +261,9 @@ function OrganizationSection({
 }) {
   const [displayOrgs, setDisplayOrgs] = useState(orgs);
 
-  const allTagsMemo =  useMemo(() => {
+  const allTagsMemo = useMemo(() => {
     return [...new Set(orgs.flatMap((org) => org.tags.map((tag) => tag.tag)))];
-  }, [orgs]) 
-  
+  }, [orgs]);
 
   const [displayTags, setDisplayTags] = useState<string[]>(allTagsMemo);
   const [strict, setStrict] = useState(false);
@@ -292,6 +291,7 @@ function OrganizationSection({
     });
 
     const newOrgList = filteredByCategory.filter((org) => {
+      
       const orgTags = org.tags.map((tag) => tag.tag);
       if (selectedTags.length === 0) return true;
       if (strict)
@@ -352,25 +352,25 @@ function OrganizationSection({
             }));*/
             }}
           />
-          <div
-            className="-mt-2">
-          <input
-            type="checkbox"
-            name="strict-tag-search"
-            value="strict"
-            checked={strict}
-            onChange={(e) => {
-              console.log(strict);
-              setStrict(e.target.checked);
-            }}
-          />{" "}
-          <label
-            htmlFor="strict-tag-search"
-            className="ml-1 text-xs font-bold text-stone-500"
-          >
-            Strict
-          </label>
-        </div></div>
+          <div className="-mt-2">
+            <input
+              type="checkbox"
+              name="strict-tag-search"
+              value="strict"
+              checked={strict}
+              onChange={(e) => {
+                console.log(strict);
+                setStrict(e.target.checked);
+              }}
+            />
+            <label
+              htmlFor="strict-tag-search"
+              className="ml-1 text-xs font-bold text-stone-500"
+            >
+              Strict
+            </label>
+          </div>
+        </div>
       </div>
       {displayOrgs.map((org) => (
         <OrganizationCard admin={admin} key={org.id} org={org} />
