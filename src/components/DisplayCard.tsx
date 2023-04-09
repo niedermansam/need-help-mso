@@ -4,8 +4,12 @@ import Link from "next/link";
 import { ContactIcons, ContactInfo } from "./ContactInfo";
 import { TagList } from "./Tags";
 import type { Organization, Resource, Tag } from "@prisma/client";
+import { faStar } from "@fortawesome/free-regular-svg-icons";
+import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
+import { api } from "../utils/api";
+import { useEffect, useState } from "react";
 
-export type ResourceCardProps = Pick<
+export type ResourceCardInformation = Pick<
   Resource,
   "name" | "id" | "url" | "category" | "organizationId"
 > & {
@@ -18,15 +22,24 @@ export type ResourceCardProps = Pick<
   tags: Pick<Tag, "tag">[];
 };
 
-export function ResourceCard({
-  resource,
-  showOrg = true,
-  admin = false,
-}: {
-  resource: ResourceCardProps;
+
+
+
+type ResourceCardProps = {
+  resource: ResourceCardInformation;
+  favoritesArray: string[];
   showOrg?: boolean;
   admin?: boolean;
-}) {
+  loggedIn?: boolean;
+} 
+
+export function ResourceCard({
+  resource,
+  favoritesArray,
+  loggedIn,
+  showOrg = true,
+  admin,
+}: ResourceCardProps) {
   const resourceName = resource.name;
   const orgName = resource.organization.name;
 
@@ -36,6 +49,20 @@ export function ResourceCard({
   const phone = resource.organization.phone;
   const email = resource.organization.email;
   const website = resource.url || resource.organization.website;
+
+  const [isFavoriteResource, setIsFavoriteResource] = useState(favoritesArray.includes(resourceId));
+
+  useEffect(() => {
+    setIsFavoriteResource(favoritesArray.includes(resourceId));
+  }, [favoritesArray, resourceId]);
+
+  const toggleFavorite = api.user.toggleFavoriteResource.useMutation({
+    onMutate: ({ newState }) => setIsFavoriteResource(newState),
+    onSettled: (data, err, input) => {
+      const oldState = !input.newState;
+      if (err || data === undefined) return setIsFavoriteResource(oldState);
+    },
+  });
   return (
     <CardWrapper>
       <div className="flex w-full flex-wrap items-center justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left">
@@ -47,11 +74,11 @@ export function ResourceCard({
               </h3>
             </Link>
           )}
-          <div className="flex ">
+          <div className="flex">
             {admin && (
               <Link href={`/resource/${resourceId}/edit`} className="">
                 <FontAwesomeIcon
-                  className="text-stone-500 hover:text-rose-500 mr-1"
+                  className="mr-1 text-stone-500 hover:text-rose-500"
                   icon={faEdit}
                 />
               </Link>
@@ -60,7 +87,7 @@ export function ResourceCard({
               href={`/resource/${resourceId}`}
               className="hover:text-rose-500"
             >
-              <h2 className="mb-2 text-stone-600 truncate text-2xl font-bold tracking-tight md:text-xl">
+              <h2 className="mb-2 truncate text-2xl font-bold tracking-tight text-stone-600 hover:text-rose-500 md:text-xl">
                 {resourceName}
               </h2>
             </Link>
@@ -71,6 +98,22 @@ export function ResourceCard({
       <DesktopContactInfo phone={phone} email={email} website={website} />
       <CategoryTagSection category={resource.category} tags={resource.tags} />
       <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
+        {loggedIn && (
+          <button
+            onClick={() =>
+              toggleFavorite.mutate({
+                resourceId,
+                newState: !isFavoriteResource,
+              })
+            }
+            className="mr-1 flex h-4 items-center justify-center"
+          >
+            <FontAwesomeIcon
+              icon={isFavoriteResource ? faStarSolid : faStar}
+              className="text-gold-500 h-4 text-amber-400 "
+            />
+          </button>
+        )}
         <Link
           className="mr-2 flex w-1/2 justify-center justify-self-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md sm:w-2/3 md:w-32"
           href={`/resource/${resource.id}`}
@@ -160,10 +203,35 @@ export type OrgCardProps = Pick<
 export function OrganizationCard({
   org,
   admin,
+  loggedIn,
+  favoriteIds,
 }: {
   org: OrgCardProps;
   admin: boolean;
+  loggedIn: boolean;
+  favoriteIds: string[];
+
 }) {
+  const orgId = org.id;
+  const [isFavoriteOrg, setIsFavoriteOrg] = useState(
+    
+    favoriteIds.includes(orgId)
+  );
+
+  useEffect(() => {
+    setIsFavoriteOrg(favoriteIds.includes(orgId));
+  }, [favoriteIds, orgId]);
+
+  
+
+
+  const toggleFavorite = api.user.toggleFavoriteOrganization.useMutation({
+    onMutate: ({ newState }) => setIsFavoriteOrg(newState),
+    onSettled: (data, err, input) => {
+      const oldState = !input.newState;
+      if (err || data === undefined) return setIsFavoriteOrg(oldState);
+    },
+  });
   return (
     <CardWrapper>
       <div className="flex w-full flex-wrap items-center justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left">
@@ -199,6 +267,22 @@ export function OrganizationCard({
 
       <CategoryTagSection category={org.category} tags={org.tags} />
       <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
+        {loggedIn && (
+          <button
+            onClick={() =>
+              toggleFavorite.mutate({
+                organizationId: org.id,
+                newState: !isFavoriteOrg,
+              })
+            }
+            className="mr-1 flex h-4 items-center justify-center"
+          >
+            <FontAwesomeIcon
+              icon={isFavoriteOrg ? faStarSolid : faStar}
+              className="text-gold-500 h-4 text-amber-400 "
+            />
+          </button>
+        )}
         <Link
           className="mr-2 flex w-1/2 justify-center justify-self-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md sm:w-2/3 md:w-32"
           href={`/org/${org.id}`}

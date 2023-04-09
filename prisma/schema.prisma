@@ -60,6 +60,7 @@ model User {
     admin         Boolean               @default(false)
     lists         FavoritesList[]       @relation("AuthorizedUsers")
     createdLists  FavoritesList[]       @relation("Admin")
+    currentListId Int?
 }
 
 model VerificationToken {
@@ -91,15 +92,15 @@ model Tag {
 }
 
 model Community {
-    name               String          @unique @id
-    id                 String         @unique @default(cuid()) 
-    slug                 String         @default(cuid())  @unique
+    name               String         @id @unique
+    id                 String         @unique @default(cuid())
+    slug               String         @unique @default(cuid())
     description        String?
     exclusiveOrgs      Organization[] @relation("ExclusiveOrg")
     exclusiveResources Resource[]     @relation("ExclusiveResource")
     helpfulOrgs        Organization[] @relation("HelpfulOrg")
     helpfulResources   Resource[]     @relation("HelpfulResource")
-    parentCommunities Community[]    @relation("SubCommunity")
+    parentCommunities  Community[]    @relation("SubCommunity")
     subCommunities     Community[]    @relation("SubCommunity")
 
     @@index([name])
@@ -211,7 +212,7 @@ model OrganizationContact {
 }
 
 model FavoritesList {
-    id              Int            @id @default(autoincrement())
+    id              Int            @id @default(autoincrement()) @unique
     createdAt       DateTime       @default(now())
     updatedAt       DateTime       @updatedAt
     adminId         String

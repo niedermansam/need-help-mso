@@ -7,6 +7,9 @@ import { prisma } from "../../server/db";
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import type { BarriersToEntry, SpeedOfAid } from "@prisma/client";
 import { ResourceCard } from "../../components/DisplayCard";
+import { useSession } from "next-auth/react";
+import { getSessionDetails } from "../../utils";
+import { api } from "../../utils/api";
 
 export default function CategoryPage({
   resources,
@@ -14,6 +17,14 @@ export default function CategoryPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { category: URI } = useRouter().query;
   const category = decodeTag(URI as string);
+
+  const session = useSession().data;
+
+  const sessionDetails = getSessionDetails(session);
+
+  const { data: favorites } = api.user.getFavoriteList.useQuery();
+
+  console.log(sessionDetails);
 
   const [availableTags, setAvailableTags] = useState<string[]>([]);
 
@@ -87,7 +98,13 @@ export default function CategoryPage({
         <label htmlFor="strictFilter">Strict Filter?</label>
       </div>
       {visibleResources.map((resource) => (
-        <ResourceCard resource={resource} key={resource.id} />
+        <ResourceCard
+          resource={resource}
+          key={resource.id}
+          admin={sessionDetails.admin}
+          loggedIn={sessionDetails.loggedIn}
+          favoritesArray={favorites?.resources || []}
+        />
       ))}
     </div>
   );

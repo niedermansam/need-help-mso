@@ -3,6 +3,7 @@ import { organizationRouter } from "./routers/organization";
 import { resourceRouter } from "./routers/resources";
 import { tagRouter } from "./routers/tag";
 import { communityRouter } from "./routers/community";
+import { userRouter } from "./routers/user";
 
 /**
  * This is the primary router for your server.
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
   resource: resourceRouter,
   tag: tagRouter,
   community: communityRouter,
+  user: userRouter,
 
   getCategoryList: publicProcedure.query(async ({ ctx }) => {
     const categories = await ctx.prisma.category.findMany();

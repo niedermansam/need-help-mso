@@ -40,12 +40,12 @@ const Title = () => {
         <br /> <span className="tracking-wide text-rose-500">Missoula</span>
       </h1>{" "}
       <p className="my-4 w-full text-center tracking-tight">
-        <span className=" text-xl font-bold md:text-2xl lg:text-3xl">
-          A Digital Directory of Resources
+        <span className=" text-xl font-bold text-stone-400 md:text-xl lg:text-2xl  ">
+          A digital directory of resources for people 
         </span>{" "}
         <br />{" "}
-        <span className="text-lg tracking-tighter text-stone-400  md:text-2xl lg:text-3xl">
-          for People Who Could Use a Helping Hand
+        <span className="text-lg text-stone-400 font-bold md:text-xl lg:text-2xl">
+         who could use a helping hand.
         </span>
       </p>
     </div>

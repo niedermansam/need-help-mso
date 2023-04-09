@@ -1,4 +1,7 @@
 // create a function to trim a long string to a certain number of words, remove any punctuation or spaces from the end and add an ellipsis at the end
+
+import type { Session } from "next-auth";
+
 //
 export const trimString = (str: string, numWords: number) => {
   // split the string into an array of words
@@ -50,6 +53,21 @@ export const getRawPhoneNumber = (phoneNumber: string, prefix?:boolean ) => {
   else return null;
 
 };
+
+export function isItemFavorite(favoriteIds: string[] | undefined, itemId: string) {
+  
+  if (!favoriteIds) return false;
+  return favoriteIds.some((id) => id === itemId) || false;
+}
+
+export function getSessionDetails (session:Session | null) {
+  if (!session) return  {
+    loggedIn: false,
+    admin: false
+  };
+
+  return { loggedIn: true, admin: session.user.admin, favoriteList: session.user.currentListId};
+}
 
 
 
