@@ -20,6 +20,7 @@ import { api } from "../../utils/api";
 import { useMemo } from "react";
 
 import { OrganizationCard } from "../../components/DisplayCard";
+import LoadingPage from "../../components/LoadingPage";
 
 export type OrganizationProps = {
   name: string;
@@ -324,6 +325,8 @@ function OrganizationSection({
     }
   }, [selectedTags, strict, selectedCategory, orgs, allTagsMemo]);
 
+
+
   return (
     <div className="flex flex-wrap">
       <div className="mx-4 flex w-full">
@@ -392,12 +395,14 @@ function OrganizationSection({
 
 export default function OrganizationsPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { data: orgs } = api.organization.getAll.useQuery();
+  const { data: orgs, isLoading } = api.organization.getAll.useQuery();
   const session = useSession().data;
 
   const isLoggedIn = !!session?.user;
 
   const isAdmin = session?.user.admin || false;
+
+  if (isLoading) return <LoadingPage />
   return (
     <div>
       <NavBar />
