@@ -13,8 +13,7 @@ export default function AboutPage() {
         </h3>
         <p className="my-2 leading-relaxed">
           I&apos;m the developer behind Need Help Missoula, and I like to think
-          that software can make the world a better place (despite the best
-          efforts of... <span className="italic">some</span> companies). The
+          that software can make the world a better place. The
           project was born out of a desire to make life a little easier for the
           hundred of case workers, social workers, and other professionals who
           work tirelessly to help people in need. I hope that this project can
