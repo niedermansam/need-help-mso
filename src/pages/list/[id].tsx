@@ -3,19 +3,25 @@ import type {
   InferGetServerSidePropsType,
 } from "next/types";
 import NavBar from "../../components/Nav";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { prisma } from "../../server/db";
 import {
   OrganizationCard,
   ResourceCard,
   type ResourceCardInformation,
 } from "../../components/DisplayCard";
+import { api } from "../../utils/api";
 
 function ResourceSection({
   resources,
+  session,
+  userFavorites
 }: {
   resources: ResourceCardInformation[];
+  session: ReturnType<typeof useSession>;
+  userFavorites: string[] | undefined;
 }) {
+
   return (
     <div className="mt-6">
       <h2 className="text-3xl font-bold text-stone-500">Resources</h2>
@@ -23,8 +29,8 @@ function ResourceSection({
         <ResourceCard
           key={resource.id}
           resource={resource}
-          favoritesArray={[resource.id]}
-          loggedIn={true}
+          favoritesArray={userFavorites || []}
+          loggedIn={!!session.data?.user}
         />
       ))}
     </div>
@@ -33,6 +39,8 @@ function ResourceSection({
 
 function OrganizationSection({
   organizations,
+  session,
+  userFavorites
 }: {
   organizations: {
     name: string;
@@ -45,6 +53,8 @@ function OrganizationSection({
       tag: string;
     }[];
   }[];
+  userFavorites: string[] | undefined;
+  session: ReturnType<typeof useSession>;
 }) {
   return (
     <div className="mt-6">
@@ -54,8 +64,8 @@ function OrganizationSection({
           key={organization.id}
           org={organization}
           admin={false}
-          favoriteIds={[organization.id]}
-          loggedIn={true}
+          favoriteIds={userFavorites || []}
+          loggedIn={!!session.data?.user}
         />
       ))}
     </div>
@@ -63,20 +73,30 @@ function OrganizationSection({
 }
 
 export default function ListsPage({
-  favorites,
+  listDetails: favorites,
+  
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const session = useSession()
   const hasFavoriteResources = favorites.resources.length > 0;
   const hasFavoriteOrganizations = favorites.organizations.length > 0;
+
+  const {data: userFavorites } = api.user.getFavoriteList.useQuery(undefined ,{
+    enabled: !!session.data?.user
+  })
   return (
     <div>
       <NavBar />
       <div className="mx-6 pt-14">
         <h1 className=" text-5xl font-extrabold text-stone-500">Favorites</h1>
         {hasFavoriteResources && (
-          <ResourceSection resources={favorites.resources} />
+          <ResourceSection resources={favorites.resources} session={session} userFavorites={userFavorites?.resources} />
         )}
         {hasFavoriteOrganizations && (
-          <OrganizationSection organizations={favorites.organizations} />
+          <OrganizationSection
+            organizations={favorites.organizations}
+            session={session}
+            userFavorites={userFavorites?.organizations}
+          />
         )}
       </div>
     </div>
@@ -84,7 +104,7 @@ export default function ListsPage({
 }
 
 type ServerSideProps = {
-  favorites: {
+  listDetails: {
     name: string;
     id: number;
     resources: {
@@ -123,18 +143,11 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 ) => {
   const session = await getSession(context);
 
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/api/auth/signin",
-        permanent: false,
-      },
-    };
-  }
+  const loggedIn = !!session?.user.id;
 
-  const favoritesListId =  parseInt( (context.query.id as string));
+  const favoritesListId = parseInt(context.query.id as string);
 
-  const favorites = await prisma.favoritesList.findUnique({
+  const listDetails = await prisma.favoritesList.findUnique({
     where: {
       id: favoritesListId,
     },
@@ -182,7 +195,13 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     },
   });
 
-  if (favorites === null) {
+  if (listDetails === null && !session?.user.id) {
+    return {
+      notFound: true,
+    };
+  }
+
+  if (listDetails === null && loggedIn) {
     const newList = await prisma.favoritesList.create({
       data: {
         name: "Favorites",
@@ -205,14 +224,18 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 
     return {
       props: {
-        favorites: { ...newList, resources: [], organizations: [] },
+        listDetails: { ...newList, resources: [], organizations: [] },
       },
+    };
+  } else if (listDetails === null) {
+    return {
+      notFound: true,
     };
   }
 
   return {
     props: {
-      favorites,
+      listDetails,
     },
   };
 };
