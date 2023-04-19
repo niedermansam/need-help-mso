@@ -17,14 +17,15 @@ import type { Session } from "next-auth";
 import { EditLink } from "../../components";
 import { ContactInfo } from "../../components/ContactInfo";
 import { ResourceCard } from "../../components/DisplayCard";
+import { api } from "../../utils/api";
 
 export default function OrganizationDetailsPage({
   orgData,
   userSession,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  if (!orgData) return <p>no data</p>;
-
   const isAdmin = userSession?.user.admin || false;
+
+  const { data: favorites } = api.user.getFavoriteList.useQuery();
 
   return (
     <div className="text-stone-600">
@@ -54,6 +55,7 @@ export default function OrganizationDetailsPage({
             resource={{ ...resource, organization: { ...orgData } }}
             key={resource.id}
             showOrg={false}
+            favoritesArray={favorites?.resources || []}
           />
         );
       })}

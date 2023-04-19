@@ -1,11 +1,35 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
+
+const NavLink = ({
+  href,
+  label,
+  isActive,
+}: {
+  href: string;
+  label: string;
+  isActive: boolean;
+}) => {
+  return (
+    <Link
+      href={href}
+      className={`mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block ${
+        isActive ? "font-bold text-white" : ""
+      }`}
+    >
+      {label}
+    </Link>
+  );
+};
 
 export default function NavBar() {
   const session = useSession();
+  const router = useRouter();
   const userId = session.data?.user?.id;
   const [isOpen, setIsOpen] = useState(false);
+  console.log(router);
   return (
     <nav className="fixed z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
       <div className="mr-6 flex flex-shrink-0 items-center text-white">
@@ -34,30 +58,33 @@ export default function NavBar() {
         } transition-height overflow-hidden duration-200 ease-in-out md:h-auto`}
       >
         <div className=" md:flex-grow">
-          <Link
+          <NavLink
             href="/about"
-            className="mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block"
-          >
-            About
-          </Link>
-          <Link
+            label="About"
+            isActive={/\/about/.test(router.pathname)}
+          />
+          <NavLink
             href="/resource"
-            className="mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block"
-          >
-            Resources
-          </Link>{" "}
-          <Link
+            label="Resources"
+            isActive={/\/resource/.test(router.pathname)}
+          />
+          <NavLink
             href="/org"
-            className="mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block"
-          >
-            Organizations
-          </Link>{" "}
-          <Link
+            label="Organizations"
+            isActive={/\/org/.test(router.pathname)}
+          />
+          <NavLink
             href="/community"
-            className="mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block"
-          >
-            Communities
-          </Link>
+            label="Communities"
+            isActive={/\/community/.test(router.pathname)}
+          />
+          {userId && (
+            <NavLink
+              href="/favorites"
+              label="Favorites"
+              isActive={/\/list/.test(router.pathname)}
+            />
+          )}
         </div>
         <div className="flex">
           {

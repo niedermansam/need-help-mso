@@ -22,6 +22,7 @@ declare module "next-auth" {
       id: string;
       // ...other properties
       admin: boolean;
+      currentListId: number | undefined;
     } & DefaultSession["user"];
   }
 
@@ -29,6 +30,7 @@ declare module "next-auth" {
   //   // ...other properties
   //   // role: UserRole;
     admin: boolean;
+    currentListId: number | undefined;
  }
 }
 
@@ -44,6 +46,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = user.id;
         session.user.admin = user.admin // <-- put other properties on the session here
+        session.user.currentListId = user.currentListId
       }
       return session;
     },

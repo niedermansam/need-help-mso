@@ -1,10 +1,7 @@
 import Link, { type LinkProps } from "next/link";
 import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
-import type {
-  BarriersToEntry,
-  SpeedOfAid,
-} from "@prisma/client";
+import type { BarriersToEntry, SpeedOfAid } from "@prisma/client";
 import { useEffect, useState } from "react";
 import type { MultiValue, SingleValue } from "react-select";
 import { encodeTag } from "../../utils/manageUrl";
@@ -16,9 +13,13 @@ import {
 } from "../../components/Selectors";
 import { CategorySelect, TagSelect } from "../../components/Selectors";
 import ReactModal from "react-modal";
-import { ResourceCard, type ResourceCardProps } from "../../components/DisplayCard";
+import {
+  ResourceCard,
+  type ResourceCardInformation,
+} from "../../components/DisplayCard";
 import LoadingPage from "../../components/LoadingPage";
 import Custom404 from "../404";
+import { useSession } from "next-auth/react";
 
 type CreateResourceProps = {
   name: string;
@@ -359,16 +360,20 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
   );
 }
 
-
-
 export function ResourceSection({
   resources,
+  isLoggedIn,
+  isAdmin,
 }: {
-  resources: ResourceCardProps[];
+  resources: ResourceCardInformation[];
+  isLoggedIn: boolean;
+  isAdmin?: boolean;
 }) {
+  const { data: favorites } = api.user.getFavoriteList.useQuery();
+
   const allResources = resources;
   const [visibleResources, setVisibleResources] =
-    useState<ResourceCardProps[]>(resources);
+    useState<ResourceCardInformation[]>(resources);
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -442,7 +447,13 @@ export function ResourceSection({
       </div>
       <div className="mr-6">
         {visibleResources.map((resource) => (
-          <ResourceCard key={resource.id} resource={resource} />
+          <ResourceCard
+            key={resource.id}
+            resource={resource}
+            favoritesArray={favorites?.resources || []}
+            loggedIn={isLoggedIn}
+            admin={isAdmin}
+          />
         ))}
       </div>
     </div>
@@ -450,19 +461,29 @@ export function ResourceSection({
 }
 
 export default function ResourcePage() {
-  const { data, isLoading, isError } = api.resource.getAll.useQuery();
+  const {
+    data: resources,
+    isLoading,
+    isError,
+  } = api.resource.getAll.useQuery();
+
+  const session = useSession().data;
+
+  const isLoggedIn = !!session?.user;
+
+  const isAdmin = session?.user.admin
 
   if (isLoading) return <LoadingPage />;
-  if (isError) return  <Custom404 />;
+  if (isError) return <Custom404 />;
 
-  if (data)
+  if (resources)
     return (
       <div className="w-screen text-stone-600">
         <NavBar />
         <div className="px-4 pt-12 text-4xl font-bold">
           <h1 className="my-2">Resources</h1>
         </div>
-        <ResourceSection resources={data} />
+        <ResourceSection resources={resources} isLoggedIn={isLoggedIn} isAdmin={isAdmin} />
       </div>
     );
 }

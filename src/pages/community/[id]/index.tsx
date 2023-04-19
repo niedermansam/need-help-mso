@@ -1,7 +1,7 @@
 import type { Session } from "next-auth";
 import NavBar from "../../../components/Nav";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { prisma } from "../../../server/db";
 import type { Community, Resource, Tag } from "@prisma/client";
 import {
@@ -16,6 +16,7 @@ import {
   getValidSingleValue,
 } from "../../../components/Selectors";
 import { useEffect, useMemo, useState } from "react";
+import { api } from "../../../utils/api";
 
 export default function CommunityResourcesPage(
   props: InferGetServerSidePropsType<typeof getServerSideProps>
@@ -27,6 +28,12 @@ export default function CommunityResourcesPage(
   const communityHasResources =
     props.data.exclusiveResources.length > 0 ||
     props.data.helpfulResources.length > 0;
+
+    const {data: favorites} = api.user.getFavoriteList.useQuery();
+
+    const session = useSession()
+
+    const isLoggedIn = !!session.data?.user;
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>();
 
@@ -150,7 +157,7 @@ export default function CommunityResourcesPage(
           <div>
             <h2 className="text-2xl font-bold text-gray-700">Organizations</h2>
             {visibleOrgs.map((org) => (
-              <OrganizationCard key={org.id} org={org} admin={isAdmin} />
+              <OrganizationCard loggedIn={isLoggedIn} favoriteIds={favorites?.organizations || []} key={org.id} org={org} admin={isAdmin} />
             ))}
           </div>
         )}
@@ -162,6 +169,7 @@ export default function CommunityResourcesPage(
                 key={resource.id}
                 resource={resource}
                 admin={isAdmin}
+                favoritesArray={favorites?.resources || []}
               />
             ))}
           </div>

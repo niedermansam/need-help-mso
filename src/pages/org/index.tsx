@@ -1,6 +1,6 @@
 import type { Organization, Tag } from "@prisma/client";
 import type { Session } from "next-auth/core/types";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import type {
   GetServerSideProps,
@@ -20,6 +20,7 @@ import { api } from "../../utils/api";
 import { useMemo } from "react";
 
 import { OrganizationCard } from "../../components/DisplayCard";
+import LoadingPage from "../../components/LoadingPage";
 
 export type OrganizationProps = {
   name: string;
@@ -255,11 +256,15 @@ export type OrgProps = Omit<
 function OrganizationSection({
   orgs,
   admin,
+  loggedIn,
 }: {
   orgs: OrgProps[];
   admin: boolean;
+  loggedIn: boolean;
 }) {
   const [displayOrgs, setDisplayOrgs] = useState(orgs);
+
+  const { data: favorites } = api.user.getFavoriteList.useQuery();
 
   const allTagsMemo = useMemo(() => {
     return [...new Set(orgs.flatMap((org) => org.tags.map((tag) => tag.tag)))];
@@ -291,7 +296,6 @@ function OrganizationSection({
     });
 
     const newOrgList = filteredByCategory.filter((org) => {
-      
       const orgTags = org.tags.map((tag) => tag.tag);
       if (selectedTags.length === 0) return true;
       if (strict)
@@ -320,6 +324,8 @@ function OrganizationSection({
       setDisplayTags(uniqueTags);
     }
   }, [selectedTags, strict, selectedCategory, orgs, allTagsMemo]);
+
+
 
   return (
     <div className="flex flex-wrap">
@@ -372,18 +378,31 @@ function OrganizationSection({
           </div>
         </div>
       </div>
-      {displayOrgs.map((org) => (
-        <OrganizationCard admin={admin} key={org.id} org={org} />
-      ))}
+      {displayOrgs.map((org) => {
+        return (
+          <OrganizationCard
+            admin={admin}
+            key={org.id}
+            org={org}
+            loggedIn={loggedIn}
+            favoriteIds={favorites?.organizations || []}
+          />
+        );
+      })}
     </div>
   );
 }
 
 export default function OrganizationsPage({
-  userSession,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { data: orgs } = api.organization.getAll.useQuery();
-  const admin = userSession?.user?.admin || false;
+  const { data: orgs, isLoading } = api.organization.getAll.useQuery();
+  const session = useSession().data;
+
+  const isLoggedIn = !!session?.user;
+
+  const isAdmin = session?.user.admin || false;
+
+  if (isLoading) return <LoadingPage />
   return (
     <div>
       <NavBar />
@@ -393,8 +412,14 @@ export default function OrganizationsPage({
             Organizations
           </h1>
         </div>
-        {admin && <CreateOrganizationModal />}
-        {orgs && <OrganizationSection orgs={orgs} admin={admin} />}
+        {isAdmin && <CreateOrganizationModal />}
+        {orgs && (
+          <OrganizationSection
+            orgs={orgs}
+            admin={isAdmin}
+            loggedIn={isLoggedIn}
+          />
+        )}
       </div>
     </div>
   );

@@ -45,6 +45,7 @@ Table User {
   admin Boolean [not null, default: false]
   lists FavoritesList [not null]
   createdLists FavoritesList [not null]
+  currentListId Int
 }
 
 Table VerificationToken {
