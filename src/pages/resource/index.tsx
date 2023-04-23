@@ -2,7 +2,7 @@ import Link, { type LinkProps } from "next/link";
 import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
 import type { BarriersToEntry, SpeedOfAid } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { MultiValue, SingleValue } from "react-select";
 import { encodeTag } from "../../utils/manageUrl";
 import type { CategorySelectItem } from "../../components/Selectors";
@@ -10,6 +10,7 @@ import {
   BarriersToEntrySelect,
   CommunitySelect,
   SpeedOfAidSelect,
+  getValidSingleValue,
 } from "../../components/Selectors";
 import { CategorySelect, TagSelect } from "../../components/Selectors";
 import ReactModal from "react-modal";
@@ -377,44 +378,70 @@ export function ResourceSection({
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
+
+  const allTags = useMemo(() => {
+    return [...new Set(resources.flatMap((resource) => resource.tags.map((tag) => tag.tag)))];
+  }, [resources]);
+
+  const [displayTags, setDisplayTags] = useState(allTags);
+
+
   const [strict, setStrict] = useState(false);
 
-  const handleCategoryChange = (selected: unknown) => {
-    if (selected && typeof selected === "object" && "value" in selected) {
-      setVisibleResources(
-        resources.filter((resource) => resource.category === selected.value)
-      );
-    } else {
-      setVisibleResources(resources);
-    }
-  };
+
 
   useEffect(() => {
-    if (selectedTags.length === 0) {
-      return setVisibleResources(allResources);
+    if (selectedTags.length === 0 && !selectedCategory) {
+      setDisplayTags(allTags);
+      setVisibleResources(resources);
+      return;
     }
-    if (!strict)
-      return setVisibleResources(
-        resources.filter((resource) => {
-          const resourceTags = resource.tags.map((tag) => tag.tag);
-          return selectedTags.some((tag) => resourceTags.includes(tag));
-        })
-      );
-    else
-      return setVisibleResources(
-        resources.filter((resource) => {
-          const resourceTags = resource.tags.map((tag) => tag.tag);
-          return selectedTags.every((tag) => resourceTags.includes(tag));
-        })
-      );
-  }, [selectedTags, allResources, resources, strict]);
+
+    const filteredByCategory = resources.filter((resource) => {
+      if (!selectedCategory) return true;
+      return resource.category === selectedCategory;
+    });
+
+    const newResourceList = filteredByCategory.filter((resource) => {
+      const resourceTags = resource.tags.map((tag) => tag.tag);
+      if (selectedTags.length === 0) return true;
+      if (strict)
+        return selectedTags.every((tag) => resourceTags.includes(tag));
+      else return selectedTags.some((tag) => resourceTags.includes(tag));
+    });
+
+    setVisibleResources(newResourceList);
+
+
+  if (strict) {
+    // create a list of available tags
+    const availableTags = newResourceList.flatMap((resource) =>
+      resource.tags.map((tag) => tag.tag)
+    );
+
+    const uniqueTags = [...new Set(availableTags)];
+
+    setDisplayTags(uniqueTags);
+  } else {
+    const availableTags = filteredByCategory.flatMap((resource) =>
+      resource.tags.map((tag) => tag.tag)
+    );
+
+    const uniqueTags = [...new Set(availableTags)];
+
+    setDisplayTags(uniqueTags);
+  }
+  }, [selectedTags, allResources, resources, strict, selectedCategory, allTags]);
 
   return (
     <div className="mr-6 w-full">
       <div className="flex flex-wrap">
         <div className="mx-4">
           <CategorySelect
-            onChange={handleCategoryChange}
+            onChange={(value) => {
+              setSelectedCategory(getValidSingleValue(value));
+            }}
             className="w-64 cursor-pointer"
           />
         </div>
@@ -427,6 +454,12 @@ export function ResourceSection({
               );
               setSelectedTags(selectedTags);
             }}
+            options={displayTags.map((tag) => {
+              return {
+                value: tag,
+                label: tag,
+              };
+            })}
           />
           <input
             type="checkbox"

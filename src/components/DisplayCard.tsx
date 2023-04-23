@@ -187,7 +187,7 @@ const CategoryTagSection = ({
       </p>
       <div className="flex max-h-[48px] px-4">
         <p className="mb-0.5 mr-2 w-16 font-light"> Tags: </p>
-        <TagList className="overflow-scroll" tags={tags} />
+        <TagList className="overflow-y-auto" tags={tags} />
       </div>
     </div>
   );

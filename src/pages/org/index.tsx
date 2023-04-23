@@ -287,8 +287,6 @@ function OrganizationSection({
       setDisplayOrgs(orgs);
       return;
     }
-
-    console.log(selectedTags.length);
     const filteredByCategory = orgs.filter((org) => {
       const orgCategory = org["category"];
       if (selectedCategory && orgCategory !== selectedCategory) return false;
@@ -324,8 +322,6 @@ function OrganizationSection({
       setDisplayTags(uniqueTags);
     }
   }, [selectedTags, strict, selectedCategory, orgs, allTagsMemo]);
-
-
 
   return (
     <div className="flex flex-wrap">
@@ -393,8 +389,9 @@ function OrganizationSection({
   );
 }
 
-export default function OrganizationsPage({
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function OrganizationsPage({}: InferGetServerSidePropsType<
+  typeof getServerSideProps
+>) {
   const { data: orgs, isLoading } = api.organization.getAll.useQuery();
   const session = useSession().data;
 
@@ -402,7 +399,7 @@ export default function OrganizationsPage({
 
   const isAdmin = session?.user.admin || false;
 
-  if (isLoading) return <LoadingPage />
+  if (isLoading) return <LoadingPage />;
   return (
     <div>
       <NavBar />
