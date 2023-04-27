@@ -19,10 +19,12 @@ export default function TagPage({
 
   const session = useSession().data;
 
+  const isLoggedIn = !!session?.user;
+
   const isAdmin = session?.user.admin || false;
 
 
-  const { data: userFavorites } = api.user.getFavoriteList.useQuery();
+  const { data: userFavorites } = api.user.getFavoriteList.useQuery(undefined, {enabled: isLoggedIn});
 
   return (
     <div className="text-stone-700">

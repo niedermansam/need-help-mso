@@ -25,7 +25,11 @@ export default function OrganizationDetailsPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const isAdmin = userSession?.user.admin || false;
 
-  const { data: favorites } = api.user.getFavoriteList.useQuery();
+  const isLoggedIn = !!userSession?.user;
+
+  const { data: favorites } = api.user.getFavoriteList.useQuery(undefined, {
+    enabled: isLoggedIn,
+  });
 
   return (
     <div className="text-stone-600">

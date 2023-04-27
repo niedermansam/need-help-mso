@@ -5,7 +5,7 @@ import { getSession, useSession } from "next-auth/react";
 import { prisma } from "../../../server/db";
 import type { Community, Resource, Tag } from "@prisma/client";
 import {
- type OrgCardProps,
+  type OrgCardProps,
   OrganizationCard,
   ResourceCard,
 } from "../../../components/DisplayCard";
@@ -21,6 +21,7 @@ import { api } from "../../../utils/api";
 export default function CommunityResourcesPage(
   props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
+  const session = useSession();
   const isAdmin = props.admin;
   const communityHasOrgs =
     props.data.exclusiveOrgs.length > 0 || props.data.helpfulOrgs.length > 0;
@@ -28,12 +29,13 @@ export default function CommunityResourcesPage(
   const communityHasResources =
     props.data.exclusiveResources.length > 0 ||
     props.data.helpfulResources.length > 0;
+  const isLoggedIn = !!session.data?.user;
 
-    const {data: favorites} = api.user.getFavoriteList.useQuery();
+  const { data: favorites } = api.user.getFavoriteList.useQuery(undefined, {
+    enabled: isLoggedIn,  
+    });
 
-    const session = useSession()
 
-    const isLoggedIn = !!session.data?.user;
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>();
 
@@ -43,11 +45,11 @@ export default function CommunityResourcesPage(
 
   const allOrgs = useMemo(() => {
     return props.data.exclusiveOrgs.concat(props.data.helpfulOrgs);
-  }, [props.data.exclusiveOrgs, props.data.helpfulOrgs])
+  }, [props.data.exclusiveOrgs, props.data.helpfulOrgs]);
 
   const allResources = useMemo(() => {
     return props.data.exclusiveResources.concat(props.data.helpfulResources);
-  }, [props.data.exclusiveResources, props.data.helpfulResources])
+  }, [props.data.exclusiveResources, props.data.helpfulResources]);
 
   const [visibleOrgs, setVisibleOrgs] = useState<OrgCardProps[]>(allOrgs);
   const [visibleResources, setVisibleResources] =
@@ -93,7 +95,6 @@ export default function CommunityResourcesPage(
     setVisibleResources(newResources);
   }, [selectedCategory, selectedTags, allResources, strict]);
 
-
   return (
     <div>
       <NavBar />
@@ -120,16 +121,14 @@ export default function CommunityResourcesPage(
               };
             })}
             onChange={(value) => {
-              if( value === null)
-              {
+              if (value === null) {
                 setSelectedTags([]);
                 return;
               }
               const newValue = getValidMultivalueArray(value);
               setSelectedTags(
-                newValue.map((option) => 
-                {
-                  return option.value
+                newValue.map((option) => {
+                  return option.value;
                 })
               );
             }}
@@ -157,7 +156,13 @@ export default function CommunityResourcesPage(
           <div>
             <h2 className="text-2xl font-bold text-gray-700">Organizations</h2>
             {visibleOrgs.map((org) => (
-              <OrganizationCard loggedIn={isLoggedIn} favoriteIds={favorites?.organizations || []} key={org.id} org={org} admin={isAdmin} />
+              <OrganizationCard
+                loggedIn={isLoggedIn}
+                favoriteIds={favorites?.organizations || []}
+                key={org.id}
+                org={org}
+                admin={isAdmin}
+              />
             ))}
           </div>
         )}

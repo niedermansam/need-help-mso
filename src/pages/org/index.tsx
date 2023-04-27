@@ -264,7 +264,9 @@ function OrganizationSection({
 }) {
   const [displayOrgs, setDisplayOrgs] = useState(orgs);
 
-  const { data: favorites } = api.user.getFavoriteList.useQuery();
+  const { data: favorites } = api.user.getFavoriteList.useQuery(undefined, {
+    enabled: loggedIn,
+  });
 
   const allTagsMemo = useMemo(() => {
     return [...new Set(orgs.flatMap((org) => org.tags.map((tag) => tag.tag)))];

@@ -4,6 +4,7 @@ import { resourceRouter } from "./routers/resources";
 import { tagRouter } from "./routers/tag";
 import { communityRouter } from "./routers/community";
 import { userRouter } from "./routers/user";
+import { CategoryLink } from "../../pages/resource";
 
 /**
  * This is the primary router for your server.
