@@ -51,6 +51,10 @@ const orgInput = z.object({
   website: z.string().optional(),
   helpfulToCommunities: z.array(z.string()).optional(),
   exclusiveToCommunities: z.array(z.string()).optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zip: z.string().optional(),
 });
 
 const orgUpdateInput = z.object({
@@ -64,6 +68,10 @@ const orgUpdateInput = z.object({
   website: z.string().nullish(),
   helpfulToCommunities: z.array(z.string()).nullish(),
   exclusiveToCommunities: z.array(z.string()).nullish(),
+  address: z.string().nullish(),
+  city: z.string().nullish(),
+  state: z.string().nullish(),
+  zip: z.string().nullish(),
 });
 
 const createOrgId = (name: string) => {
@@ -78,7 +86,7 @@ export const organizationRouter = createTRPCRouter({
           id: createOrgId(input.name),
           name: input.name,
           description: input.description,
-          email: input.email,
+          email: input.email || undefined,
           phone: input.phone,
           website: input.website,
           tags: {
@@ -117,6 +125,17 @@ export const organizationRouter = createTRPCRouter({
                 ),
               }
             : undefined,
+
+          
+          locations: {
+            create: {
+              address: input.address,
+              city: input.city,
+              state: input.state,
+              zip: input.zip,
+            },
+
+          },
 
           categoryMeta: {
             connectOrCreate: {

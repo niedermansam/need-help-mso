@@ -126,6 +126,7 @@ model Organization {
     roles                  OrganizationRole[]
     contacts               OrganizationContact[]
     lists                  FavoritesList[]
+    locations             Location[]
 
     @@index([name])
     @@index([id])
@@ -140,6 +141,25 @@ model OrganizationRole {
     organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
     @@id([userId, orgId])
+}
+
+model Location {
+    id          String   @id @unique @default(cuid())
+    name        String?
+    description String?
+    latitude    Float?
+    longitude   Float?
+    address     String?
+    city        String?
+    state       String?
+    zip         String?
+    orgId       String?
+    org         Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+    resources   Resource[]
+
+    @@index([name])
+    @@index([id])
+    @@index([orgId])
 }
 
 enum BarriersToEntry {
@@ -177,6 +197,7 @@ model Resource {
     speedOfAidDetails      String?
     lists                  FavoritesList[]
     free                   Boolean           @default(false)
+    locations              Location[]
 
     @@index([name])
     @@index([id])

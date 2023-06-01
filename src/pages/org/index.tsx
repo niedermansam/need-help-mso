@@ -26,12 +26,19 @@ export type OrganizationProps = {
   name: string;
   description: string;
   website: string;
-  email: string;
+  email?: string;
   phone: string;
   category: string;
   tags: string[];
   exclusiveCommunities: string[];
   helpfulToCommunities: string[];
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+
+  
+
 };
 
 function CreateOrganizationForm() {
@@ -39,12 +46,16 @@ function CreateOrganizationForm() {
     name: "",
     description: "",
     website: "",
-    email: "",
+    email: undefined,
     phone: "",
     category: "",
     tags: [],
     exclusiveCommunities: [],
     helpfulToCommunities: [],
+    address: '',
+    city: 'Missoula',
+    state: 'MT',
+    zip: '59801',
   };
 
   const [formData, setFormData] = useState(INITIAL_STATE);
@@ -167,9 +178,6 @@ function CreateOrganizationForm() {
                   });
                 }}
               />
-            </div>
-
-            <div className="mx-4 flex w-3/12 basis-80 flex-col">
               <CommunitySelect
                 title="Exclusive to Communities"
                 onChange={(communities) => {
@@ -208,6 +216,62 @@ function CreateOrganizationForm() {
                   label: x,
                 }))}
               />
+            </div>
+
+            <div className="mx-4 flex w-3/12 basis-80 flex-col">
+              <label className="text-lg font-light" htmlFor="address">
+                Address
+              </label>
+              <input
+                className="mb-2.5 rounded border border-stone-300 px-2  py-1.5"
+                type="text"
+                name="address"
+                id="address"
+                value={formData.address}
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
+              />
+              <label className="text-lg font-light" htmlFor="city">
+                City
+              </label>
+              <input
+                className="mb-2.5 rounded border border-stone-300 px-2  py-1.5"
+                type="text"
+                name="city"
+                id="city"
+                value={formData.city}
+                onChange={(e) =>
+                  setFormData({ ...formData, city: e.target.value })
+                }
+              />
+              <label className="text-lg font-light" htmlFor="state">
+                State
+              </label>
+              <input
+                className="mb-2.5 rounded border border-stone-300 px-2  py-1.5"
+                type="text"
+                name="state"
+                id="state"
+                value={formData.state}
+                onChange={(e) =>
+                  setFormData({ ...formData, state: e.target.value })
+                }
+              />
+              <label className="text-lg font-light" htmlFor="zip">
+                Zip
+              </label>
+              <input
+                className="mb-2.5 rounded border border-stone-300 px-2  py-1.5"
+                type="text"
+                name="zip"
+                id="zip"
+                value={formData.zip}
+                onChange={(e) =>
+                  setFormData({ ...formData, zip: e.target.value })
+                }
+              />
+
             </div>
           </div>
         </form>
