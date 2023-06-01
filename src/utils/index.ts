@@ -88,6 +88,7 @@ export function prettyPhoneNumber(phoneNumber: string | null | undefined) {
 
 export const prettyUrl = (website: string, shortUrl?: boolean) => {
   if (shortUrl === undefined) shortUrl = true;
+  if(!website.startsWith("http")) return website.replace(/^www\./, "").replace(/\/$/, "");
   const url = new URL(website);
 
   let urlString = "";
