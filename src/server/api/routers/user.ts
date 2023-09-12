@@ -10,7 +10,7 @@ async function createFavoriteList(
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
     never,
-    Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+     Prisma.RejectPerOperation | undefined
   >
 ) {
   try {
