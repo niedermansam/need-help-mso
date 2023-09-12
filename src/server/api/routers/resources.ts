@@ -86,7 +86,6 @@ export const resourceRouter = createTRPCRouter({
         const resources = await ctx.prisma.resource.findMany({
           where: {
             category: {
-              mode: "insensitive",
               equals: input,
             },
           },
@@ -138,10 +137,6 @@ export const resourceRouter = createTRPCRouter({
         tags,
         exclusiveToCommunities,
         helpfulToCommunities,
-        barriersToEntry,
-        barriersToEntryDetails,
-        speedOfAid,
-        speedOfAidDetails,
         free,
       } = input;
 
@@ -238,11 +233,7 @@ export const resourceRouter = createTRPCRouter({
               }
             : undefined,
 
-          barriersToEntry: barriersToEntry,
-          barriersToEntryDetails: barriersToEntryDetails,
 
-          speedOfAid: speedOfAid,
-          speedOfAidDetails: speedOfAidDetails,
 
           free: free,
         },
@@ -284,10 +275,6 @@ export const resourceRouter = createTRPCRouter({
         tags,
         helpfulTo,
         exclusiveTo,
-        barriersToEntry,
-        barriersToEntryDetails,
-        speedOfAid,
-        speedOfAidDetails,
         free,
         helpingOrganizations,
         orgId,
@@ -351,11 +338,7 @@ export const resourceRouter = createTRPCRouter({
               : [],
           },
 
-          barriersToEntry: barriersToEntry,
-          barriersToEntryDetails: barriersToEntryDetails,
 
-          speedOfAid: speedOfAid,
-          speedOfAidDetails: speedOfAidDetails,
 
           free: free,
         },

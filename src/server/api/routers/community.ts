@@ -9,7 +9,7 @@ export const communityRouter = createTRPCRouter({
     .input(z.object({ community: z.string() }))
     .query(async ({ input, ctx }) => {
       return await ctx.prisma.community.findFirst({
-        where: { name: { equals: input.community, mode: "insensitive" } },
+        where: { name: { equals: input.community, } },
       });
     }),
 
