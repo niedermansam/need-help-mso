@@ -97,7 +97,6 @@ export const getServerSideProps: GetServerSideProps<{ tag: string }> = async (
     where: {
       tag: {
         equals: decodeTag(tag),
-        mode: "insensitive",
       },
     },
   });

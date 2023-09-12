@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { TagSelect } from "../../components/Selectors";
 import { prisma } from "../../server/db";
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import type { BarriersToEntry, SpeedOfAid } from "@prisma/client";
 import { ResourceCard } from "../../components/DisplayCard";
 import { useSession } from "next-auth/react";
 import { getSessionDetails } from "../../utils";
@@ -135,10 +134,6 @@ type ResourceReturn = {
   description: string;
   url: string | null;
   organizationId: string;
-  barriersToEntry: BarriersToEntry | null;
-  barriersToEntryDetails: string | null;
-  speedOfAid: SpeedOfAid[];
-  speedOfAidDetails: string | null;
   free: boolean;
 }[];
 
@@ -150,7 +145,6 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   const resources = await prisma.resource.findMany({
     where: {
       category: {
-        mode: "insensitive",
         equals: category,
       },
     },
@@ -174,10 +168,6 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
       description: true,
       url: true,
       organizationId: true,
-      barriersToEntry: true,
-      barriersToEntryDetails: true,
-      speedOfAid: true,
-      speedOfAidDetails: true,
       free: true,
     },
   });

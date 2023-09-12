@@ -1,15 +1,12 @@
 import Link, { type LinkProps } from "next/link";
 import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
-import type { BarriersToEntry, SpeedOfAid } from "@prisma/client";
 import { useEffect, useMemo, useState } from "react";
 import type { MultiValue, SingleValue } from "react-select";
 import { encodeTag } from "../../utils/manageUrl";
 import type { CategorySelectItem } from "../../components/Selectors";
 import {
-  BarriersToEntrySelect,
   CommunitySelect,
-  SpeedOfAidSelect,
   getValidSingleValue,
 } from "../../components/Selectors";
 import { CategorySelect, TagSelect } from "../../components/Selectors";
@@ -30,9 +27,9 @@ type CreateResourceProps = {
   category: string;
   exclusiveToCommunities: string[];
   helpfulToCommunities: string[];
-  barriersToEntry: BarriersToEntry | undefined;
+  barriersToEntry: string | undefined;
   barriersToEntryDetails: string;
-  speedOfAid: SpeedOfAid[];
+  speedOfAid: string[];
   speedOfAidDetails: string;
   free: boolean;
 };
@@ -186,10 +183,6 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
                 orgId: orgId,
                 exclusiveToCommunities: formData.exclusiveToCommunities,
                 helpfulToCommunities: formData.helpfulToCommunities,
-                barriersToEntry: formData.barriersToEntry,
-                barriersToEntryDetails: formData.barriersToEntryDetails,
-                speedOfAid: formData.speedOfAid || undefined,
-                speedOfAidDetails: formData.speedOfAidDetails,
                 free: formData.free,
               })
             }
@@ -283,79 +276,7 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
           />
         </div>
 
-        <div className="m-2 flex h-full w-80 flex-col justify-start">
-          <BarriersToEntrySelect
-            onChange={(value) => {
-              const newValue = value as SingleValue<{
-                value: BarriersToEntry;
-                label: string;
-              }>;
 
-              setFormData({
-                ...formData,
-                barriersToEntry: newValue?.value || undefined,
-              });
-              console.log(formData.barriersToEntry);
-            }}
-          />
-          <label
-            className="text-lg font-light"
-            htmlFor="barriersToEntryDetails"
-          >
-            Barriers to Entry Details
-          </label>
-          <textarea
-            name="barriersToEntryDetails"
-            id="barriersToEntryDetails"
-            className="mb-2 mt-0.5 h-28 rounded border border-stone-300 px-2 py-1.5"
-            value={formData.barriersToEntryDetails}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                barriersToEntryDetails: e.target.value,
-              })
-            }
-          />
-        </div>
-        <div className="m-2 flex h-full w-80 flex-col justify-start">
-          <SpeedOfAidSelect
-            onChange={(value) => {
-              const newValue = value as MultiValue<{
-                value: SpeedOfAid;
-                label: string;
-              }>;
-
-              setFormData({
-                ...formData,
-                speedOfAid: newValue.map((x) => {
-                  return x.value;
-                }),
-              });
-              console.log(formData);
-            }}
-            value={formData.speedOfAid.map((x) => {
-              return {
-                value: x,
-                label: x,
-              };
-            })}
-          />
-          <label className="text-lg font-light" htmlFor="speedOfAidDetails">
-            Speed of Aid Details
-          </label>
-          <textarea
-            name="speedOfAidDetails"
-            id="speedOfAidDetails"
-            className="mb-2 mt-0.5 h-28 rounded border border-stone-300 px-2 py-1.5"
-            value={formData.speedOfAidDetails}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                speedOfAidDetails: e.target.value,
-              })
-            }
-          />
-        </div>
       </form>
     </div>
   );

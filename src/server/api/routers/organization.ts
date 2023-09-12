@@ -74,13 +74,22 @@ const orgUpdateInput = z.object({
   zip: z.string().nullish(),
 });
 
+
+// regex to replace all punctuation with a space
+
 const createOrgId = (name: string) => {
-  return name.replace(/\s/g, "-").toLowerCase();
+  return name
+    .trim()
+    .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+    .replace(/\s/g, "-")
+    .toLowerCase();
 };
 
 export const organizationRouter = createTRPCRouter({
   create: adminProcedure.input(orgInput).mutation(async ({ input, ctx }) => {
     try {
+
+      console.log(input.email)
       return await ctx.prisma.organization.create({
         data: {
           id: createOrgId(input.name),

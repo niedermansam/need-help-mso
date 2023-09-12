@@ -2,7 +2,6 @@ import type { StateManagerProps } from "react-select/dist/declarations/src/useSt
 import { api } from "../utils/api";
 import type { MultiValue, SingleValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import { BarriersToEntry, SpeedOfAid } from "@prisma/client";
 import Select from "react-select";
 
 export type CategorySelectItem = {
@@ -140,16 +139,16 @@ export function SpeedOfAidSelect({
   ...attributes
 }: CategorySelectProps) {
   type SpeedOfAidOption = {
-    value: SpeedOfAid;
+    value: string;
     label: string;
   };
 
   const optionList: SpeedOfAidOption[] = [
-    { value: SpeedOfAid.IMMEDIATE, label: "Immediate" },
-    { value: SpeedOfAid.DAYS, label: "Days" },
-    { value: SpeedOfAid.WEEKS, label: "Weeks" },
-    { value: SpeedOfAid.MONTHS, label: "Months" },
-    { value: SpeedOfAid.YEARS, label: "Years" },
+    { value: '0', label: "Immediate" },
+    { value: '1', label: "Days" },
+    { value: '2', label: "Weeks" },
+    { value: '3', label: "Months" },
+    { value: '4', label: "Years" },
   ];
 
   return (
@@ -171,15 +170,16 @@ export function BarriersToEntrySelect({
   ...attributes
 }: CategorySelectProps) {
   type BarriersToEntryOption = {
-    value: BarriersToEntry;
+    value: string;
     label: string;
   };
 
   const optionList: BarriersToEntryOption[] = [
-    { value: BarriersToEntry.MINIMAL, label: "Minimal" },
-    { value: BarriersToEntry.LOW, label: "Low" },
-    { value: BarriersToEntry.MEDIUM, label: "Medium" },
-    { value: BarriersToEntry.HIGH, label: "High" },
+    { value: 
+      "0", label: "Minimal" },
+    { value: "1", label: "Low" },
+    { value: "2", label: "Medium" },
+    { value: "3", label: "High" },
   ];
 
   return (

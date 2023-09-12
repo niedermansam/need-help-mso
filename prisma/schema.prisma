@@ -5,14 +5,15 @@ generator client {
     provider = "prisma-client-js"
 }
 
-
 datasource db {
-    provider = "postgresql"
+    provider = "mysql"
     // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
     // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url      = env("DATABASE_URL")
+
+    relationMode = "prisma"
 }
 
 // Necessary for Next auth
@@ -32,6 +33,7 @@ model Account {
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
+    @@index([userId])
 }
 
 model Session {
@@ -40,6 +42,8 @@ model Session {
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
 }
 
 model User {
@@ -70,7 +74,7 @@ model VerificationToken {
 
 model Category {
     category      String         @id @unique
-    description   String?
+    description   String?        @db.Text
     organizations Organization[]
     resources     Resource[]
     tags          Tag[]
@@ -80,7 +84,7 @@ model Category {
 
 model Tag {
     tag           String         @id @unique
-    description   String?
+    description   String?        @db.Text
     organizations Organization[]
     resources     Resource[]
     categories    Category[]
@@ -92,7 +96,7 @@ model Community {
     name               String         @id @unique
     id                 String         @unique @default(cuid())
     slug               String         @unique @default(cuid())
-    description        String?
+    description        String?        @db.Text
     exclusiveOrgs      Organization[] @relation("ExclusiveOrg")
     exclusiveResources Resource[]     @relation("ExclusiveResource")
     helpfulOrgs        Organization[] @relation("HelpfulOrg")
@@ -109,7 +113,7 @@ model Organization {
     createdAt              DateTime              @default(now())
     updatedAt              DateTime              @updatedAt
     admins                 User[]
-    description            String
+    description            String                @db.Text
     category               String
     categoryMeta           Category              @relation(fields: [category], references: [category])
     tags                   Tag[]
@@ -126,7 +130,8 @@ model Organization {
     roles                  OrganizationRole[]
     contacts               OrganizationContact[]
     lists                  FavoritesList[]
-    locations             Location[]
+    locations              Location[]
+    address                String?
 
     @@index([name])
     @@index([id])
@@ -141,12 +146,14 @@ model OrganizationRole {
     organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
     @@id([userId, orgId])
+    @@index([userId])
+    @@index([orgId])
 }
 
 model Location {
-    id          String   @id @unique @default(cuid())
+    id          String        @id @unique @default(cuid())
     name        String?
-    description String?
+    description String?      @db.Text
     latitude    Float?
     longitude   Float?
     address     String?
@@ -180,7 +187,7 @@ enum SpeedOfAid {
 model Resource {
     id                     String            @id @unique @default(cuid())
     name                   String
-    description            String
+    description            String          @db.Text
     url                    String?
     organizationId         String
     organization           Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -193,7 +200,6 @@ model Resource {
     contacts               ResourceContact[]
     barriersToEntry        BarriersToEntry?
     barriersToEntryDetails String?
-    speedOfAid             SpeedOfAid[]
     speedOfAidDetails      String?
     lists                  FavoritesList[]
     free                   Boolean           @default(false)
@@ -215,6 +221,8 @@ model ResourceContact {
     email String?
 
     @@id([userId, resourceId])
+    @@index([userId])
+    @@index([resourceId])
 }
 
 model OrganizationContact {
@@ -227,10 +235,12 @@ model OrganizationContact {
     email String?
 
     @@id([userId, orgId])
+    @@index([userId])
+    @@index([orgId])
 }
 
 model FavoritesList {
-    id              Int            @id @default(autoincrement()) @unique
+    id              Int            @id @unique @default(autoincrement())
     createdAt       DateTime       @default(now())
     updatedAt       DateTime       @updatedAt
     adminId         String
@@ -241,4 +251,6 @@ model FavoritesList {
     resources       Resource[]
     organizations   Organization[]
     public          Boolean        @default(true)
+
+    @@index([adminId])
 }

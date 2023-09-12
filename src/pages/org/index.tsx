@@ -1,12 +1,12 @@
 import type { Organization, Tag } from "@prisma/client";
 import type { Session } from "next-auth/core/types";
 import { getSession, useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 import type {
   GetServerSideProps,
   InferGetServerSidePropsType,
 } from "next/types";
-import { useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import ReactModal from "react-modal";
 import NavBar from "../../components/Nav";
 import {
@@ -41,7 +41,13 @@ export type OrganizationProps = {
 
 };
 
-function CreateOrganizationForm() {
+function CreateOrganizationForm({
+  //setIsOpen,
+  setDisplayOrgs,
+}: {
+  setIsOpen: (isOpen: boolean) => void;
+  setDisplayOrgs: Dispatch<SetStateAction<OrgProps[]>>;
+}) {
   const INITIAL_STATE: OrganizationProps = {
     name: "",
     description: "",
@@ -52,18 +58,27 @@ function CreateOrganizationForm() {
     tags: [],
     exclusiveCommunities: [],
     helpfulToCommunities: [],
-    address: '',
-    city: 'Missoula',
-    state: 'MT',
-    zip: '59801',
+    address: "",
+    city: "Missoula",
+    state: "MT",
+    zip: "59801",
   };
 
   const [formData, setFormData] = useState(INITIAL_STATE);
-  const router = useRouter();
+  // const router = useRouter();
   const addOrg = api.organization.create.useMutation({
-    onSuccess: async (results) => {
+    onSuccess: (results) => {
       if (!results) return console.error("No results returned from mutation");
-      await router.push(`/org/${results.id}/edit`);
+      // await router.push(`/org/${results.id}/edit`);
+      
+      const newOrg: OrgProps = {
+        ...results,
+        tags: formData.tags.map((tag) => ({ tag: tag })),
+      };
+
+      setDisplayOrgs((orgs) => [...orgs, newOrg]);
+      // setIsOpen(false);
+      setFormData({...INITIAL_STATE, category: newOrg.category});
     },
   });
   return (
@@ -271,7 +286,6 @@ function CreateOrganizationForm() {
                   setFormData({ ...formData, zip: e.target.value })
                 }
               />
-
             </div>
           </div>
         </form>
@@ -280,12 +294,16 @@ function CreateOrganizationForm() {
   );
 }
 
-function CreateOrganizationModal() {
+function CreateOrganizationModal({
+  setDisplayOrgs,
+}: {
+  setDisplayOrgs: Dispatch<SetStateAction<OrgProps[]>>;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
       <button
-        className="fixed bottom-10 right-1/3 z-40 rounded bg-rose-500 py-2 px-4 font-bold text-white"
+        className="fixed bottom-10 right-1/3 z-40 rounded bg-rose-500 px-4 py-2 font-bold text-white"
         onClick={() => setIsOpen(true)}
       >
         New Organization
@@ -304,7 +322,7 @@ function CreateOrganizationModal() {
         isOpen={isOpen}
         onRequestClose={() => setIsOpen(false)}
       >
-        <CreateOrganizationForm />
+        <CreateOrganizationForm setIsOpen={setIsOpen} setDisplayOrgs={setDisplayOrgs} />
       </ReactModal>
     </>
   );
@@ -391,6 +409,7 @@ function OrganizationSection({
 
   return (
     <div className="flex flex-wrap">
+      {admin && <CreateOrganizationModal setDisplayOrgs={setDisplayOrgs} />}
       <div className="mx-4 flex w-full">
         <div className="mr-2 w-96">
           <CategorySelect
@@ -461,6 +480,7 @@ export default function OrganizationsPage({}: InferGetServerSidePropsType<
   const { data: orgs, isLoading } = api.organization.getAll.useQuery();
   const session = useSession().data;
 
+
   const isLoggedIn = !!session?.user;
 
   const isAdmin = session?.user.admin || false;
@@ -475,7 +495,6 @@ export default function OrganizationsPage({}: InferGetServerSidePropsType<
             Organizations
           </h1>
         </div>
-        {isAdmin && <CreateOrganizationModal />}
         {orgs && (
           <OrganizationSection
             orgs={orgs}

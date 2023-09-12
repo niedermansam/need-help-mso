@@ -260,7 +260,6 @@ export default function EditResourcePage(props: ServerSideProps) {
                 barriersToEntry: formData.barriersToEntry || undefined,
                 barriersToEntryDetails:
                   formData.barriersToEntryDetails || undefined,
-                speedOfAid: formData.speedOfAid || undefined,
                 speedOfAidDetails: formData.speedOfAidDetails || undefined,
                 free: formData.free,
                 helpingOrganizations: formData.helpingOrganizations.map(

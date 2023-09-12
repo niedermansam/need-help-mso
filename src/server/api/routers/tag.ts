@@ -125,7 +125,6 @@ export const tagRouter = createTRPCRouter({
           where: {
             tag: {
               equals: decodedTag,
-              mode: "insensitive",
             },
           },
           select: {
@@ -141,8 +140,6 @@ export const tagRouter = createTRPCRouter({
                 categoryMeta: true,
                 barriersToEntry: true,
                 barriersToEntryDetails: true,
-                speedOfAid: true,
-                speedOfAidDetails: true,
                 free: true,
                 tags: {
                   select: {
