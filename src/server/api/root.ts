@@ -1,4 +1,4 @@
-import { createTRPCRouter, publicProcedure } from "./trpc";
+import { router, publicProcedure } from "./trpc";
 import { organizationRouter } from "./routers/organization";
 import { resourceRouter } from "./routers/resources";
 import { tagRouter } from "./routers/tag";
@@ -10,7 +10,7 @@ import { userRouter } from "./routers/user";
  *
  * All routers added in /api/routers should be manually added here
  */
-export const appRouter = createTRPCRouter({
+export const appRouter = router({
   organization: organizationRouter,
   resource: resourceRouter,
   tag: tagRouter,

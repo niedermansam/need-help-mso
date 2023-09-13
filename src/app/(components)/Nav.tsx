@@ -1,7 +1,7 @@
-
+'use client'
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const NavLink = ({
@@ -16,7 +16,7 @@ const NavLink = ({
   return (
     <Link
       href={href}
-      className={`mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block ${
+      className={`mr-4 mt-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block ${
         isActive ? "font-bold text-white" : ""
       }`}
     >
@@ -27,12 +27,11 @@ const NavLink = ({
 
 export default function NavBar() {
   const session = useSession();
-  const router = useRouter();
+  const pathname = usePathname() || '';
   const userId = session.data?.user?.id;
   const [isOpen, setIsOpen] = useState(false);
-  console.log(router);
   return (
-    <nav className="fixed z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
+    <nav className="sticky z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
       <div className="mr-6 flex flex-shrink-0 items-center text-white">
         <Link href="/" className="text-xl font-semibold tracking-tight">
           Need Help Missoula
@@ -62,28 +61,28 @@ export default function NavBar() {
           <NavLink
             href="/about"
             label="About"
-            isActive={/\/about/.test(router.pathname)}
+            isActive={/\/about/.test(pathname)}
           />
           <NavLink
             href="/resource"
             label="Resources"
-            isActive={/\/resource/.test(router.pathname)}
+            isActive={/\/resource/.test(pathname)}
           />
           <NavLink
             href="/org"
             label="Organizations"
-            isActive={/\/org/.test(router.pathname)}
+            isActive={/\/org/.test(pathname)}
           />
           <NavLink
             href="/community"
             label="Communities"
-            isActive={/\/community/.test(router.pathname)}
+            isActive={/\/community/.test(pathname)}
           />
           {userId && (
             <NavLink
               href="/favorites"
               label="Favorites"
-              isActive={/\/list/.test(router.pathname)}
+              isActive={/\/list/.test(pathname)}
             />
           )}
         </div>

@@ -78,6 +78,7 @@ model Category {
     organizations Organization[]
     resources     Resource[]
     tags          Tag[]
+    allOrganizations Organization[] @relation("OrganizationCategory")
 
     @@index([category])
 }
@@ -116,6 +117,7 @@ model Organization {
     description            String                @db.Text
     category               String
     categoryMeta           Category              @relation(fields: [category], references: [category])
+    categories             Category[]           @relation("OrganizationCategory")
     tags                   Tag[]
     website                String?
     logo                   String?

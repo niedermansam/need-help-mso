@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpc";
+import { adminProcedure, router, publicProcedure } from "../trpc";
 
-export const communityRouter = createTRPCRouter({
+export const communityRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.community.findMany();
   }),
@@ -9,7 +9,7 @@ export const communityRouter = createTRPCRouter({
     .input(z.object({ community: z.string() }))
     .query(async ({ input, ctx }) => {
       return await ctx.prisma.community.findFirst({
-        where: { name: { equals: input.community, } },
+        where: { name: { equals: input.community } },
       });
     }),
 
@@ -133,7 +133,6 @@ export const communityRouter = createTRPCRouter({
               }
             : undefined,
 
-
           helpfulResources: helpfulResources
             ? {
                 connect: helpfulResources.map((resource) => {
@@ -154,17 +153,14 @@ export const communityRouter = createTRPCRouter({
             ? {
                 connect: subCommunityIds.map((id) => {
                   return { id: id };
-                })
+                }),
               }
-              : undefined,
-                
-
+            : undefined,
         },
       });
     }),
 
-
-    disconnectParentCommunity: adminProcedure
+  disconnectParentCommunity: adminProcedure
     .input(
       z.object({
         communityId: z.string(),

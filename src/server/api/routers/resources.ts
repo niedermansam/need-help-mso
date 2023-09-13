@@ -1,21 +1,25 @@
 import { z } from "zod";
 
-import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpc";
+import { adminProcedure, router, publicProcedure } from "../trpc";
 import { getTagsFromResources } from "./tag";
 import type { PrismaClient, Prisma } from "@prisma/client";
 
-const createResourceId = async (name: string, orgId: string, prisma:  PrismaClient<Prisma.PrismaClientOptions>
-  ) => {
+const createResourceId = async (
+  name: string,
+  orgId: string,
+  prisma: PrismaClient<Prisma.PrismaClientOptions>
+) => {
   let newId = name.replace(/\s/g, "-").toLowerCase();
 
-  const newIdIsUnique = (await prisma.resource.findUnique({
-    where: {
-      id: newId,
-    },
-    select: {
-      id: true,
-    },
-  })) === null;
+  const newIdIsUnique =
+    (await prisma.resource.findUnique({
+      where: {
+        id: newId,
+      },
+      select: {
+        id: true,
+      },
+    })) === null;
 
   if (!newIdIsUnique) {
     const orgName = await prisma.organization.findUnique({
@@ -40,12 +44,10 @@ const createResourceId = async (name: string, orgId: string, prisma:  PrismaClie
     newId = `${newId}-${orgInitials}`;
   }
 
-
   return `${newId}-${orgId}`;
 };
 
-
-export const resourceRouter = createTRPCRouter({
+export const resourceRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const resources = await ctx.prisma.resource.findMany({
       include: {
@@ -177,7 +179,7 @@ export const resourceRouter = createTRPCRouter({
 
       const newResource = await ctx.prisma.resource.create({
         data: {
-          id:  await createResourceId(name, orgId, ctx.prisma) ,
+          id: await createResourceId(name, orgId, ctx.prisma),
           name: name,
           description: description,
           url: url,
@@ -233,8 +235,6 @@ export const resourceRouter = createTRPCRouter({
               }
             : undefined,
 
-
-
           free: free,
         },
       });
@@ -280,13 +280,14 @@ export const resourceRouter = createTRPCRouter({
         orgId,
       } = input;
 
-
       const resource = await ctx.prisma.resource.update({
         where: {
           id: id,
         },
         data: {
-          id: name ? await createResourceId(name, orgId, ctx.prisma) : undefined,
+          id: name
+            ? await createResourceId(name, orgId, ctx.prisma)
+            : undefined,
           name: name || undefined,
           description: description || undefined,
           categoryMeta: category
@@ -338,13 +339,11 @@ export const resourceRouter = createTRPCRouter({
               : [],
           },
 
-
-
           free: free,
         },
       });
 
-      // update org with new tags 
+      // update org with new tags
       if (tags) {
         await ctx.prisma.organization.update({
           where: {
@@ -359,7 +358,6 @@ export const resourceRouter = createTRPCRouter({
           },
         });
       }
-
 
       return resource;
     }),

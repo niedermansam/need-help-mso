@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure,  adminProcedure } from "../trpc";
+import { router, publicProcedure, adminProcedure } from "../trpc";
 //import Airtable from "airtable";
 
 export interface OrganizationSchema {
@@ -74,7 +74,6 @@ const orgUpdateInput = z.object({
   zip: z.string().nullish(),
 });
 
-
 // regex to replace all punctuation with a space
 
 const createOrgId = (name: string) => {
@@ -85,10 +84,9 @@ const createOrgId = (name: string) => {
     .toLowerCase();
 };
 
-export const organizationRouter = createTRPCRouter({
+export const organizationRouter = router({
   create: adminProcedure.input(orgInput).mutation(async ({ input, ctx }) => {
     try {
-
       return await ctx.prisma.organization.create({
         data: {
           id: createOrgId(input.name),
@@ -134,16 +132,16 @@ export const organizationRouter = createTRPCRouter({
               }
             : undefined,
 
-          
-          locations: input.address ? {
-            create: {
-              address: input.address,
-              city: input.city,
-              state: input.state,
-              zip: input.zip,
-            },
-
-          } : undefined,
+          locations: input.address
+            ? {
+                create: {
+                  address: input.address,
+                  city: input.city,
+                  state: input.state,
+                  zip: input.zip,
+                },
+              }
+            : undefined,
 
           categoryMeta: {
             connectOrCreate: {
@@ -320,5 +318,3 @@ export const organizationRouter = createTRPCRouter({
       }
     }),
 });
-
-

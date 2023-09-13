@@ -1,11 +1,8 @@
 import Link from "next/link";
-import NavBar from "../../components/Nav";
 
 export default function AboutPage() {
-  
   return (
     <div>
-      <NavBar />
       <div className="relative mx-12 mb-20 max-w-4xl pt-16 text-lg font-light text-stone-800 md:mx-auto md:pl-6">
         <h1 className=" mb-2 text-5xl">About The App</h1>
         <h3 className="mb-4 text-2xl text-stone-500">
@@ -13,12 +10,12 @@ export default function AboutPage() {
         </h3>
         <p className="my-2 leading-relaxed">
           I&apos;m the developer behind Need Help Missoula, and I like to think
-          that software can make the world a better place. The
-          project was born out of a desire to make life a little easier for the
-          hundred of case workers, social workers, and other professionals who
-          work tirelessly to help people in need. I hope that this project can
-          be a useful tool for them, and that it can help people who need a
-          helping hand find the resources they need.
+          that software can make the world a better place. The project was born
+          out of a desire to make life a little easier for the hundred of case
+          workers, social workers, and other professionals who work tirelessly
+          to help people in need. I hope that this project can be a useful tool
+          for them, and that it can help people who need a helping hand find the
+          resources they need.
         </p>
         <p className="mb-2">
           Check out the development timeline for more information on when this
@@ -26,7 +23,7 @@ export default function AboutPage() {
         </p>
         <Link
           href="/timeline"
-          className="umami--click--timeline mr-2 mb-6 flex basis-32 justify-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md"
+          className="umami--click--timeline mb-6 mr-2 flex basis-32 justify-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md"
         >
           Development Timeline
         </Link>

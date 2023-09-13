@@ -1,15 +1,10 @@
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "../trpc";
+import { router, protectedProcedure } from "../trpc";
 import type { Prisma, PrismaClient } from "@prisma/client";
 
 async function createFavoriteList(
   userId: string,
-  prisma: PrismaClient<
-    Prisma.PrismaClientOptions
-  >
+  prisma: PrismaClient<Prisma.PrismaClientOptions>
 ) {
   try {
     const newList = await prisma.favoritesList.create({
@@ -35,7 +30,7 @@ async function createFavoriteList(
   }
 }
 
-export const userRouter = createTRPCRouter({
+export const userRouter = router({
   getFavoriteList: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
 
@@ -70,7 +65,6 @@ export const userRouter = createTRPCRouter({
     const resourceArray = favoriteList?.resources.map((x) => x.id);
     const orgArray = favoriteList?.organizations.map((x) => x.id);
 
-
     return {
       ...favoriteList,
       resources: resourceArray || [],
@@ -81,7 +75,6 @@ export const userRouter = createTRPCRouter({
     .input(z.object({ resourceId: z.string(), newState: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
       let userList = ctx.session.user.currentListId;
-
 
       if (!userList)
         userList = await createFavoriteList(ctx.session.user.id, ctx.prisma);
@@ -111,7 +104,6 @@ export const userRouter = createTRPCRouter({
   toggleFavoriteOrganization: protectedProcedure
     .input(z.object({ organizationId: z.string(), newState: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
-
       let userList = ctx.session.user.currentListId;
 
       if (!userList)

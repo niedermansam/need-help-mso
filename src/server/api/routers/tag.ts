@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpc";
+import { adminProcedure, router, publicProcedure } from "../trpc";
 import { decodeTag } from "../../../utils/manageUrl";
 import type { Resource, Organization, Tag, Category } from "@prisma/client";
 
@@ -16,7 +16,7 @@ export const getTagsFromResources = (resources: ResourceArray) => {
   return uniqueTags;
 };
 
-export const tagRouter = createTRPCRouter({
+export const tagRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
     try {
       const tags = await ctx.prisma.tag.findMany();
@@ -145,7 +145,7 @@ export const tagRouter = createTRPCRouter({
                   select: {
                     tag: true,
                   },
-                }
+                },
               },
             },
             organizations: {
@@ -161,10 +161,8 @@ export const tagRouter = createTRPCRouter({
                 tags: {
                   select: {
                     tag: true,
-
                   },
-                }
-
+                },
               },
             },
           },
