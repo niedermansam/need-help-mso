@@ -8,9 +8,7 @@ import type { Prisma, PrismaClient } from "@prisma/client";
 async function createFavoriteList(
   userId: string,
   prisma: PrismaClient<
-    Prisma.PrismaClientOptions,
-    never,
-     Prisma.RejectPerOperation | undefined
+    Prisma.PrismaClientOptions
   >
 ) {
   try {
