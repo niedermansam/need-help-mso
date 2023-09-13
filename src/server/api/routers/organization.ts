@@ -155,8 +155,8 @@ export const organizationRouter = router({
         },
       });
 
-      await fetch(SITE_URL + "/api/revalidate/&path=/api/org")
-      await fetch(SITE_URL + "/api/revalidate/&path=/organizations")
+      await fetch(SITE_URL + "/api/revalidate?path=/api/org");
+      await fetch(SITE_URL + "/api/revalidate?path=/organizations");
 
       return newOrg;
     } catch (err) {
