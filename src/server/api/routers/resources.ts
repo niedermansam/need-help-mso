@@ -4,7 +4,7 @@ import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpc";
 import { getTagsFromResources } from "./tag";
 import type { PrismaClient, Prisma } from "@prisma/client";
 
-const createResourceId = async (name: string, orgId: string, prisma:  PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>
+const createResourceId = async (name: string, orgId: string, prisma:  PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectPerOperation | undefined>
   ) => {
   let newId = name.replace(/\s/g, "-").toLowerCase();
 
