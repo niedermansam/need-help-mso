@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { router, publicProcedure, adminProcedure } from "../trpc";
+import { SITE_URL } from "@/utils/constants";
 //import Airtable from "airtable";
 
 export interface OrganizationSchema {
@@ -87,7 +88,7 @@ const createOrgId = (name: string) => {
 export const organizationRouter = router({
   create: adminProcedure.input(orgInput).mutation(async ({ input, ctx }) => {
     try {
-      return await ctx.prisma.organization.create({
+      const newOrg = await ctx.prisma.organization.create({
         data: {
           id: createOrgId(input.name),
           name: input.name,
@@ -153,6 +154,11 @@ export const organizationRouter = router({
           },
         },
       });
+
+      await fetch(SITE_URL + "/api/revalidate/&path=/api/org")
+      await fetch(SITE_URL + "/api/revalidate/&path=/organizations")
+
+      return newOrg;
     } catch (err) {
       console.log(err);
     }
