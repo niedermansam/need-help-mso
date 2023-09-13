@@ -89,7 +89,6 @@ export const organizationRouter = createTRPCRouter({
   create: adminProcedure.input(orgInput).mutation(async ({ input, ctx }) => {
     try {
 
-      console.log(input.email)
       return await ctx.prisma.organization.create({
         data: {
           id: createOrgId(input.name),
