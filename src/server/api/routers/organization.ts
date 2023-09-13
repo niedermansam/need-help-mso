@@ -135,7 +135,7 @@ export const organizationRouter = createTRPCRouter({
             : undefined,
 
           
-          locations: {
+          locations: input.address ? {
             create: {
               address: input.address,
               city: input.city,
@@ -143,7 +143,7 @@ export const organizationRouter = createTRPCRouter({
               zip: input.zip,
             },
 
-          },
+          } : undefined,
 
           categoryMeta: {
             connectOrCreate: {
