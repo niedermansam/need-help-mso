@@ -1,13 +1,23 @@
 // import type { Organization } from '@prisma/client'
 import React from 'react'
-import { SITE_URL } from '@/utils/constants'
-import type { Organization } from '@prisma/client'
+// import { SITE_URL } from '@/utils/constants'
+// import type { Organization } from '@prisma/client'
 import { OrganizationCard } from '@/components/DisplayCard'
+import { prisma } from '@/server/db'
 
 async function OrganizationPage() {
 
-    const json = await fetch(SITE_URL + '/api/org', {next: {revalidate: 3600 *24}})
-    const orgs = await json.json() as (Organization & {tags: {tag: string}[]})[]
+
+    const orgs = await prisma.organization.findMany({
+        include: {
+            tags: {
+                select: {
+                    tag: true
+                }
+            }
+        }
+
+    })
 
 
     console.log(orgs)
