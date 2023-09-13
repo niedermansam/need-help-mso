@@ -5,9 +5,9 @@ import { SITE_URL } from '@/utils/constants'
 async function OrganizationPage() {
 
     const orgs = await fetch(SITE_URL + '/api/org')
-    const orgsJson = await orgs.json() as Organization[]
+    //const orgsJson = await orgs.json() as Organization[]
 
-    console.log('datas  here')
+    //console.log('datas  here')
 
   return (
     <div>page</div>
