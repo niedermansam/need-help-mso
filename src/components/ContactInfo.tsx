@@ -26,7 +26,7 @@ export function ContactInfo({
           className="mb-1.5 flex w-full items-center truncate text-sm text-stone-500 hover:text-cyan-700"
           href={getRawPhoneNumber(phone, true) || undefined}
         >
-          <FontAwesomeIcon className="mr-2 " icon={faPhone} />
+          <FontAwesomeIcon className="mr-2 h-4" icon={faPhone} />
           <span>{phone}</span>
         </a>
       )}
@@ -35,7 +35,7 @@ export function ContactInfo({
           className="mb-1.5 flex w-full items-center truncate text-ellipsis text-sm text-stone-500 hover:text-cyan-700"
           href={`mailto:${email}`}
         >
-          <FontAwesomeIcon className="mr-2 " icon={faEnvelope} />
+          <FontAwesomeIcon className="mr-2 h-4" icon={faEnvelope} />
           <span className="mr-2 truncate">{email}</span>
         </a>
       )}
@@ -45,7 +45,7 @@ export function ContactInfo({
           className="mb-1.5 flex w-full items-center truncate whitespace-nowrap text-sm uppercase text-stone-500 hover:text-cyan-700"
           href={website}
         >
-          <FontAwesomeIcon className="mr-2 " icon={faGlobe} />
+          <FontAwesomeIcon className="mr-2" icon={faGlobe} style={{width: 18, height: 18}} />
           <span className="mr-3 truncate text-xs font-semibold tracking-wide ">
             {prettyUrl(website, shortenUrl)}
           </span>
