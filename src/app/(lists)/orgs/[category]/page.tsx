@@ -1,12 +1,12 @@
 import { BackButton } from '@/app/components/BackButton';
 import { OrganizationCard } from '@/app/components/DisplayCard/server';
-import { env } from '@/env.mjs';
 import { prisma } from '@/server/db';
 import React from 'react'
 
 export async function generateStaticParams() {
-    const categories = await fetch('https://needhelpmissoula.org/api' + `/categories`).then((res) => res.json()) as string[]
-    const slugs = categories.map((category) => ({
+    const categories = await fetch('https://needhelpmissoula.org/api' + `/categories`)
+    const categoriesJson = await categories.json() as string[]
+    const slugs = categoriesJson.map((category) => ({
         params: { category: category },
     }))
 
