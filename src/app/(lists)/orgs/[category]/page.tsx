@@ -3,14 +3,25 @@ import { OrganizationCard } from '@/app/components/DisplayCard/server';
 import { prisma } from '@/server/db';
 import React from 'react'
 
-export async function generateStaticParams() {
-    const categories = await fetch('https://needhelpmissoula.org/api' + `/categories`)
-    const categoriesJson = await categories.json() as string[]
-    const slugs = categoriesJson.map((category) => ({
-        params: { category: category },
-    }))
+export function generateStaticParams() {
+  const slugs = [
+    "case-management",
+    "clothing",
+    "food",
+    "health",
+    "job-services",
+    "legal",
+    "misc",
+    "recovery",
+    "shelter",
+    "transportation",
+  ];
 
-    return slugs
+    return slugs.map((slug) => ({
+      params: {
+        category: slug,
+      },
+    }));
 }
 
 async function OrganizationByCategoryPage({params}: {params: {category: string}}) {
