@@ -1,14 +1,11 @@
 import { TagList } from "@/components/Tags";
 import type { OrgProps } from "@/pages/org";
-import { authOptions } from "@/server/auth";
 import { getRawPhoneNumber, prettyUrl } from "@/utils";
-import { faEdit, faStar } from "@fortawesome/free-regular-svg-icons";
+import { faStar } from "@fortawesome/free-regular-svg-icons";
 import { faEnvelope, faGlobe, faPhone, faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { Organization } from "@prisma/client";
-import { getServerSession } from "next-auth/next";
 import Link from "next/link";
-import { Suspense } from "react";
 
 export type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
 
@@ -200,22 +197,7 @@ const CategoryTagSection = ({
   );
 };
 
- async function EditButton ({ orgId }: { orgId: string }) {
 
-
-    const session = await getServerSession(authOptions);
-    
-    // console.log(session?.user.admin)
-
-    return (
-        <Link href={`/org/${orgId}/edit`} className="mr-1">
-        <FontAwesomeIcon
-            className="text-stone-500 hover:text-rose-500 h-4 w-4"
-            icon={faEdit}
-        />
-        </Link> 
-    );
-    }
 
 export function OrganizationCard({
   org,
@@ -236,9 +218,6 @@ export function OrganizationCard({
     <CardWrapper>
       <div className="flex w-full flex-wrap items-center justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left">
         <div className="flex truncate">
-            <Suspense fallback={null}>
-            <EditButton orgId={orgId} />
-            </Suspense>
           <Link
             className="flex items-center justify-center"
             href={`/org/${org.id}`}
