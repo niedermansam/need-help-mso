@@ -10,11 +10,6 @@ import { authOptions } from '@/server/auth';
 
 async function OrganizationPage() {
 
-      const session = await getServerSession(authOptions)
-      const trpc = appRouter.createCaller({
-         prisma,
-        session,
-      });
 
 
     const orgs = await prisma.organization.findMany({
@@ -23,14 +18,16 @@ async function OrganizationPage() {
         }
     })
 
-    const admin = session?.user.admin || false;
-    const favoritesList = await trpc.user.getFavoriteList()
-    const loggedIn = !!session?.user;
+    // const session = await getServerSession(authOptions)
+
+    const admin = false;
+    const favoritesList:string[] = [];
+    const loggedIn = false;
 
   return (
     <div>
         <h1>Organizations</h1>
-        {orgs.map( org => <OrganizationCard key={org.id} org={org} admin={admin}  favoriteIds={favoritesList.organizations} loggedIn={loggedIn} />)}
+        {orgs.map( org => <OrganizationCard key={org.id} org={org} admin={admin}  favoriteIds={favoritesList} loggedIn={loggedIn} />)}
     </div>
   )
 }
