@@ -141,6 +141,7 @@ const DesktopContactInfo = ({
     </div>
   );
 };
+
 const CardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="my-4 mx-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">

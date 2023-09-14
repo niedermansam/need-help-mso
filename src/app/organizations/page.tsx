@@ -2,7 +2,7 @@
 import React from 'react'
 // import { SITE_URL } from '@/utils/constants'
 // import type { Organization } from '@prisma/client'
-import { OrganizationCard } from '@/components/DisplayCard'
+import { OrganizationCard } from '@/app/components/DisplayCard/server'
 import { prisma } from '@/server/db'
 import {appRouter } from '@/server/api/root'
 import { getServerSession } from 'next-auth';
