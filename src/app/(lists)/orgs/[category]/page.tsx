@@ -5,7 +5,7 @@ import { prisma } from '@/server/db';
 import React from 'react'
 
 export async function generateStaticParams() {
-    const categories = await fetch(`${env.NODE_ENV === "production" ? 'https://needhelpmissoula.org/api' : 'http://localhost:3000/api'}/categories`).then((res) => res.json()) as string[]
+    const categories = await fetch('https://needhelpmissoula.org/api' + `/categories`).then((res) => res.json()) as string[]
     const slugs = categories.map((category) => ({
         params: { category: category },
     }))
