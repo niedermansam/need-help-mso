@@ -74,6 +74,7 @@ model VerificationToken {
 
 model Category {
     category      String         @id @unique
+    slug          String         @unique @default(cuid()) 
     description   String?        @db.Text
     organizations Organization[]
     resources     Resource[]
@@ -81,6 +82,7 @@ model Category {
     allOrganizations Organization[] @relation("OrganizationCategory")
 
     @@index([category])
+    @@index([slug])
 }
 
 model Tag {

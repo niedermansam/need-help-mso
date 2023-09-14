@@ -275,8 +275,6 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
             })}
           />
         </div>
-
-
       </form>
     </div>
   );
@@ -301,18 +299,21 @@ export function ResourceSection({
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
+    undefined
+  );
 
   const allTags = useMemo(() => {
-    return [...new Set(resources.flatMap((resource) => resource.tags.map((tag) => tag.tag)))];
+    return [
+      ...new Set(
+        resources.flatMap((resource) => resource.tags.map((tag) => tag.tag))
+      ),
+    ];
   }, [resources]);
 
   const [displayTags, setDisplayTags] = useState(allTags);
 
-
   const [strict, setStrict] = useState(false);
-
-
 
   useEffect(() => {
     if (selectedTags.length === 0 && !selectedCategory) {
@@ -336,26 +337,32 @@ export function ResourceSection({
 
     setVisibleResources(newResourceList);
 
+    if (strict) {
+      // create a list of available tags
+      const availableTags = newResourceList.flatMap((resource) =>
+        resource.tags.map((tag) => tag.tag)
+      );
 
-  if (strict) {
-    // create a list of available tags
-    const availableTags = newResourceList.flatMap((resource) =>
-      resource.tags.map((tag) => tag.tag)
-    );
+      const uniqueTags = [...new Set(availableTags)];
 
-    const uniqueTags = [...new Set(availableTags)];
+      setDisplayTags(uniqueTags);
+    } else {
+      const availableTags = filteredByCategory.flatMap((resource) =>
+        resource.tags.map((tag) => tag.tag)
+      );
 
-    setDisplayTags(uniqueTags);
-  } else {
-    const availableTags = filteredByCategory.flatMap((resource) =>
-      resource.tags.map((tag) => tag.tag)
-    );
+      const uniqueTags = [...new Set(availableTags)];
 
-    const uniqueTags = [...new Set(availableTags)];
-
-    setDisplayTags(uniqueTags);
-  }
-  }, [selectedTags, allResources, resources, strict, selectedCategory, allTags]);
+      setDisplayTags(uniqueTags);
+    }
+  }, [
+    selectedTags,
+    allResources,
+    resources,
+    strict,
+    selectedCategory,
+    allTags,
+  ]);
 
   return (
     <div className="mr-6 w-full">
@@ -427,7 +434,7 @@ export default function ResourcePage() {
 
   const isLoggedIn = !!session?.user;
 
-  const isAdmin = session?.user.admin
+  const isAdmin = session?.user.admin;
 
   if (isLoading) return <LoadingPage />;
   if (isError) return <Custom404 />;
@@ -439,7 +446,11 @@ export default function ResourcePage() {
         <div className="px-4 pt-12 text-4xl font-bold">
           <h1 className="my-2">Resources</h1>
         </div>
-        <ResourceSection resources={resources} isLoggedIn={isLoggedIn} isAdmin={isAdmin} />
+        <ResourceSection
+          resources={resources}
+          isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
+        />
       </div>
     );
 }

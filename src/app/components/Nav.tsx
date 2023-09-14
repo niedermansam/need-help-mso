@@ -2,7 +2,9 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useFavoriteStore, useUserStore } from "@/utils/userStore";
+import { api } from "@/utils/api";
 
 const NavLink = ({
   href,
@@ -26,10 +28,30 @@ const NavLink = ({
 };
 
 export default function NavBar() {
-  const session = useSession();
   const pathname = usePathname() || '';
-  const userId = session.data?.user?.id;
   const [isOpen, setIsOpen] = useState(false);
+
+  const {data} = useSession();
+  const setUser = useUserStore((state) => state.setUser);
+
+  useEffect(() => {
+    setUser(data?.user?.name || null, !!data?.user?.name, !!data?.user.admin)
+  }, [data?.user.name, data?.user.admin, setUser])
+
+  const loggedIn =  useUserStore(state => state.loggedIn)
+
+  const setFavoriteOrgs = useFavoriteStore((state) => state.setFavoriteOrgs)
+  const setFavoriteListId =  useFavoriteStore(state => state.setFavoriteListId)
+
+  const {data: favorites} = api.user.getFavoriteList.useQuery()
+
+
+  useEffect(() => {
+    setFavoriteOrgs(favorites?.organizations || [])
+    setFavoriteListId(favorites?.id)
+  }, [favorites?.organizations, setFavoriteOrgs])
+
+
   return (
     <nav className="sticky z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
       <div className="mr-6 flex flex-shrink-0 items-center text-white">
@@ -64,21 +86,11 @@ export default function NavBar() {
             isActive={/\/about/.test(pathname)}
           />
           <NavLink
-            href="/resource"
-            label="Resources"
-            isActive={/\/resource/.test(pathname)}
-          />
-          <NavLink
-            href="/org"
+            href="/organizations"
             label="Organizations"
             isActive={/\/org/.test(pathname)}
           />
-          <NavLink
-            href="/community"
-            label="Communities"
-            isActive={/\/community/.test(pathname)}
-          />
-          {userId && (
+          {loggedIn && (
             <NavLink
               href="/favorites"
               label="Favorites"
@@ -96,12 +108,12 @@ export default function NavBar() {
             )
           }
           <button
-            onClick={userId ? () => void signOut() : () => void signIn()}
+            onClick={loggedIn ? () => void signOut() : () => void signIn()}
             className={`${
-              userId ? "umami--click--sign-out" : "umami--click-sign-in"
+              loggedIn ? "umami--click--sign-out" : "umami--click-sign-in"
             } mt-4 inline-block rounded border border-white px-4 py-2 text-sm leading-none text-white hover:border-transparent hover:bg-white hover:text-indigo-800 md:mt-0`}
           >
-            {userId ? "Sign Out" : "Sign In"}
+            {loggedIn ? "Sign Out" : "Sign In"}
           </button>
         </div>
       </div>

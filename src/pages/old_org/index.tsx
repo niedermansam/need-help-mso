@@ -36,9 +36,6 @@ export type OrganizationProps = {
   city: string;
   state: string;
   zip: string;
-
-  
-
 };
 
 function CreateOrganizationForm({
@@ -70,7 +67,7 @@ function CreateOrganizationForm({
     onSuccess: (results) => {
       if (!results) return console.error("No results returned from mutation");
       // await router.push(`/org/${results.id}/edit`);
-      
+
       const newOrg: OrgProps = {
         ...results,
         tags: formData.tags.map((tag) => ({ tag: tag })),
@@ -78,7 +75,7 @@ function CreateOrganizationForm({
 
       setDisplayOrgs((orgs) => [...orgs, newOrg]);
       // setIsOpen(false);
-      setFormData({...INITIAL_STATE, category: newOrg.category});
+      setFormData({ ...INITIAL_STATE, category: newOrg.category });
     },
   });
   return (
@@ -153,7 +150,10 @@ function CreateOrganizationForm({
                 id="email"
                 value={formData.email}
                 onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value || undefined })
+                  setFormData({
+                    ...formData,
+                    email: e.target.value || undefined,
+                  })
                 }
               />
               <label className="text-lg font-light" htmlFor="phone">
@@ -322,7 +322,10 @@ function CreateOrganizationModal({
         isOpen={isOpen}
         onRequestClose={() => setIsOpen(false)}
       >
-        <CreateOrganizationForm setIsOpen={setIsOpen} setDisplayOrgs={setDisplayOrgs} />
+        <CreateOrganizationForm
+          setIsOpen={setIsOpen}
+          setDisplayOrgs={setDisplayOrgs}
+        />
       </ReactModal>
     </>
   );
@@ -480,7 +483,6 @@ export default function OrganizationsPage({}: InferGetServerSidePropsType<
   const { data: orgs, isLoading } = api.organization.getAll.useQuery();
   const session = useSession().data;
 
-
   const isLoggedIn = !!session?.user;
 
   const isAdmin = session?.user.admin || false;
@@ -491,7 +493,7 @@ export default function OrganizationsPage({}: InferGetServerSidePropsType<
       <NavBar />
       <div className="pt-12">
         <div>
-          <h1 className="my-2 mx-4 text-4xl font-bold text-stone-700">
+          <h1 className="mx-4 my-2 text-4xl font-bold text-stone-700">
             Organizations
           </h1>
         </div>

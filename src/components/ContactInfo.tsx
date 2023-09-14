@@ -6,7 +6,7 @@ import {
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { OrgProps } from "../pages/org/[id]";
+import type { OrgProps } from "../pages/old_org/[id]";
 import ReactModal from "react-modal";
 import { useState } from "react";
 
@@ -45,7 +45,11 @@ export function ContactInfo({
           className="mb-1.5 flex w-full items-center truncate whitespace-nowrap text-sm uppercase text-stone-500 hover:text-cyan-700"
           href={website}
         >
-          <FontAwesomeIcon className="mr-2" icon={faGlobe} style={{width: 18, height: 18}} />
+          <FontAwesomeIcon
+            className="mr-2"
+            icon={faGlobe}
+            style={{ width: 18, height: 18 }}
+          />
           <span className="mr-3 truncate text-xs font-semibold tracking-wide ">
             {prettyUrl(website, shortenUrl)}
           </span>

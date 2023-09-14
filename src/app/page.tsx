@@ -1,10 +1,5 @@
 import { type NextPage } from "next";
-import Head from "next/head";
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
-
-import NavBar from "../components/Nav";
-
 
 
 const CallToAction: React.FC = () => {
@@ -17,7 +12,7 @@ const CallToAction: React.FC = () => {
         Support on Patreon
       </Link>
       <Link
-        className="umami--click--timeline focus:bg-rose-300 my-2 rounded-lg bg-rose-200 px-4 py-2 font-bold text-rose-600 shadow transition-all hover:bg-rose-300 hover:shadow-lg focus:shadow-lg"
+        className="umami--click--timeline my-2 rounded-lg bg-rose-200 px-4 py-2 font-bold text-rose-600 shadow transition-all hover:bg-rose-300 hover:shadow-lg focus:bg-rose-300 focus:shadow-lg"
         href="/timeline"
       >
         Project Timeline
@@ -41,11 +36,11 @@ const Title = () => {
       </h1>{" "}
       <p className="my-4 w-full text-center tracking-tight">
         <span className=" text-xl font-bold text-stone-400 md:text-xl lg:text-2xl  ">
-          A digital directory of resources for people 
+          A digital directory of resources for people
         </span>{" "}
         <br />{" "}
-        <span className="text-lg text-stone-400 font-bold md:text-xl lg:text-2xl">
-         who could use a helping hand.
+        <span className="text-lg font-bold text-stone-400 md:text-xl lg:text-2xl">
+          who could use a helping hand.
         </span>
       </p>
     </div>
@@ -68,47 +63,17 @@ const Description = () => {
 };
 
 const Home: NextPage = () => {
-  
-  
   return (
-    <>
-      <Head>
-        <title>Need Help Missoula</title>
-        <meta
-          name="description"
-          content="Resources & organizations in Missoula, MT for those who need a helping hand."
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <main className="">
-        <NavBar />
         <div className="flex min-h-screen items-center justify-center bg-stone-100 md:p-20">
           <div className="flex max-w-6xl  flex-wrap justify-center rounded-xl border border-stone-200 bg-white  pb-10 pt-20 shadow-xl md:px-6">
             <Title />
             <Description />
             <CallToAction />
-            
           </div>
         </div>
-      </main>
-    </>
   );
 };
 
 export default Home;
 
-export const AuthShowcase: React.FC = () => {
-  const { data: sessionData } = useSession();
 
-  return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <button
-        className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClick={sessionData ? () => void signOut() : () => void signIn()}
-      >
-        {sessionData ? "Sign out" : "Sign in"}
-      </button>
-    </div>
-  );
-};

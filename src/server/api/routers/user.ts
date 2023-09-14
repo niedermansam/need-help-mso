@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "../trpc";
+import { router, protectedProcedure, publicProcedure } from "../trpc";
 import type { Prisma, PrismaClient } from "@prisma/client";
 
 async function createFavoriteList(
@@ -130,4 +130,28 @@ export const userRouter = router({
         return !input.newState;
       }
     }),
+
+    getFavoriteOrganizations: publicProcedure.input(z.object({ listId: z.number().nullable() })).query(async ({ ctx, input }) => {
+      
+      if(!input.listId) return null;
+      
+      const list = await ctx.prisma.favoritesList.findUnique({
+        where: {
+          id: input.listId
+        },
+        select: {
+          name: true,
+          id: true,
+          organizations: {
+            include: {
+              tags: true,
+            }
+          },
+        },
+      });
+  
+  
+      return list;
+    }),
+
 });

@@ -1,15 +1,21 @@
 import { TagList } from "@/components/Tags";
-import type { OrgProps } from "@/pages/org";
+import type { OrgProps } from "@/pages/old_org";
 import { getRawPhoneNumber, prettyUrl } from "@/utils";
 import { faStar } from "@fortawesome/free-regular-svg-icons";
-import { faEnvelope, faGlobe, faPhone, faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEnvelope,
+  faGlobe,
+  faPhone,
+  faStar as faStarSolid,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { Organization } from "@prisma/client";
 import Link from "next/link";
+import { EditButton, FavoriteOrgButton } from "./client";
 
 export type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
 
-const FA_ICON_SIZE = {minWidth: 18, width: 18} as const
+const FA_ICON_SIZE = { minWidth: 18, width: 18 } as const;
 
 export function ContactInfo({
   phone,
@@ -22,7 +28,7 @@ export function ContactInfo({
     <div className="w-full truncate">
       {phone && (
         <a
-          className="mb-1.5 flex w-full items-center truncate text-sm text-stone-500 hover:text-cyan-700"
+          className="mb-1.5 flex w-full items-center truncate text-xs text-stone-500 hover:text-cyan-700"
           href={getRawPhoneNumber(phone, true) || undefined}
         >
           <FontAwesomeIcon className="mr-2 h-4" icon={faPhone} />
@@ -31,7 +37,7 @@ export function ContactInfo({
       )}
       {email && (
         <a
-          className="mb-1.5 flex w-full items-center truncate text-ellipsis text-sm text-stone-500 hover:text-cyan-700"
+          className="mb-1.5 flex w-full items-center truncate text-ellipsis text-xs text-stone-500 hover:text-cyan-700"
           href={`mailto:${email}`}
         >
           <FontAwesomeIcon
@@ -45,7 +51,7 @@ export function ContactInfo({
 
       {website && (
         <Link
-          className="mb-1.5 flex w-full items-center truncate whitespace-nowrap text-sm uppercase text-stone-500 hover:text-cyan-700"
+          className="mb-1.5 flex w-full items-center truncate whitespace-nowrap text-xs uppercase text-stone-500 hover:text-cyan-700"
           href={website}
         >
           <FontAwesomeIcon
@@ -53,7 +59,7 @@ export function ContactInfo({
             style={FA_ICON_SIZE}
             icon={faGlobe}
           />
-          <span className="mr-3 truncate text-xs font-semibold tracking-wide ">
+          <span className="mr-3 truncate text-xs  tracking-wide ">
             {prettyUrl(website, shortenUrl)}
           </span>
         </Link>
@@ -123,7 +129,7 @@ export function ContactIcons({
 
 export type OrgCardProps = Pick<
   Organization,
-  "id" | "name" | "phone" | "email" | "website" | "category"
+  "id" | "name" | "phone" | "email" | "website" | "category" | "description"
 > & {
   tags: { tag: string }[];
 };
@@ -138,7 +144,7 @@ const DesktopContactInfo = ({
   website: string | null;
 }) => {
   return (
-    <div className="ml-2 hidden items-center pt-2 lg:col-span-2 lg:flex">
+    <div className="ml-2 hidden items-start px-1 pt-2 lg:col-span-2 lg:flex">
       <ContactInfo phone={phone} email={email} website={website} />
     </div>
   );
@@ -146,7 +152,7 @@ const DesktopContactInfo = ({
 
 const CardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="mx-4 my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">
+    <div className="my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">
       {children}
     </div>
   );
@@ -179,7 +185,7 @@ const CategoryTagSection = ({
   tags: { tag: string }[];
 }) => {
   return (
-    <div className="flex h-fit flex-col xs:row-span-2 xs:mt-4 md:col-span-6 md:row-span-1 md:mt-0 lg:col-span-5">
+    <>
       <p className=" my-2 w-full px-4 text-base md:mt-0 lg:mt-0">
         <span className="mr-1 w-full text-center font-light"> Category: </span>
         <Link
@@ -193,31 +199,24 @@ const CategoryTagSection = ({
         <p className="mb-0.5 mr-2 w-16 font-light"> Tags: </p>
         <TagList className="overflow-y-auto" tags={tags} />
       </div>
-    </div>
+    </>
   );
 };
 
-
-
 export function OrganizationCard({
   org,
-  admin,
-  loggedIn,
-  favoriteIds,
+  showDescription,
 }: {
   org: OrgCardProps;
-  admin: boolean;
-  loggedIn: boolean;
-  favoriteIds: string[];
+  showDescription?: boolean;
 }) {
   const orgId = org.id;
 
-    const isFavoriteOrg = favoriteIds.includes(orgId);
-
   return (
     <CardWrapper>
-      <div className="flex w-full flex-wrap items-center justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left">
+      <div className="flex w-full flex-wrap items-start justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left">
         <div className="flex truncate">
+          <EditButton orgId={orgId} />
           <Link
             className="flex items-center justify-center"
             href={`/org/${org.id}`}
@@ -239,18 +238,15 @@ export function OrganizationCard({
         website={org.website}
       />
 
-      <CategoryTagSection category={org.category} tags={org.tags} />
-      <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
-        {loggedIn && (
-          <button
-            className="mr-1 flex h-4 items-center justify-center"
-          >
-            <FontAwesomeIcon
-              icon={isFavoriteOrg ? faStarSolid : faStar}
-              className="text-gold-500 h-4 text-amber-400 "
-            />
-          </button>
+      <div className="flex h-fit flex-col p-3 xs:row-span-2 xs:mt-4 md:col-span-6 md:row-span-1 md:mt-0 md:p-1 lg:col-span-5">
+        {showDescription ? (
+          <p>{org.description}</p>
+        ) : (
+          <CategoryTagSection category={org.category} tags={org.tags} />
         )}
+      </div>
+      <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
+        <FavoriteOrgButton orgId={orgId} />
         <Link
           className="mr-2 flex w-1/2 justify-center justify-self-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md sm:w-2/3 md:w-32"
           href={`/org/${org.id}`}
