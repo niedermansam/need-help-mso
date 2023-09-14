@@ -3,28 +3,8 @@ import { OrganizationCard } from '@/app/components/DisplayCard/server';
 import { prisma } from '@/server/db';
 import React from 'react'
 
-export function generateStaticParams() {
-  const slugs = [
-    "case-management",
-    "clothing",
-    "food",
-    "health",
-    "job-services",
-    "legal",
-    "misc",
-    "recovery",
-    "shelter",
-    "transportation",
-  ];
 
-    return slugs.map((slug) => ({
-      params: {
-        category: slug,
-      },
-    }));
-}
-
-async function OrganizationByCategoryPage({params}: {params: {category: string}}) {
+export default async function OrganizationByCategoryPage({params}: {params: {category: string}}) {
 
   const category = await prisma.category.findUnique({
     where: { slug: params.category },
@@ -59,4 +39,21 @@ async function OrganizationByCategoryPage({params}: {params: {category: string}}
   );
 }
 
-export default OrganizationByCategoryPage;
+
+export function generateStaticParams() {
+  const slugs = [
+    "case-management",
+    "clothing",
+    "food",
+    "health",
+    "job-services",
+    "legal",
+    "misc",
+    "recovery",
+    "shelter",
+    "transportation",
+  ];
+
+  return slugs.map((slug) => {return {category: slug}});
+}
+
