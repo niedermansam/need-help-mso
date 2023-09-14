@@ -17,7 +17,11 @@ async function OrganizationPage() {
       });
 
 
-    const orgs = await trpc.organization.getAll()
+    const orgs = await prisma.organization.findMany({
+        include: {
+            tags: {select: {tag: true}},
+        }
+    })
 
     const admin = session?.user.admin || false;
     const favoritesList = await trpc.user.getFavoriteList()
