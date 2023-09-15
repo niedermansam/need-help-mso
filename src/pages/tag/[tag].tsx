@@ -23,8 +23,10 @@ export default function TagPage({
 
   const isAdmin = session?.user.admin || false;
 
-
-  const { data: userFavorites } = api.user.getFavoriteList.useQuery(undefined, {enabled: isLoggedIn});
+  const { data: userFavorites } = api.user.getCurrentFavoritesList.useQuery(
+    undefined,
+    { enabled: isLoggedIn }
+  );
 
   return (
     <div className="text-stone-700">
@@ -64,7 +66,15 @@ export default function TagPage({
         </h2>
         {data &&
           data?.organizations.map((org) => {
-            return <OrganizationCard org={org} key={org.id} admin={isAdmin} loggedIn={!!session?.user} favoriteIds={userFavorites?.organizations || []} />;
+            return (
+              <OrganizationCard
+                org={org}
+                key={org.id}
+                admin={isAdmin}
+                loggedIn={!!session?.user}
+                favoriteIds={userFavorites?.organizations || []}
+              />
+            );
           })}
         {isLoading && (
           <div className="flex h-20 items-center">

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,29 +28,29 @@ const NavLink = ({
 };
 
 export default function NavBar() {
-  const pathname = usePathname() || '';
+  const pathname = usePathname() || "";
   const [isOpen, setIsOpen] = useState(false);
 
-  const {data} = useSession();
+  const { data } = useSession();
   const setUser = useUserStore((state) => state.setUser);
 
   useEffect(() => {
-    setUser(data?.user?.name || null, !!data?.user?.name, !!data?.user.admin)
-  }, [data?.user.name, data?.user.admin, setUser])
+    setUser(data?.user?.name || null, !!data?.user?.name, !!data?.user.admin);
+  }, [data?.user.name, data?.user.admin, setUser]);
 
-  const loggedIn =  useUserStore(state => state.loggedIn)
+  const loggedIn = useUserStore((state) => state.loggedIn);
 
-  const setFavoriteOrgs = useFavoriteStore((state) => state.setFavoriteOrgs)
-  const setFavoriteListId =  useFavoriteStore(state => state.setFavoriteListId)
+  const setFavoriteOrgs = useFavoriteStore((state) => state.setFavoriteOrgs);
+  const setFavoriteListId = useFavoriteStore(
+    (state) => state.setFavoriteListId
+  );
 
-  const {data: favorites} = api.user.getFavoriteList.useQuery()
-
+  const { data: favorites } = api.user.getCurrentFavoritesList.useQuery();
 
   useEffect(() => {
-    setFavoriteOrgs(favorites?.organizations || [])
-    setFavoriteListId(favorites?.id)
-  }, [favorites?.organizations, setFavoriteOrgs])
-
+    setFavoriteOrgs(favorites?.organizations || []);
+    setFavoriteListId(favorites?.id);
+  }, [favorites?.organizations, setFavoriteOrgs]);
 
   return (
     <nav className="sticky z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">

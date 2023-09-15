@@ -19,12 +19,14 @@ export default function CategoryPage({
 
   const session = useSession().data;
 
-  const isLoggedIn  = !!session?.user;
+  const isLoggedIn = !!session?.user;
 
   const sessionDetails = getSessionDetails(session);
 
-  const { data: favorites } = api.user.getFavoriteList.useQuery(undefined, 
-    {enabled: isLoggedIn});
+  const { data: favorites } = api.user.getCurrentFavoritesList.useQuery(
+    undefined,
+    { enabled: isLoggedIn }
+  );
 
   console.log(sessionDetails);
 

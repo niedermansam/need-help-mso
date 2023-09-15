@@ -31,11 +31,12 @@ export default function CommunityResourcesPage(
     props.data.helpfulResources.length > 0;
   const isLoggedIn = !!session.data?.user;
 
-  const { data: favorites } = api.user.getFavoriteList.useQuery(undefined, {
-    enabled: isLoggedIn,  
-    });
-
-
+  const { data: favorites } = api.user.getCurrentFavoritesList.useQuery(
+    undefined,
+    {
+      enabled: isLoggedIn,
+    }
+  );
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>();
 

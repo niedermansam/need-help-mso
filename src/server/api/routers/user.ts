@@ -4,12 +4,14 @@ import type { Prisma, PrismaClient } from "@prisma/client";
 
 async function createFavoriteList(
   userId: string,
-  prisma: PrismaClient<Prisma.PrismaClientOptions>
+  prisma: PrismaClient<Prisma.PrismaClientOptions>,
+  name?: string
 ) {
   try {
     const newList = await prisma.favoritesList.create({
       data: {
         adminId: userId,
+        name: name || "Favorites",
       },
     });
 
@@ -31,7 +33,7 @@ async function createFavoriteList(
 }
 
 export const userRouter = router({
-  getFavoriteList: protectedProcedure.query(async ({ ctx }) => {
+  getCurrentFavoritesList: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
 
     let currentListId = ctx.session.user.currentListId;
@@ -131,13 +133,14 @@ export const userRouter = router({
       }
     }),
 
-    getFavoriteOrganizations: publicProcedure.input(z.object({ listId: z.number().nullable() })).query(async ({ ctx, input }) => {
-      
-      if(!input.listId) return null;
-      
+  getFavoriteOrganizations: publicProcedure
+    .input(z.object({ listId: z.number().nullable() }))
+    .query(async ({ ctx, input }) => {
+      if (!input.listId) return null;
+
       const list = await ctx.prisma.favoritesList.findUnique({
         where: {
-          id: input.listId
+          id: input.listId,
         },
         select: {
           name: true,
@@ -145,13 +148,120 @@ export const userRouter = router({
           organizations: {
             include: {
               tags: true,
-            }
+            },
           },
         },
       });
-  
-  
+
       return list;
     }),
 
+  userOwnsFavoritesList: protectedProcedure
+    .input(z.object({ listId: z.number().nullable() }))
+    .query(async ({ ctx, input }) => {
+      if (!input.listId) return false;
+      const userId = ctx.session.user.id;
+
+      const list = await ctx.prisma.favoritesList.findUnique({
+        where: {
+          id: input.listId,
+        },
+        select: {
+          adminId: true,
+        },
+      });
+
+      return list?.adminId === userId;
+    }),
+
+  updateFavoritesListInfo: protectedProcedure
+    .input(z.object({ listId: z.number(), name: z.string().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const list = await ctx.prisma.favoritesList.findUnique({
+        where: {
+          id: input.listId,
+        },
+        select: {
+          adminId: true,
+        },
+      });
+
+      if (list?.adminId !== userId) return list;
+
+      const newList = await ctx.prisma.favoritesList.update({
+        where: {
+          id: input.listId,
+        },
+        data: {
+          name: input.name,
+        },
+      });
+
+      return newList;
+    }),
+
+  createFavoriteList: protectedProcedure
+    .input(z.object({ name: z.string().optional() }).optional())
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const newList = await createFavoriteList(userId, ctx.prisma, input?.name);
+
+      return newList;
+    }),
+
+  getOwnFavoritesLists: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    const lists = await ctx.prisma.favoritesList.findMany({
+      where: {
+        adminId: userId,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    ctx.session.user.currentListId
+
+    return lists.map((x) => ({...x, current: x.id === ctx.session.user.currentListId }));
+  }),
+
+  setCurrentFavoritesList: protectedProcedure
+    .input(z.object({ listId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const list = await ctx.prisma.favoritesList.findUnique({
+        where: {
+          id: input.listId,
+        },
+        select: {
+          adminId: true,
+          id: true,
+          organizations: {
+            select: {
+              id: true
+            },
+          }
+        },
+      });
+
+      if (list?.adminId !== userId) return false;
+
+      await ctx.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          currentListId: input.listId,
+        },
+      });
+
+      return list;
+    }
+    ),
 });

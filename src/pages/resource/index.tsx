@@ -289,9 +289,12 @@ export function ResourceSection({
   isLoggedIn: boolean;
   isAdmin?: boolean;
 }) {
-  const { data: favorites } = api.user.getFavoriteList.useQuery(undefined, {
-    enabled: isLoggedIn,
-  });
+  const { data: favorites } = api.user.getCurrentFavoritesList.useQuery(
+    undefined,
+    {
+      enabled: isLoggedIn,
+    }
+  );
 
   const allResources = resources;
   const [visibleResources, setVisibleResources] =

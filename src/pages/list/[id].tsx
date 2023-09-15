@@ -15,13 +15,12 @@ import { api } from "../../utils/api";
 function ResourceSection({
   resources,
   session,
-  userFavorites
+  userFavorites,
 }: {
   resources: ResourceCardInformation[];
   session: ReturnType<typeof useSession>;
   userFavorites: string[] | undefined;
 }) {
-
   return (
     <div className="mt-6">
       <h2 className="text-3xl font-bold text-stone-500">Resources</h2>
@@ -40,7 +39,7 @@ function ResourceSection({
 function OrganizationSection({
   organizations,
   session,
-  userFavorites
+  userFavorites,
 }: {
   organizations: {
     name: string;
@@ -74,22 +73,28 @@ function OrganizationSection({
 
 export default function ListsPage({
   listDetails: favorites,
-  
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    const session = useSession()
+  const session = useSession();
   const hasFavoriteResources = favorites.resources.length > 0;
   const hasFavoriteOrganizations = favorites.organizations.length > 0;
 
-  const {data: userFavorites } = api.user.getFavoriteList.useQuery(undefined ,{
-    enabled: !!session.data?.user
-  })
+  const { data: userFavorites } = api.user.getCurrentFavoritesList.useQuery(
+    undefined,
+    {
+      enabled: !!session.data?.user,
+    }
+  );
   return (
     <div>
       <NavBar />
       <div className="mx-6 pt-14">
         <h1 className=" text-5xl font-extrabold text-stone-500">Favorites</h1>
         {hasFavoriteResources && (
-          <ResourceSection resources={favorites.resources} session={session} userFavorites={userFavorites?.resources} />
+          <ResourceSection
+            resources={favorites.resources}
+            session={session}
+            userFavorites={userFavorites?.resources}
+          />
         )}
         {hasFavoriteOrganizations && (
           <OrganizationSection

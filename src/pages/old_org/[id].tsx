@@ -27,9 +27,12 @@ export default function OrganizationDetailsPage({
 
   const isLoggedIn = !!userSession?.user;
 
-  const { data: favorites } = api.user.getFavoriteList.useQuery(undefined, {
-    enabled: isLoggedIn,
-  });
+  const { data: favorites } = api.user.getCurrentFavoritesList.useQuery(
+    undefined,
+    {
+      enabled: isLoggedIn,
+    }
+  );
 
   return (
     <div className="text-stone-600">
