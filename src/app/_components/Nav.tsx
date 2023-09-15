@@ -50,7 +50,7 @@ export default function NavBar() {
   useEffect(() => {
     setFavoriteOrgs(favorites?.organizations || []);
     setFavoriteListId(favorites?.id);
-  }, [favorites?.organizations, setFavoriteOrgs]);
+  }, [favorites?.organizations, setFavoriteOrgs, favorites?.id, setFavoriteListId]);
 
   return (
     <nav className="sticky z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
