@@ -86,7 +86,7 @@ export default function NavBar() {
             isActive={/\/about/.test(pathname)}
           />
           <NavLink
-            href="/organizations"
+            href="/orgs"
             label="Organizations"
             isActive={/\/org/.test(pathname)}
           />

@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { LoadingAnimation } from ".";
-import NavBar from "../app/components/Nav";
+import NavBar from "../app/_components/Nav";
 import { BackToSafetyButtons } from "../pages/404";
 import { useState, useEffect } from "react";
 

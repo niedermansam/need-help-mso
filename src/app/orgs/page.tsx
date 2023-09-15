@@ -11,7 +11,10 @@ const CategoryLink = ({
   slug: string;
 }) => (
   <div>
-    <Link href={`/orgs/${slug}`} className="text-2xl font-bold text-stone-700 my-3">
+    <Link
+      href={`/orgs/${slug}`}
+      className="my-3 text-2xl font-bold text-stone-700"
+    >
       {category}
     </Link>
   </div>

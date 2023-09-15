@@ -1,6 +1,6 @@
 "use client";
-import { OrganizationCard } from "@/app/components/DisplayCard/server";
-import LoadingPage from "@/app/components/LoadingPage";
+import { OrganizationCard } from "@/app/_components/DisplayCard/server";
+import LoadingPage from "@/app/_components/LoadingPage";
 import { trpc } from "@/app/providers";
 import { LoadingAnimation } from "@/components";
 import { api } from "@/utils/api";
@@ -12,63 +12,66 @@ const invalidateFavorites = () => {
   const utils = trpc.useContext();
 
   const invalidate = () => {
-    utils.user.getOwnFavoritesLists.invalidate().then(
-      () => {
+    utils.user.getOwnFavoritesLists
+      .invalidate()
+      .then(() => {
         console.log("invalidated");
-      }
-    ).catch(
-      (err) => {
-        console.log(err)
-      }
-    )
-  }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return invalidate();
-}
+};
 
-export function DeleteListButton({ listId, afterDelete }: { listId: number, afterDelete?: () => void }) {
-
-  const utils = trpc.useContext()
+export function DeleteListButton({
+  listId,
+  afterDelete,
+}: {
+  listId: number;
+  afterDelete?: () => void;
+}) {
+  const utils = trpc.useContext();
 
   const favoriteStore = useFavoriteStore((state) => state.setFavoriteListId);
 
-  const {data: userOwnsList, isLoading} = api.user.userOwnsFavoritesList.useQuery({listId})
+  const { data: userOwnsList, isLoading } =
+    api.user.userOwnsFavoritesList.useQuery({ listId });
   const deleteList = api.user.deleteFavoritesList.useMutation({
     onSuccess: (data) => {
-      favoriteStore(data.currentListId)
-      utils.user.getOwnFavoritesLists.invalidate().then(
-        () => {
+      favoriteStore(data.currentListId);
+      utils.user.getOwnFavoritesLists
+        .invalidate()
+        .then(() => {
           console.log("invalidated");
-        }
-      ).catch(
-        (err) => {
-          console.log(err)
-        }
-      )
-  }
-}
-  );
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+  });
 
   const handleDelete = () => {
-     deleteList.mutate({ listId });
-  }
+    deleteList.mutate({ listId });
+  };
 
-  if( isLoading || !userOwnsList) return null;
+  if (isLoading || !userOwnsList) return null;
 
   return (
     <button
       onClick={handleDelete}
-      className="rounded bg-rose-500 px-2 py-1 text-white ml-2"
+      className="ml-2 rounded bg-rose-500 px-2 py-1 text-white"
     >
       Delete List
     </button>
-  )
+  );
 }
 
 export function FavoritesActionButtons({ listId }: { listId: number }) {
   const favoriteStore = useFavoriteStore((state) => state.setFavoriteListId);
-  
-  const invalidate = invalidateFavorites
+
+  const invalidate = invalidateFavorites;
 
   const createList = api.user.createFavoriteList.useMutation({
     onSuccess: (data) => {
@@ -88,9 +91,8 @@ export function FavoritesActionButtons({ listId }: { listId: number }) {
 
   const handleCreateList = () => {
     createList.mutate();
-    invalidate()
+    invalidate();
   };
-
 
   return (
     <div className="flex">
@@ -103,7 +105,7 @@ export function FavoritesActionButtons({ listId }: { listId: number }) {
       {listId && (
         <button
           onClick={() => copyList.mutate({ listId })}
-          className="rounded bg-stone-500 px-2 py-1 text-white ml-2"
+          className="ml-2 rounded bg-stone-500 px-2 py-1 text-white"
         >
           Copy List
         </button>
@@ -113,11 +115,18 @@ export function FavoritesActionButtons({ listId }: { listId: number }) {
   );
 }
 
-export function FavoritesHeader({ name, id }: { name: string; id: number, afterDelete?: () => void }) {
+export function FavoritesHeader({
+  name,
+  id,
+}: {
+  name: string;
+  id: number;
+  afterDelete?: () => void;
+}) {
   const [prevName, setPrevName] = React.useState(name || "");
   const [newName, setNewName] = React.useState(name || "");
 
-  const invalidate = invalidateFavorites
+  const invalidate = invalidateFavorites;
 
   const { data: userOwnsList } = api.user.userOwnsFavoritesList.useQuery(
     { listId: id || null },
@@ -217,18 +226,28 @@ function Page() {
 
   const afterDelete = () => {
     return void refetch();
-  }
-
+  };
 
   return (
     <div>
-      <FavoritesHeader name={listName} id={favoriteList?.id || 0} afterDelete={afterDelete} />
-      { currentListLoading ? <div className="w-full flex justify-center h-80 items-center"> <LoadingAnimation /> </div>:favoriteList?.organizations.map((org) => (
-        <OrganizationCard org={org} key={org.id} showDescription />
-      ))}
+      <FavoritesHeader
+        name={listName}
+        id={favoriteList?.id || 0}
+        afterDelete={afterDelete}
+      />
+      {currentListLoading ? (
+        <div className="flex h-80 w-full items-center justify-center">
+          {" "}
+          <LoadingAnimation />{" "}
+        </div>
+      ) : (
+        favoriteList?.organizations.map((org) => (
+          <OrganizationCard org={org} key={org.id} showDescription />
+        ))
+      )}
       <h2 className="text-2xl font-bold text-stone-600">Your other lists:</h2>
-      <p className="text-sm mb-2">Click to view and edit</p>
-      { userLists?.map((list) => {
+      <p className="mb-2 text-sm">Click to view and edit</p>
+      {userLists?.map((list) => {
         if (list.id === favoriteListId) return null;
         return (
           <div

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "../trpc";
 import type { Prisma, PrismaClient } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 
 async function createFavoriteList(
   userId: string,
@@ -207,7 +208,7 @@ export const userRouter = router({
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      const newList = await createFavoriteList(userId, ctx.prisma, input?.name);
+      const newList = await createFavoriteList(userId, ctx.prisma, input?.name || "" + " (Copy)");
 
       return newList;
     }),
@@ -223,6 +224,9 @@ export const userRouter = router({
         id: true,
         name: true,
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
 
     ctx.session.user.currentListId
@@ -262,6 +266,107 @@ export const userRouter = router({
       });
 
       return list;
+    }
+    ),
+
+   copyFavoritesList: protectedProcedure
+    .input(z.object({ listId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const list = await ctx.prisma.favoritesList.findUnique({
+        where: {
+          id: input.listId,
+        },
+        select: {
+          name: true,
+          organizations: {
+            select: {
+              id: true
+            },
+          },
+          resources: {
+            select: {
+              id: true
+            },
+          }
+        },
+      });
+
+
+      const newList = await ctx.prisma.favoritesList.create({
+        data: {
+          adminId: userId,
+          name: list?.name || "Favorites " + " (Copy)",
+          organizations: {
+            connect: list?.organizations.map(x => ({id: x.id}))
+          },
+          resources: {
+            connect: list?.resources.map(x => ({id: x.id}))
+          }
+        },
+      });
+
+      return newList;
+    }
+    ),
+
+  deleteFavoritesList: protectedProcedure
+    .input(z.object({ listId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const list = await ctx.prisma.favoritesList.findUnique({
+        where: {
+          id: input.listId,
+        },
+        select: {
+          adminId: true,
+        },
+      });
+
+      if (list?.adminId !== userId) throw new TRPCError({code: 'FORBIDDEN', message: 'You do not have permission to delete this list'});
+
+      await ctx.prisma.favoritesList.delete({
+        where: {
+          id: input.listId,
+        },
+      });
+
+      // get most recent favorites list 
+      const recentlyCreatedListArr = await ctx.prisma.favoritesList.findMany({
+        where: {
+          adminId: userId,
+        },
+        select: {
+          id: true,
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        take: 1
+      });
+
+      if (ctx.session.user.currentListId !== input.listId) return {success: true, listId: input.listId, };
+      
+      
+      let recentlyCreatedListId = recentlyCreatedListArr[0]?.id;
+
+      if(!recentlyCreatedListId) recentlyCreatedListId =  await createFavoriteList(userId, ctx.prisma);
+
+      if(!recentlyCreatedListId) throw new Error('Could not create favorites list');
+
+
+      if(ctx.session.user.currentListId === input.listId) await ctx.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          currentListId: recentlyCreatedListId,
+        },
+      });
+
+      return {success: true, listId: input.listId, currentListId: recentlyCreatedListId };
     }
     ),
 });
