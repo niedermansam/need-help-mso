@@ -132,6 +132,7 @@ function Page() {
     return <LoadingPage />;
   }
 
+  
   return (
     <div>
       <FavoritesHeader name={listName} id={favoriteList?.id || 0} />
