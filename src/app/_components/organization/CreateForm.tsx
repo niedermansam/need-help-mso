@@ -1,7 +1,5 @@
 "use client";
-
-import React from "react";
-import type { OrganizationFormProps } from "./page";
+import { FormItemWrapper } from "@/app/_components/FormItemWrapper";
 import {
   CategorySelect,
   type CategorySelectItem,
@@ -10,26 +8,32 @@ import {
   getValidSingleValue,
 } from "@/components/Selectors";
 import { api } from "@/utils/api";
-import { FormItemWrapper } from "../../../_components/FormItemWrapper";
+import { useUserStore } from "@/utils/userStore";
+import Link from "next/link";
+import React from "react";
+import { twMerge } from "tailwind-merge";
 
-export function UpdateOrganizationForm({
-  org,
-}: {
-  org: OrganizationFormProps;
-}) {
-  const editOrganization = api.organization.update.useMutation();
-  const disconnectTag = api.organization.disconnectTag.useMutation();
+export const NEW_ORG_URL = "/admin/org/new";
 
-  type MutationOptions = Parameters<typeof editOrganization.mutate>;
+export function NewOrganizationForm() {
+  const createOrganization = api.organization.create.useMutation();
 
-  type FormValues = MutationOptions[0];
-  const [formData, setFormData] = React.useState<FormValues>({
-    id: org.id,
-  });
+  type CreateOrg = Parameters<typeof createOrganization.mutate>[0];
+
+  const [formData, setFormData] = React.useState<Partial<CreateOrg>>();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    editOrganization.mutate(formData);
+    if (!formData) return;
+
+    const { category, name, description } = formData;
+
+    if (category === undefined || category === null) return;
+    if (name === undefined || name === null) return;
+
+    if (description === undefined || description === null) return;
+
+    createOrganization.mutate({ ...formData, category, name, description });
   };
 
   const handleChange = (
@@ -58,7 +62,6 @@ export function UpdateOrganizationForm({
             type="text"
             name="name"
             id="name"
-            defaultValue={org.name}
             onChange={handleChange}
           />
         </FormItemWrapper>
@@ -73,7 +76,6 @@ export function UpdateOrganizationForm({
             className="text-bold h-full rounded border border-stone-200 p-2"
             name="description"
             id="description"
-            defaultValue={org.description}
             onChange={handleChange}
           ></textarea>
         </FormItemWrapper>
@@ -88,7 +90,6 @@ export function UpdateOrganizationForm({
             type="text"
             name="phone"
             id="phone"
-            defaultValue={org.phone || ""}
             className="text-bold rounded border border-stone-200 p-2 "
             onChange={handleChange}
           />
@@ -105,7 +106,6 @@ export function UpdateOrganizationForm({
             type="text"
             name="email"
             id="email"
-            defaultValue={org.email || ""}
             className="text-bold rounded border border-stone-200 p-2 "
             onChange={handleChange}
           />
@@ -122,7 +122,6 @@ export function UpdateOrganizationForm({
             name="website"
             className="text-bold rounded border border-stone-200 p-2 "
             id="website"
-            defaultValue={org.website || ""}
           />
         </FormItemWrapper>
         <FormItemWrapper>
@@ -138,10 +137,14 @@ export function UpdateOrganizationForm({
               setFormData((prev) => ({ ...prev, category: newValueString }));
             }}
             title=""
-            value={{
-              value: formData.category || org.category,
-              label: formData.category || org.category,
-            }}
+            value={
+              formData && formData.category
+                ? {
+                    value: formData.category,
+                    label: formData.category,
+                  }
+                : []
+            }
           />
         </FormItemWrapper>
         <FormItemWrapper>
@@ -160,29 +163,15 @@ export function UpdateOrganizationForm({
                 (x) => x.value
               );
 
-              if (formData.tags === undefined || formData.tags === null)
+              if (formData?.tags === undefined || formData.tags === null)
                 return setFormData({ ...formData, tags: newTags });
-
-              const oldTags = formData.tags.map((x) => x.trim());
-
-              // check if any tags have been removed from oldTags
-              const removedTags = oldTags.filter((x) => !newTags.includes(x));
-
-              console.log(removedTags);
-
-              if (removedTags.length > 0) {
-                // remove the tags from the org
-                removedTags.forEach((tag) => {
-                  disconnectTag.mutate({ orgId: org.id, tag: tag });
-                });
-              }
 
               setFormData({ ...formData, tags: newTags });
             }}
             value={
-              formData.tags
+              formData?.tags
                 ? formData.tags.map((x) => ({ label: x, value: x }))
-                : org.tags.map((x) => ({ label: x.tag, value: x.tag }))
+                : []
             }
           />
         </FormItemWrapper>
@@ -197,13 +186,17 @@ export function UpdateOrganizationForm({
             title=""
             onChange={(value) => {
               if (!value)
-                return setFormData({ ...formData, exclusiveToCommunities: [] });
+                return setFormData({
+                  ...formData,
+                  exclusiveToCommunities: [],
+                });
 
               const newTags = (value as CategorySelectItem[]).map(
                 (x) => x.value
               );
 
               if (
+                formData === undefined ||
                 formData.exclusiveToCommunities === undefined ||
                 formData.exclusiveToCommunities === null
               )
@@ -216,30 +209,15 @@ export function UpdateOrganizationForm({
                 x.trim()
               );
 
-              // check if any tags have been removed from oldTags
-              const removedTags = oldTags.filter((x) => !newTags.includes(x));
-
-              console.log(removedTags);
-
-              if (removedTags.length > 0) {
-                // remove the tags from the org
-                removedTags.forEach((tag) => {
-                  disconnectTag.mutate({ orgId: org.id, tag: tag });
-                });
-              }
-
               setFormData({ ...formData, exclusiveToCommunities: newTags });
             }}
             value={
-              formData.exclusiveToCommunities
+              formData?.exclusiveToCommunities
                 ? formData.exclusiveToCommunities.map((x) => ({
                     label: x,
                     value: x,
                   }))
-                : org.exclusiveToCommunities.map((x) => ({
-                    label: x.name,
-                    value: x.name,
-                  }))
+                : []
             }
           />
         </FormItemWrapper>
@@ -261,6 +239,7 @@ export function UpdateOrganizationForm({
               );
 
               if (
+                formData === undefined ||
                 formData.helpfulToCommunities === undefined ||
                 formData.helpfulToCommunities === null
               )
@@ -269,34 +248,13 @@ export function UpdateOrganizationForm({
                   helpfulToCommunities: newTags,
                 });
 
-              const oldTags = formData.helpfulToCommunities.map((x) =>
-                x.trim()
-              );
-
-              // check if any tags have been removed from oldTags
-              const removedTags = oldTags.filter((x) => !newTags.includes(x));
-
-              console.log(removedTags);
-
-              if (removedTags.length > 0) {
-                // remove the tags from the org
-                removedTags.forEach((tag) => {
-                  disconnectTag.mutate({ orgId: org.id, tag: tag });
-                });
-              }
-
               setFormData({ ...formData, helpfulToCommunities: newTags });
             }}
             value={
-              formData.helpfulToCommunities
-                ? formData.helpfulToCommunities.map((x) => ({
-                    label: x,
-                    value: x,
-                  }))
-                : org.helpfulToCommunities.map((x) => ({
-                    label: x.name,
-                    value: x.name,
-                  }))
+              formData?.helpfulToCommunities?.map((x) => ({
+                label: x,
+                value: x,
+              })) || undefined
             }
           />
         </FormItemWrapper>
@@ -306,5 +264,22 @@ export function UpdateOrganizationForm({
         </button>
       </form>
     </>
+  );
+}
+
+export function NewOrgButton ({className, ...props}: {
+  className?: string,
+  props?: React.ComponentProps<typeof Link>
+} ){
+  const admin = useUserStore((state) => state.admin);
+  
+  return (
+    admin ? <Link
+      {...props}
+      href={NEW_ORG_URL}
+      className={twMerge("bg-rose-500 text-white text-center rounded py-2 px-4 text-sm font-bold w-full", className || '') }
+    >
+      Add New Organization
+    </Link> : null
   );
 }

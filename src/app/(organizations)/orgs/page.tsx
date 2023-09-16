@@ -2,6 +2,7 @@
 import React, { type HTMLAttributes } from "react";
 import { prisma } from "@/server/db";
 import Link from "next/link";
+import { NewOrgButton } from "@/app/_components/organization/CreateForm";
 
 const CategoryLink = ({
   category,
@@ -45,6 +46,7 @@ async function OrganizationPage() {
           category="All Organizations"
           slug="all"
         />
+        <NewOrgButton className="md:col-span-2" />
       </div>
     </div>
   );
