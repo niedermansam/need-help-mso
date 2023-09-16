@@ -42,9 +42,11 @@ export function CategorySelect({ title, categories , ...attributes }: CategorySe
   categories?: string[];
 }) {
   const { data } = api.getCategoryList.useQuery();
+
+  const label = title === undefined ? "Category" : title;
   return (
     <>
-      <label className="text-lg font-light">{title || "Category"}</label>
+      <label className="text-lg font-light">{label}</label>
       <CreatableSelect
         className="mb-2.5"
         {...attributes}
@@ -83,9 +85,12 @@ export function TagSelect({ title, ...attributes }: CategorySelectProps) {
   const { data } = api.tag.getAll.useQuery(undefined, {
     enabled: !options,
   });
+
+  const label = title === undefined ? "Tags" : title;
+
   return (
     <>
-      <label className="text-lg font-light">{title || "Tags"}</label>
+      <label className="text-lg font-light">{label}</label>
       <CreatableSelect
         className="mb-2.5"
         {...attributes}
@@ -112,9 +117,11 @@ export function CommunitySelect({
     enabled: !options,
   });
 
+  const label = title === undefined ? "Community" : title;
+
   return (
     <>
-      <label className="text-lg font-light">{title || "Community"}</label>
+      <label className="text-lg font-light">{label}</label>
       <CreatableSelect
         className="mb-2.5"
         {...attributes}
@@ -206,11 +213,16 @@ export const validateMultivalueArray = (
 export const getValidMultivalueArray = (
   array: MultiValue<CategorySelectItem> | CategorySelectItem
 ): MultiValue<CategorySelectItem> => {
+  let copy;
+  console.log(copy)
   if (validateMultivalueArray(array)) {
-    return array;
+    copy = array;
+    return copy;
   }
   return [];
 };
+
+
 
 export const validateSingleValue = (
   value: unknown

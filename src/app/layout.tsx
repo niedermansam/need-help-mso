@@ -14,10 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-stone-50">
         <Providers>
           <NavBar />
-          {children}
+          <main className=" bg-stone-50">
+            <div className="px-4 py-6 sm:px-8 md:px-12">{children}</div>
+          </main>
         </Providers>
       </body>
     </html>

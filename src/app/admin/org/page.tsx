@@ -2,7 +2,7 @@ import React from 'react'
 
 function Page() {
   return (
-    <div>Edit org page</div>
+    <div>Page to edit all orgs at once.</div>
   )
 }
 

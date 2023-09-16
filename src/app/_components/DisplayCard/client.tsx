@@ -39,7 +39,7 @@ export function EditButton({orgId}: {orgId: string}) {
     const admin = useUserStore(state => state.admin)
 
     return (
-        admin ? <Link href={`/org/${orgId}/edit`} className="mr-1">
+        admin ? <Link href={`/admin/org/${orgId}/`} className="mr-1">
             <FontAwesomeIcon
                 className="text-stone-500 hover:text-rose-500"
                 icon={faEdit}

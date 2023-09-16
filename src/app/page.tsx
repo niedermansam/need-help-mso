@@ -64,7 +64,7 @@ const Description = () => {
 
 const Home: NextPage = () => {
   return (
-        <div className="flex min-h-screen items-center justify-center bg-stone-100 md:p-20">
+        <div className="flex min-h-screen items-center justify-center bg-stone-50 md:p-20">
           <div className="flex max-w-6xl  flex-wrap justify-center rounded-xl border border-stone-200 bg-white  pb-10 pt-20 shadow-xl md:px-6">
             <Title />
             <Description />
