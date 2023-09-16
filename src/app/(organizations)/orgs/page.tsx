@@ -3,22 +3,25 @@ import React, { type HTMLAttributes } from "react";
 import { prisma } from "@/server/db";
 import Link from "next/link";
 import { NewOrgButton } from "@/app/_components/organization/CreateForm";
+import { twMerge } from "tailwind-merge";
 
 const CategoryLink = ({
   category,
   slug,
   className,
+  divClassName
 }: {
   category: string;
   slug: string;
   className?: HTMLAttributes<HTMLDivElement>["className"];
+  divClassName?: HTMLAttributes<HTMLDivElement>["className"];
 }) => (
   <Link
     href={`/orgs/${slug}`}
     className={className}
   >
     <div
-      className={`text-2xl font-bold text-stone-600 flex h-24 items-center justify-center rounded shadow hover:shadow-lg cursor-pointer hover:scale-105 transition-all hover:text-rose-600 bg-white` }
+      className={twMerge(`text-2xl font-bold text-stone-600 flex h-24 items-center justify-center rounded shadow hover:shadow-lg cursor-pointer hover:scale-105 transition-all hover:text-rose-600 bg-white`, divClassName) }
     >
       {category}
     </div>
@@ -42,11 +45,12 @@ async function OrganizationPage() {
           />
         ))}
         <CategoryLink
-          className=" md:col-span-2"
+          className="col-span-auto"
+          divClassName="bg-rose-500 text-white hover:bg-rose-600 hover:text-white"
           category="All Organizations"
           slug="all"
         />
-        <NewOrgButton className="sm:col-span-2 md:col-span-3" />
+        <NewOrgButton className=" col-span-full"  />
       </div>
     </div>
   );
