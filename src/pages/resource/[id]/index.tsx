@@ -5,7 +5,7 @@ import type {
   InferGetServerSidePropsType,
 } from "next/types";
 import { prisma } from "../../../server/db";
-import type { Community, Organization, Resource, Tag } from "@prisma/client";
+import type { Community, Organization, Program, Tag } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import { CategoryLink } from "..";
@@ -13,8 +13,8 @@ import { ContactInfo } from "../../../components/ContactInfo";
 import { TagLink } from "../../../components/Tags";
 import { EditLink } from "../../../components";
 
-export default function ResourcePage({
-  resource,
+export default function ProgramPage({
+  program,
   admin,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
@@ -22,37 +22,37 @@ export default function ResourcePage({
       <NavBar />
       <div className="px-6 pt-16 text-stone-600">
         <h1 className="text-3xl font-bold">
-          {resource.name}
-          {admin && <EditLink href={`/resource/${resource.id}/edit`} />}
+          {program.name}
+          {admin && <EditLink href={`/program/${program.id}/edit`} />}
         </h1>
         <div className="mb-2 text-lg font-bold">
           Help With&nbsp;
           <CategoryLink
             className=" text-rose-500 hover:text-rose-700"
-            category={resource.category}
+            category={program.category}
           />
           &nbsp;From&nbsp;
           <Link
             className="text-xl text-rose-500 hover:text-rose-700"
-            href={`/org/${resource.organizationId}`}
+            href={`/org/${program.organizationId}`}
           >
-            {resource.organization.name}
+            {program.organization.name}
           </Link>
         </div>
         <div className="mb-6  flex flex-wrap">
           <div className="flex flex-col">
             <h3 className="font-semibold text-stone-500">Contact Info:</h3>
             <ContactInfo
-              phone={resource.organization.phone}
-              email={resource.organization.email}
-              website={resource.url || resource.organization.website}
+              phone={program.organization.phone}
+              email={program.organization.email}
+              website={program.url || program.organization.website}
             />
           </div>
           <div>
             <div className=" mx-6">
               <h3 className=" font-semibold text-stone-500">Tags:</h3>
-              {resource.tags.map((tag) => (
-                <TagLink tag={tag.tag} key={`${tag.tag} ${resource.id}`} />
+              {program.tags.map((tag) => (
+                <TagLink tag={tag.tag} key={`${tag.tag} ${program.id}`} />
               ))}
             </div>
           </div>
@@ -61,7 +61,7 @@ export default function ResourcePage({
           <h3 className="mb-2 font-semibold leading-4 text-stone-500">
             Description:
           </h3>
-          <p className="mb-2">{resource.description}</p>
+          <p className="mb-2">{program.description}</p>
         </div>
       </div>
     </div>
@@ -71,8 +71,8 @@ export default function ResourcePage({
 type CommunityPick = Pick<Community, "name">;
 
 type ServerSideProps = {
-  resource: Pick<
-    Resource,
+  program: Pick<
+    Program,
     "name" | "id" | "category" | "organizationId" | "url" | "description"
   > & {
     organization: Pick<
@@ -96,7 +96,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 
   const admin = (session && session.user && session.user.admin) || false;
 
-  const returnResource = await prisma.resource.findUnique({
+  const returnProgram = await prisma.program.findUnique({
     where: {
       id: id as string,
     },
@@ -135,19 +135,19 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     },
   });
 
-  if (!returnResource) {
+  if (!returnProgram) {
     return {
       notFound: true,
     };
   }
 
-  const resource = {
-    ...returnResource,
+  const program = {
+    ...returnProgram,
   };
 
   return {
     props: {
-      resource,
+      program,
       session,
       admin,
     },

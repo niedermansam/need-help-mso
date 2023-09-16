@@ -10,7 +10,7 @@ const getOrganization = async (id: string) => {
       id: id,
     },
     include: {
-      resources: {
+      programs: {
         include: {
           tags: true,
           categoryMeta: true,

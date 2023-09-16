@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 import { adminProcedure, router, publicProcedure } from "../trpc";
-import { getTagsFromResources } from "./tag";
+import { getTagsFromPrograms } from "./tag";
 import type { PrismaClient, Prisma } from "@prisma/client";
 
-const createResourceId = async (
+const createProgramId = async (
   name: string,
   orgId: string,
   prisma: PrismaClient<Prisma.PrismaClientOptions>
@@ -12,7 +12,7 @@ const createResourceId = async (
   let newId = name.replace(/\s/g, "-").toLowerCase();
 
   const newIdIsUnique =
-    (await prisma.resource.findUnique({
+    (await prisma.program.findUnique({
       where: {
         id: newId,
       },
@@ -47,9 +47,9 @@ const createResourceId = async (
   return `${newId}-${orgId}`;
 };
 
-export const resourceRouter = router({
+export const programRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const resources = await ctx.prisma.resource.findMany({
+    const programs = await ctx.prisma.program.findMany({
       include: {
         tags: true,
         categoryMeta: true,
@@ -63,10 +63,10 @@ export const resourceRouter = router({
         },
       },
     });
-    return resources;
+    return programs;
   }),
   getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const resource = await ctx.prisma.resource.findUnique({
+    const program = await ctx.prisma.program.findUnique({
       where: {
         id: input,
       },
@@ -79,13 +79,13 @@ export const resourceRouter = router({
         helpingOrganizations: true,
       },
     });
-    return resource;
+    return program;
   }),
   getByCategory: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
       try {
-        const resources = await ctx.prisma.resource.findMany({
+        const programs = await ctx.prisma.program.findMany({
           where: {
             category: {
               equals: input,
@@ -98,9 +98,9 @@ export const resourceRouter = router({
           },
         });
 
-        const uniqueTags = getTagsFromResources(resources);
+        const uniqueTags = getTagsFromPrograms(programs);
 
-        return { resources, tags: uniqueTags };
+        return { programs, tags: uniqueTags };
       } catch (e) {
         console.log(e);
       }
@@ -145,7 +145,7 @@ export const resourceRouter = router({
       let newId = name.replace(/\s/g, "-").toLowerCase();
 
       const newIdIsUnique =
-        (await ctx.prisma.resource.findUnique({
+        (await ctx.prisma.program.findUnique({
           where: {
             id: newId,
           },
@@ -177,9 +177,9 @@ export const resourceRouter = router({
         newId = `${newId}-${orgInitials}`;
       }
 
-      const newResource = await ctx.prisma.resource.create({
+      const newProgram = await ctx.prisma.program.create({
         data: {
-          id: await createResourceId(name, orgId, ctx.prisma),
+          id: await createProgramId(name, orgId, ctx.prisma),
           name: name,
           description: description,
           url: url,
@@ -238,7 +238,7 @@ export const resourceRouter = router({
           free: free,
         },
       });
-      return newResource;
+      return newProgram;
     }),
   update: adminProcedure
     .input(
@@ -280,14 +280,12 @@ export const resourceRouter = router({
         orgId,
       } = input;
 
-      const resource = await ctx.prisma.resource.update({
+      const program = await ctx.prisma.program.update({
         where: {
           id: id,
         },
         data: {
-          id: name
-            ? await createResourceId(name, orgId, ctx.prisma)
-            : undefined,
+          id: name ? await createProgramId(name, orgId, ctx.prisma) : undefined,
           name: name || undefined,
           description: description || undefined,
           categoryMeta: category
@@ -359,22 +357,22 @@ export const resourceRouter = router({
         });
       }
 
-      return resource;
+      return program;
     }),
 
   reassignAdministeringOrg: adminProcedure
     .input(
       z.object({
-        resourceId: z.string(),
+        programId: z.string(),
         orgId: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { resourceId, orgId } = input;
+      const { programId, orgId } = input;
 
-      const resource = await ctx.prisma.resource.update({
+      const program = await ctx.prisma.program.update({
         where: {
-          id: resourceId,
+          id: programId,
         },
         data: {
           organization: {
@@ -384,6 +382,6 @@ export const resourceRouter = router({
           },
         },
       });
-      return resource;
+      return program;
     }),
 });

@@ -11,7 +11,7 @@ async function Page({ params }: { params: { id: string } }) {
       id: params.id,
     },
     include: {
-      resources: {
+      programs: {
         include: {
           tags: true,
           categoryMeta: true,

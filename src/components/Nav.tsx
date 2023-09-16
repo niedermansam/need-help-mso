@@ -1,4 +1,3 @@
-
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -16,7 +15,7 @@ const NavLink = ({
   return (
     <Link
       href={href}
-      className={`mt-4 mr-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block ${
+      className={`mr-4 mt-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block ${
         isActive ? "font-bold text-white" : ""
       }`}
     >
@@ -65,9 +64,9 @@ export default function NavBar() {
             isActive={/\/about/.test(router.pathname)}
           />
           <NavLink
-            href="/resource"
-            label="Resources"
-            isActive={/\/resource/.test(router.pathname)}
+            href="/program"
+            label="Programs"
+            isActive={/\/program/.test(router.pathname)}
           />
           <NavLink
             href="/org"

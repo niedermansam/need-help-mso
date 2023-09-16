@@ -9,14 +9,14 @@ import type {
   Category,
   Community,
   Organization,
-  Resource,
+  Program,
   Tag,
 } from "@prisma/client";
 import type { Session } from "next-auth";
 
 import { EditLink } from "../../components";
 import { ContactInfo } from "../../components/ContactInfo";
-import { ResourceCard } from "../../components/DisplayCard";
+import { ProgramCard } from "../../components/DisplayCard";
 import { api } from "../../utils/api";
 
 export default function OrganizationDetailsPage({
@@ -55,14 +55,14 @@ export default function OrganizationDetailsPage({
           <p>{orgData.description}</p>
         </div>
       </div>
-      <h2 className="mx-6 mt-6 text-2xl font-bold">Available Resources</h2>
-      {orgData.resources.map((resource) => {
+      <h2 className="mx-6 mt-6 text-2xl font-bold">Available Programs</h2>
+      {orgData.programs.map((program) => {
         return (
-          <ResourceCard
-            resource={{ ...resource, organization: { ...orgData } }}
-            key={resource.id}
+          <ProgramCard
+            program={{ ...program, organization: { ...orgData } }}
+            key={program.id}
             showOrg={false}
-            favoritesArray={favorites?.resources || []}
+            favoritesArray={favorites?.programs || []}
           />
         );
       })}
@@ -74,7 +74,7 @@ export type OrgReturnProps = Organization & {
   tags: Tag[];
   exclusiveToCommunities: Community[];
   helpfulToCommunities: Community[];
-  resources: (Resource & {
+  programs: (Program & {
     tags: Tag[];
     categoryMeta: Category;
   })[];
@@ -102,7 +102,7 @@ export const getServerSideProps: GetServerSideProps<
       id: orgId,
     },
     include: {
-      resources: {
+      programs: {
         include: {
           tags: true,
           categoryMeta: true,

@@ -2,16 +2,16 @@ import { z } from "zod";
 
 import { adminProcedure, router, publicProcedure } from "../trpc";
 import { decodeTag } from "../../../utils/manageUrl";
-import type { Resource, Organization, Tag, Category } from "@prisma/client";
+import type { Program, Organization, Tag, Category } from "@prisma/client";
 
-type ResourceArray = (Resource & {
+type ProgramArray = (Program & {
   organization: Organization;
   tags: Tag[];
   categoryMeta: Category;
 })[];
 
-export const getTagsFromResources = (resources: ResourceArray) => {
-  const tags = resources.map((resource) => resource.tags).flat();
+export const getTagsFromPrograms = (programs: ProgramArray) => {
+  const tags = programs.map((program) => program.tags).flat();
   const uniqueTags = [...new Set(tags.map((tag) => tag.tag))];
   return uniqueTags;
 };
@@ -26,18 +26,18 @@ export const tagRouter = router({
     }
   }),
   connectCategories: adminProcedure.mutation(async ({ ctx }) => {
-    const resources = await ctx.prisma.resource.findMany({
+    const programs = await ctx.prisma.program.findMany({
       include: { tags: true },
     });
 
-    for (const resource of resources) {
-      for (const tag of resource.tags) {
+    for (const program of programs) {
+      for (const tag of program.tags) {
         await ctx.prisma.tag.update({
           where: { tag: tag.tag },
           data: {
             categories: {
               connect: {
-                category: resource.category,
+                category: program.category,
               },
             },
           },
@@ -91,23 +91,23 @@ export const tagRouter = router({
       return true;
     }),
 
-  connectResource: adminProcedure
-    .input(z.object({ resourceId: z.string(), tag: z.string() }))
+  connectProgram: adminProcedure
+    .input(z.object({ programId: z.string(), tag: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.tag.upsert({
         where: { tag: input.tag },
         create: {
           tag: input.tag,
-          resources: {
+          programs: {
             connect: {
-              id: input.resourceId,
+              id: input.programId,
             },
           },
         },
         update: {
-          resources: {
+          programs: {
             connect: {
-              id: input.resourceId,
+              id: input.programId,
             },
           },
         },
@@ -116,7 +116,7 @@ export const tagRouter = router({
       return true;
     }),
 
-  getResources: publicProcedure
+  getPrograms: publicProcedure
     .input(z.object({ tag: z.string() }))
     .query(async ({ ctx, input }) => {
       try {
@@ -128,7 +128,7 @@ export const tagRouter = router({
             },
           },
           select: {
-            resources: {
+            programs: {
               select: {
                 id: true,
                 name: true,
@@ -168,10 +168,10 @@ export const tagRouter = router({
           },
         });
 
-        const resources = tagArray.map((tag) => tag.resources).flat();
+        const programs = tagArray.map((tag) => tag.programs).flat();
         const organizations = tagArray.map((tag) => tag.organizations).flat();
 
-        return { resources, organizations };
+        return { programs, organizations };
       } catch (err) {
         console.log(err);
       }

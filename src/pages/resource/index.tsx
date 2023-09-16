@@ -12,14 +12,14 @@ import {
 import { CategorySelect, TagSelect } from "../../components/Selectors";
 import ReactModal from "react-modal";
 import {
-  ResourceCard,
-  type ResourceCardInformation,
+  ProgramCard,
+  type ProgramCardInformation,
 } from "../../components/DisplayCard";
 import LoadingPage from "../../components/LoadingPage";
 import Custom404 from "../404";
 import { useSession } from "next-auth/react";
 
-type CreateResourceProps = {
+type CreateProgramProps = {
   name: string;
   description: string;
   url: string;
@@ -39,9 +39,9 @@ type CreateResourceProps = {
  * 
       <Link
         className="basis-32"
-        href={`/cat/${encodeTag(resource.categoryMeta.category)}`}
+        href={`/cat/${encodeTag(program.categoryMeta.category)}`}
       >
-        {resource.categoryMeta.category}
+        {program.categoryMeta.category}
       </Link> */
 
 export function CategoryLink({
@@ -58,7 +58,7 @@ export function CategoryLink({
     </Link>
   );
 }
-export function CreateResourceModal({ orgId }: { orgId: string }) {
+export function CreateProgramModal({ orgId }: { orgId: string }) {
   const [showModal, setShowModal] = useState(false);
 
   return (
@@ -68,7 +68,7 @@ export function CreateResourceModal({ orgId }: { orgId: string }) {
         onClick={() => setShowModal(true)}
         type="button"
       >
-        Add Resource
+        Add Program
       </button>
       <ReactModal
         className="w-fit"
@@ -83,14 +83,14 @@ export function CreateResourceModal({ orgId }: { orgId: string }) {
           },
         }}
       >
-        <CreateResourceForm orgId={orgId} />
+        <CreateProgramForm orgId={orgId} />
       </ReactModal>
     </>
   );
 }
 
-export function CreateResourceForm({ orgId }: { orgId: string }) {
-  const INIT_RESOURCE: CreateResourceProps = {
+export function CreateProgramForm({ orgId }: { orgId: string }) {
+  const INIT_RESOURCE: CreateProgramProps = {
     name: "",
     description: "",
     url: "",
@@ -107,7 +107,7 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
 
   const [formData, setFormData] = useState({ ...INIT_RESOURCE });
 
-  const addResource = api.resource.create.useMutation({
+  const addProgram = api.program.create.useMutation({
     onSuccess: () =>
       setFormData({ ...INIT_RESOURCE, category: formData.category }),
   });
@@ -117,7 +117,7 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
   return (
     <div className="m-6 flex w-fit flex-col rounded-lg border border-stone-300 bg-stone-50 p-6">
       <h1 className="max-w-full flex-grow text-center text-5xl font-extrabold text-stone-600">
-        Create New Resource
+        Create New Program
       </h1>
       <form className="flex  justify-center">
         <div className="m-2 flex w-80 flex-col">
@@ -145,7 +145,7 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
                 setFormData({ ...formData, free: e.target.checked })
               }
             />
-            <label>Free Resource</label>
+            <label>Free Program</label>
           </div>
           <label className="text-lg font-light" htmlFor="description">
             Description
@@ -174,7 +174,7 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
           <button
             className="w-full rounded bg-rose-500 px-2 py-1.5 font-bold tracking-wide text-rose-50"
             onClick={() =>
-              addResource.mutate({
+              addProgram.mutate({
                 name: formData.name,
                 description: formData.description,
                 url: formData.url,
@@ -280,12 +280,12 @@ export function CreateResourceForm({ orgId }: { orgId: string }) {
   );
 }
 
-export function ResourceSection({
-  resources,
+export function ProgramSection({
+  programs,
   isLoggedIn,
   isAdmin,
 }: {
-  resources: ResourceCardInformation[];
+  programs: ProgramCardInformation[];
   isLoggedIn: boolean;
   isAdmin?: boolean;
 }) {
@@ -296,9 +296,9 @@ export function ResourceSection({
     }
   );
 
-  const allResources = resources;
-  const [visibleResources, setVisibleResources] =
-    useState<ResourceCardInformation[]>(resources);
+  const allPrograms = programs;
+  const [visiblePrograms, setVisiblePrograms] =
+    useState<ProgramCardInformation[]>(programs);
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -309,10 +309,10 @@ export function ResourceSection({
   const allTags = useMemo(() => {
     return [
       ...new Set(
-        resources.flatMap((resource) => resource.tags.map((tag) => tag.tag))
+        programs.flatMap((program) => program.tags.map((tag) => tag.tag))
       ),
     ];
-  }, [resources]);
+  }, [programs]);
 
   const [displayTags, setDisplayTags] = useState(allTags);
 
@@ -321,51 +321,43 @@ export function ResourceSection({
   useEffect(() => {
     if (selectedTags.length === 0 && !selectedCategory) {
       setDisplayTags(allTags);
-      setVisibleResources(resources);
+      setVisiblePrograms(programs);
       return;
     }
 
-    const filteredByCategory = resources.filter((resource) => {
+    const filteredByCategory = programs.filter((program) => {
       if (!selectedCategory) return true;
-      return resource.category === selectedCategory;
+      return program.category === selectedCategory;
     });
 
-    const newResourceList = filteredByCategory.filter((resource) => {
-      const resourceTags = resource.tags.map((tag) => tag.tag);
+    const newProgramList = filteredByCategory.filter((program) => {
+      const programTags = program.tags.map((tag) => tag.tag);
       if (selectedTags.length === 0) return true;
-      if (strict)
-        return selectedTags.every((tag) => resourceTags.includes(tag));
-      else return selectedTags.some((tag) => resourceTags.includes(tag));
+      if (strict) return selectedTags.every((tag) => programTags.includes(tag));
+      else return selectedTags.some((tag) => programTags.includes(tag));
     });
 
-    setVisibleResources(newResourceList);
+    setVisiblePrograms(newProgramList);
 
     if (strict) {
       // create a list of available tags
-      const availableTags = newResourceList.flatMap((resource) =>
-        resource.tags.map((tag) => tag.tag)
+      const availableTags = newProgramList.flatMap((program) =>
+        program.tags.map((tag) => tag.tag)
       );
 
       const uniqueTags = [...new Set(availableTags)];
 
       setDisplayTags(uniqueTags);
     } else {
-      const availableTags = filteredByCategory.flatMap((resource) =>
-        resource.tags.map((tag) => tag.tag)
+      const availableTags = filteredByCategory.flatMap((program) =>
+        program.tags.map((tag) => tag.tag)
       );
 
       const uniqueTags = [...new Set(availableTags)];
 
       setDisplayTags(uniqueTags);
     }
-  }, [
-    selectedTags,
-    allResources,
-    resources,
-    strict,
-    selectedCategory,
-    allTags,
-  ]);
+  }, [selectedTags, allPrograms, programs, strict, selectedCategory, allTags]);
 
   return (
     <div className="mr-6 w-full">
@@ -412,11 +404,11 @@ export function ResourceSection({
         </div>
       </div>
       <div className="mr-6">
-        {visibleResources.map((resource) => (
-          <ResourceCard
-            key={resource.id}
-            resource={resource}
-            favoritesArray={favorites?.resources || []}
+        {visiblePrograms.map((program) => (
+          <ProgramCard
+            key={program.id}
+            program={program}
+            favoritesArray={favorites?.programs || []}
             loggedIn={isLoggedIn}
             admin={isAdmin}
           />
@@ -426,12 +418,8 @@ export function ResourceSection({
   );
 }
 
-export default function ResourcePage() {
-  const {
-    data: resources,
-    isLoading,
-    isError,
-  } = api.resource.getAll.useQuery();
+export default function ProgramPage() {
+  const { data: programs, isLoading, isError } = api.program.getAll.useQuery();
 
   const session = useSession().data;
 
@@ -442,15 +430,15 @@ export default function ResourcePage() {
   if (isLoading) return <LoadingPage />;
   if (isError) return <Custom404 />;
 
-  if (resources)
+  if (programs)
     return (
       <div className="w-screen text-stone-600">
         <NavBar />
         <div className="px-4 pt-12 text-4xl font-bold">
-          <h1 className="my-2">Resources</h1>
+          <h1 className="my-2">Programs</h1>
         </div>
-        <ResourceSection
-          resources={resources}
+        <ProgramSection
+          programs={programs}
           isLoggedIn={isLoggedIn}
           isAdmin={isAdmin}
         />

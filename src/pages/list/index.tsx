@@ -5,18 +5,23 @@ import type {
 import NavBar from "../../components/Nav";
 import { getSession } from "next-auth/react";
 import { prisma } from "../../server/db";
-import { OrganizationCard, ResourceCard, type ResourceCardInformation } from "../../components/DisplayCard";
+import {
+  OrganizationCard,
+  ProgramCard,
+  type ProgramCardInformation,
+} from "../../components/DisplayCard";
 
-function ResourceSection({
-  resources,
-}: {
-  resources: ResourceCardInformation[];
-}) {
+function ProgramSection({ programs }: { programs: ProgramCardInformation[] }) {
   return (
     <div className="mt-6">
-      <h2 className="text-3xl font-bold text-stone-500">Resources</h2>
-      {resources.map((resource) => (
-        <ResourceCard key={resource.id} resource={resource} favoritesArray={[resource.id]} loggedIn={true}/>
+      <h2 className="text-3xl font-bold text-stone-500">Programs</h2>
+      {programs.map((program) => (
+        <ProgramCard
+          key={program.id}
+          program={program}
+          favoritesArray={[program.id]}
+          loggedIn={true}
+        />
       ))}
     </div>
   );
@@ -56,15 +61,15 @@ function OrganizationSection({
 export default function ListsPage({
   favorites,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const hasFavoriteResources = favorites.resources.length > 0;
+  const hasFavoritePrograms = favorites.programs.length > 0;
   const hasFavoriteOrganizations = favorites.organizations.length > 0;
   return (
     <div>
       <NavBar />
       <div className="mx-6 pt-14">
         <h1 className=" text-5xl font-extrabold text-stone-500">Favorites</h1>
-        {hasFavoriteResources && (
-          <ResourceSection resources={favorites.resources} />
+        {hasFavoritePrograms && (
+          <ProgramSection programs={favorites.programs} />
         )}
         {hasFavoriteOrganizations && (
           <OrganizationSection organizations={favorites.organizations} />
@@ -78,7 +83,7 @@ type ServerSideProps = {
   favorites: {
     name: string;
     id: number;
-    resources: {
+    programs: {
       name: string;
       id: string;
       url: string | null;
@@ -132,7 +137,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     select: {
       name: true,
       id: true,
-      resources: {
+      programs: {
         select: {
           name: true,
           id: true,
@@ -196,7 +201,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 
     return {
       props: {
-        favorites: { ...newList, resources: [], organizations: [] },
+        favorites: { ...newList, programs: [], organizations: [] },
       },
     };
   }

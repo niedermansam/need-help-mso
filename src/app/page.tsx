@@ -1,7 +1,6 @@
 import { type NextPage } from "next";
 import Link from "next/link";
 
-
 const CallToAction: React.FC = () => {
   return (
     <div className="m-4 mt-4 flex w-full flex-col justify-around md:flex-row">
@@ -36,7 +35,7 @@ const Title = () => {
       </h1>{" "}
       <p className="my-4 w-full text-center tracking-tight">
         <span className=" text-xl font-bold text-stone-400 md:text-xl lg:text-2xl  ">
-          A digital directory of resources for people
+          A digital directory of programs for people
         </span>{" "}
         <br />{" "}
         <span className="text-lg font-bold text-stone-400 md:text-xl lg:text-2xl">
@@ -53,7 +52,7 @@ const Description = () => {
       <p className=" text-xl font-light leading-8">
         We hope to be a hub for different organizations and groups that help
         people who need a hand. A place where social workers, case managers, and
-        other professionals can find resources for their clients. But right now,
+        other professionals can find programs for their clients. But right now,
         we&apos;re still under construction. Check out the development timeline
         for more information about when to check back, and consider supporting
         our efforts on Patreon.
@@ -64,16 +63,14 @@ const Description = () => {
 
 const Home: NextPage = () => {
   return (
-        <div className="flex min-h-screen items-center justify-center bg-stone-50 md:p-20">
-          <div className="flex max-w-6xl  flex-wrap justify-center rounded-xl border border-stone-200 bg-white  pb-10 pt-20 shadow-xl md:px-6">
-            <Title />
-            <Description />
-            <CallToAction />
-          </div>
-        </div>
+    <div className="flex min-h-screen items-center justify-center bg-stone-50 md:p-20">
+      <div className="flex max-w-6xl  flex-wrap justify-center rounded-xl border border-stone-200 bg-white  pb-10 pt-20 shadow-xl md:px-6">
+        <Title />
+        <Description />
+        <CallToAction />
+      </div>
+    </div>
   );
 };
 
 export default Home;
-
-

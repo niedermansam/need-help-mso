@@ -3,11 +3,11 @@ import NavBar from "../../../components/Nav";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { getSession, useSession } from "next-auth/react";
 import { prisma } from "../../../server/db";
-import type { Community, Resource, Tag } from "@prisma/client";
+import type { Community, Program, Tag } from "@prisma/client";
 import {
   type OrgCardProps,
   OrganizationCard,
-  ResourceCard,
+  ProgramCard,
 } from "../../../components/DisplayCard";
 import {
   CategorySelect,
@@ -18,7 +18,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../../../utils/api";
 
-export default function CommunityResourcesPage(
+export default function CommunityProgramsPage(
   props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
   const session = useSession();
@@ -26,9 +26,9 @@ export default function CommunityResourcesPage(
   const communityHasOrgs =
     props.data.exclusiveOrgs.length > 0 || props.data.helpfulOrgs.length > 0;
 
-  const communityHasResources =
-    props.data.exclusiveResources.length > 0 ||
-    props.data.helpfulResources.length > 0;
+  const communityHasPrograms =
+    props.data.exclusivePrograms.length > 0 ||
+    props.data.helpfulPrograms.length > 0;
   const isLoggedIn = !!session.data?.user;
 
   const { data: favorites } = api.user.getCurrentFavoritesList.useQuery(
@@ -48,13 +48,13 @@ export default function CommunityResourcesPage(
     return props.data.exclusiveOrgs.concat(props.data.helpfulOrgs);
   }, [props.data.exclusiveOrgs, props.data.helpfulOrgs]);
 
-  const allResources = useMemo(() => {
-    return props.data.exclusiveResources.concat(props.data.helpfulResources);
-  }, [props.data.exclusiveResources, props.data.helpfulResources]);
+  const allPrograms = useMemo(() => {
+    return props.data.exclusivePrograms.concat(props.data.helpfulPrograms);
+  }, [props.data.exclusivePrograms, props.data.helpfulPrograms]);
 
   const [visibleOrgs, setVisibleOrgs] = useState<OrgCardProps[]>(allOrgs);
-  const [visibleResources, setVisibleResources] =
-    useState<ResourceReturn[]>(allResources);
+  const [visiblePrograms, setVisiblePrograms] =
+    useState<ProgramReturn[]>(allPrograms);
 
   useEffect(() => {
     let newOrgs = allOrgs;
@@ -76,25 +76,25 @@ export default function CommunityResourcesPage(
   }, [selectedCategory, selectedTags, allOrgs, strict]);
 
   useEffect(() => {
-    let newResources = allResources;
+    let newPrograms = allPrograms;
     if (selectedCategory !== undefined) {
-      newResources = newResources.filter(
-        (resource) => resource.category === selectedCategory
+      newPrograms = newPrograms.filter(
+        (program) => program.category === selectedCategory
       );
     }
     if (selectedTags.length > 0) {
-      newResources = newResources.filter((resource) => {
-        const resourceTags = resource.tags.map((tag) => tag.tag);
+      newPrograms = newPrograms.filter((program) => {
+        const programTags = program.tags.map((tag) => tag.tag);
         if (strict) {
-          return selectedTags.every((tag) => resourceTags.includes(tag));
+          return selectedTags.every((tag) => programTags.includes(tag));
         } else {
-          return selectedTags.some((tag) => resourceTags.includes(tag));
+          return selectedTags.some((tag) => programTags.includes(tag));
         }
       });
     }
 
-    setVisibleResources(newResources);
-  }, [selectedCategory, selectedTags, allResources, strict]);
+    setVisiblePrograms(newPrograms);
+  }, [selectedCategory, selectedTags, allPrograms, strict]);
 
   return (
     <div>
@@ -167,15 +167,15 @@ export default function CommunityResourcesPage(
             ))}
           </div>
         )}
-        {communityHasResources && (
+        {communityHasPrograms && (
           <div>
-            <h2 className="text-2xl font-bold text-gray-700">Resources</h2>
-            {visibleResources.map((resource) => (
-              <ResourceCard
-                key={resource.id}
-                resource={resource}
+            <h2 className="text-2xl font-bold text-gray-700">Programs</h2>
+            {visiblePrograms.map((program) => (
+              <ProgramCard
+                key={program.id}
+                program={program}
                 admin={isAdmin}
-                favoritesArray={favorites?.resources || []}
+                favoritesArray={favorites?.programs || []}
               />
             ))}
           </div>
@@ -193,8 +193,8 @@ type ServerSideProps = {
   categories: string[];
 };
 
-type ResourceReturn = Pick<
-  Resource,
+type ProgramReturn = Pick<
+  Program,
   "name" | "id" | "url" | "category" | "organizationId"
 > & {
   tags: Pick<Tag, "tag">[];
@@ -210,8 +210,8 @@ type ResourceReturn = Pick<
 type DataReturn = Community & {
   exclusiveOrgs: OrgCardProps[];
   helpfulOrgs: OrgCardProps[];
-  exclusiveResources: ResourceReturn[];
-  helpfulResources: ResourceReturn[];
+  exclusivePrograms: ProgramReturn[];
+  helpfulPrograms: ProgramReturn[];
 };
 
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
@@ -223,7 +223,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 
   const communityId = context.query.id as string;
 
-  const selectResourcesObject = {
+  const selectProgramsObject = {
     select: {
       tags: {
         select: {
@@ -248,13 +248,13 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     },
   } as const;
 
-  const resources = await prisma.community.findUnique({
+  const programs = await prisma.community.findUnique({
     where: {
       id: communityId,
     },
     include: {
-      exclusiveResources: selectResourcesObject,
-      helpfulResources: selectResourcesObject,
+      exclusivePrograms: selectProgramsObject,
+      helpfulPrograms: selectProgramsObject,
 
       exclusiveOrgs: {
         select: {
@@ -281,7 +281,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     },
   });
 
-  if (!resources) {
+  if (!programs) {
     return {
       notFound: true,
     };
@@ -289,31 +289,29 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 
   const categorySet = new Set<string>();
 
-  const exclusiveResouceTags = resources.exclusiveResources.flatMap(
-    (resource) => {
-      categorySet.add(resource.category);
-      return resource.tags.map((tag) => tag.tag);
-    }
-  );
-
-  const helpfulResourceTags = resources.helpfulResources.flatMap((resource) => {
-    categorySet.add(resource.category);
-    return resource.tags.map((tag) => tag.tag);
+  const exclusiveResouceTags = programs.exclusivePrograms.flatMap((program) => {
+    categorySet.add(program.category);
+    return program.tags.map((tag) => tag.tag);
   });
 
-  const exclusiveOrgTags = resources.exclusiveOrgs.flatMap((org) => {
+  const helpfulProgramTags = programs.helpfulPrograms.flatMap((program) => {
+    categorySet.add(program.category);
+    return program.tags.map((tag) => tag.tag);
+  });
+
+  const exclusiveOrgTags = programs.exclusiveOrgs.flatMap((org) => {
     categorySet.add(org.category);
     return org.tags.map((tag) => tag.tag);
   });
 
-  const helpfulOrgTags = resources.helpfulOrgs.flatMap((org) => {
+  const helpfulOrgTags = programs.helpfulOrgs.flatMap((org) => {
     categorySet.add(org.category);
     return org.tags.map((tag) => tag.tag);
   });
 
   const allTags = [
     ...exclusiveResouceTags,
-    ...helpfulResourceTags,
+    ...helpfulProgramTags,
     ...exclusiveOrgTags,
     ...helpfulOrgTags,
   ];
@@ -325,7 +323,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   return {
     props: {
       userSession: session,
-      data: resources,
+      data: programs,
       admin: isAdmin,
       tags: uniqueTags,
       categories: categoryArray,

@@ -46,7 +46,7 @@ async function OrganizationPage() {
           category="All Organizations"
           slug="all"
         />
-        <NewOrgButton className="md:col-span-2" />
+        <NewOrgButton className="sm:col-span-2 md:col-span-3" />
       </div>
     </div>
   );

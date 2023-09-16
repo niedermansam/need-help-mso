@@ -1,7 +1,7 @@
 import { useState } from "react";
 import NavBar from "../../../components/Nav";
 import { api } from "../../../utils/api";
-import { CreateResourceModal } from "../../resource";
+import { CreateProgramModal } from "../../program";
 import {
   CategorySelect,
   CommunitySelect,
@@ -14,7 +14,7 @@ import type {
 } from "next/types";
 import { prisma } from "../../../server/db";
 import { getSession } from "next-auth/react";
-import type { Community, Organization, Resource, Tag } from "@prisma/client";
+import type { Community, Organization, Program, Tag } from "@prisma/client";
 import type { Session } from "next-auth";
 
 function CreateOrganizationForm({ orgData }: ServerSideProps) {
@@ -135,8 +135,9 @@ function CreateOrganizationForm({ orgData }: ServerSideProps) {
                 setFormData({ ...formData, phone: e.target.value })
               }
             />
-            <div className="flex h-full flex-col justify-end items-center mb-6">
-            <CreateResourceModal orgId={orgData.id} /></div>
+            <div className="mb-6 flex h-full flex-col items-center justify-end">
+              <CreateProgramModal orgId={orgData.id} />
+            </div>
           </div>
 
           <div className="mx-3 flex w-4/12 flex-col">
@@ -240,35 +241,35 @@ function CreateOrganizationForm({ orgData }: ServerSideProps) {
 }
 export default function EditOrgPage({
   orgData,
-  userSession
+  userSession,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-
   return (
     <div>
       <NavBar />
       <p>Edit Organization</p>
-      {orgData ? <CreateOrganizationForm userSession={userSession} orgData={orgData}  /> : null}
+      {orgData ? (
+        <CreateOrganizationForm userSession={userSession} orgData={orgData} />
+      ) : null}
     </div>
   );
 }
 
 type ServerSideProps = {
   userSession: Session;
-  orgData:  Omit< Organization, 'createdAt' | 'updatedAt' > & {
+  orgData: Omit<Organization, "createdAt" | "updatedAt"> & {
     createdAt: string;
     updatedAt: string;
-
   } & {
     tags: Tag[];
     exclusiveToCommunities: Community[];
     helpfulToCommunities: Community[];
-    resources: Resource[];
+    programs: Program[];
   };
-}
+};
 
-export const getServerSideProps: GetServerSideProps<
-  ServerSideProps
-> = async (context) => {
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
+  context
+) => {
   const orgId = context.query.id as string;
 
   const session = await getSession(context);
@@ -290,7 +291,7 @@ export const getServerSideProps: GetServerSideProps<
       tags: true,
       exclusiveToCommunities: true,
       helpfulToCommunities: true,
-      resources: true,
+      programs: true,
     },
   });
 
@@ -307,7 +308,6 @@ export const getServerSideProps: GetServerSideProps<
   };
 
   return {
-    props: { orgData: propsData, userSession: session, },
-    
+    props: { orgData: propsData, userSession: session },
   };
 };

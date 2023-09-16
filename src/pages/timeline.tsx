@@ -57,28 +57,30 @@ type FeatureProps = {
 
 export const REBUILD_FEATURES: FeatureProps[] = [
   {
-    title: "Add, edit, and delete resources and organizations",
-    description: "Create forms, database, and API endpoints. Add a few resources and organizations to the database.",
+    title: "Add, edit, and delete programs and organizations",
+    description:
+      "Create forms, database, and API endpoints. Add a few programs and organizations to the database.",
     status: "DONE",
     priority: "COMPLETED",
   },
   {
     title: "Filter and sort by tag.",
     description:
-      "Filter resources by category or tag. Allow users to mark tags as favorites and/or less interested, and sort resources by priority.",
+      "Filter programs by category or tag. Allow users to mark tags as favorites and/or less interested, and sort programs by priority.",
     status: "TODO",
     priority: "HIGH",
   },
   {
     title: "Custom user profiles/pages and favorites list.",
     description:
-      'Allow users to save their most referenced resources to a "Favorites" Page. Allow service providers to add their organization to the database, and social workers to save multiple lists of resources that are often used together.',
+      'Allow users to save their most referenced programs to a "Favorites" Page. Allow service providers to add their organization to the database, and social workers to save multiple lists of programs that are often used together.',
     status: "TODO",
     priority: "MEDIUM",
   },
   {
-    title: "List resources and organizations by category.",
-    description: "Show a list of resources and organizations with filters for general category (e.g. food, housing, etc.).",
+    title: "List programs and organizations by category.",
+    description:
+      "Show a list of programs and organizations with filters for general category (e.g. food, housing, etc.).",
     status: "IN_PROGRESS",
     priority: "HIGH",
   },
@@ -108,20 +110,20 @@ export const CLOSED_BETA_FEATURES: FeatureProps[] = [
   },
   {
     title: 'Create a "How to Use" page.',
-    description: "Add resources to the database.",
+    description: "Add programs to the database.",
     status: "TODO",
     priority: "MEDIUM",
   },
   {
-    title: "Search Bar with for organizations and resources",
-    description: "Search for resources by name, category, or tag.",
+    title: "Search Bar with for organizations and programs",
+    description: "Search for programs by name, category, or tag.",
     status: "TODO",
     priority: "LOW",
   },
   {
-    title: "Allow service providers to save multiple lists of resources.",
+    title: "Allow service providers to save multiple lists of programs.",
     description:
-      "Create functionality that will allow social workers or case managers to create a list of resources for their clients, save that list, and send it to their clients via text or email.",
+      "Create functionality that will allow social workers or case managers to create a list of programs for their clients, save that list, and send it to their clients via text or email.",
     status: "TODO",
     priority: "HIGH",
   },
@@ -130,27 +132,27 @@ export const CLOSED_BETA_FEATURES: FeatureProps[] = [
 export const CLOSED_BETA_DETAILS: PhaseDetails = {
   title: "Closed Beta",
   description:
-    "During this phase, the application will be shared with a small group of service providers in Missoula, and focus will shift for a time to filling out the database with resources, and organizations.",
+    "During this phase, the application will be shared with a small group of service providers in Missoula, and focus will shift for a time to filling out the database with programs, and organizations.",
   features: CLOSED_BETA_FEATURES,
 };
 
 export const OPEN_BETA_FEATURES: FeatureProps[] = [
   {
     title: "Bug Hunt.",
-    description: "Add resources to the database.",
+    description: "Add programs to the database.",
     status: "TODO",
     priority: "LOW",
   },
   {
     title: 'Add a "Contact Us" page.',
-    description: "Add resources to the database.",
+    description: "Add programs to the database.",
     status: "TODO",
     priority: "LOW",
   },
   {
     title: "Allow users to filter by community/identity.",
     description:
-      "Add functionality to hide or search for resources and organizations that only serve specific groups (e.g. UM students, veterans, people with disabilities, etc.)",
+      "Add functionality to hide or search for programs and organizations that only serve specific groups (e.g. UM students, veterans, people with disabilities, etc.)",
     status: "TODO",
     priority: "HIGH",
   },
@@ -159,7 +161,7 @@ export const OPEN_BETA_FEATURES: FeatureProps[] = [
 const OPEN_BETA_DETAILS: PhaseDetails = {
   title: "Open Beta",
   description:
-    "During this phase, the application will be shared with the public, and focus will shift to bug hunting and adding new features to filter resources and organizations and prevent the application from overwhelming users as the database grows.",
+    "During this phase, the application will be shared with the public, and focus will shift to bug hunting and adding new features to filter programs and organizations and prevent the application from overwhelming users as the database grows.",
   features: OPEN_BETA_FEATURES,
 };
 
@@ -170,7 +172,7 @@ const PUBLIC_LAUNCH_DETAILS: PhaseDetails = {
   features: [
     {
       title: "The never ending hunt for bugs and optiminizations.",
-      description: "Add resources to the database.",
+      description: "Add programs to the database.",
       status: "TODO",
       priority: "LOW",
     },
@@ -274,7 +276,7 @@ function FeatureList({
   phaseDetails: PhaseDetails;
 }) {
   return (
-    <div className="flex w-full max-w-md flex-col items-center h-full  text-stone-400 overflow-scroll overflow-x-hidden">
+    <div className="flex h-full w-full max-w-md flex-col items-center  overflow-scroll overflow-x-hidden text-stone-400">
       <h1 className="w-full text-3xl font-bold text-stone-600">
         {phaseDetails.title}
       </h1>
@@ -282,16 +284,16 @@ function FeatureList({
       <h2 className="w-full text-xl font-semibold text-stone-600">
         Important Tasks & Features
       </h2>
-      <div className="ml-2 mr-6 mt-4 mb-4 flex w-full items-center justify-around text-xs">
+      <div className="mb-4 ml-2 mr-6 mt-4 flex w-full items-center justify-around text-xs">
         <span className="flex items-center">
-          <HeartCheckmark className="h-5 w-5 mr-1" status="DONE" /> DONE
+          <HeartCheckmark className="mr-1 h-5 w-5" status="DONE" /> DONE
         </span>
         <span className="flex items-center">
-          <HeartCheckmark className="h-5 w-5 mr-1" status="IN_PROGRESS" /> IN
+          <HeartCheckmark className="mr-1 h-5 w-5" status="IN_PROGRESS" /> IN
           PROGRESS
         </span>
         <span className="flex items-center">
-          <HeartCheckmark className="h-5 w-5 mr-1" status="TODO" /> TO DO
+          <HeartCheckmark className="mr-1 h-5 w-5" status="TODO" /> TO DO
         </span>
       </div>
       {phaseDetails.features.sort(sortFeatures).map((feature) => {
@@ -368,8 +370,8 @@ export function Timeline({
                 className={`absolute z-10 rounded-full ${
                   // pinging dot
                   index <= progress
-                    ? "-left-3 -bottom-1 h-4 w-4"
-                    : "bottom-[0px] -left-3 h-2 w-2"
+                    ? "-bottom-1 -left-3 h-4 w-4"
+                    : "-left-3 bottom-[0px] h-2 w-2"
                 }
                 border-4 border-rose-500 bg-rose-300 
                ${
@@ -382,8 +384,8 @@ export function Timeline({
                 className={`absolute z-10 ${
                   // normal dot
                   index <= progress
-                    ? "-left-3 -bottom-1 h-4 w-4"
-                    : "bottom-[0px] -left-3 h-2 w-2"
+                    ? "-bottom-1 -left-3 h-4 w-4"
+                    : "-left-3 bottom-[0px] h-2 w-2"
                 } rounded-full border-4 border-rose-500 bg-rose-300 `}
               ></span>
               <span
@@ -404,7 +406,7 @@ export function Timeline({
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
-        className="icon-cheveron-down relative right-4 -bottom-[9.5px]  z-10 h-20 w-20 rotate-90 text-rose-300"
+        className="icon-cheveron-down relative -bottom-[9.5px] right-4  z-10 h-20 w-20 rotate-90 text-rose-300"
         style={{
           stroke: "currentColor",
           fill: "currentColor",
@@ -438,7 +440,9 @@ function FeatureCarousel({ featureArray }: { featureArray: PhaseDetails[] }) {
         className="cursor-pointer leading-3 text-stone-600 hover:text-stone-400"
         onClick={handlePreviousFeatures}
       >
-        <button className="umami--click--previous-features text-3xl font-bold leading-3 ">←</button>
+        <button className="umami--click--previous-features text-3xl font-bold leading-3 ">
+          ←
+        </button>
 
         <p className="mx-0.5 text-xs font-light">back</p>
       </div>
@@ -463,7 +467,7 @@ export default function ProjectTimeline() {
   return (
     <div>
       <NavBar />
-      <h1 className="pt-20 pl-6 text-4xl font-light text-stone-700">
+      <h1 className="pl-6 pt-20 text-4xl font-light text-stone-700">
         Project Timeline
       </h1>
       <div>

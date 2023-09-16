@@ -8,11 +8,11 @@ export interface OrganizationSchema {
   Tags?: string[];
   URL?: string;
   Category?: string;
-  "Resources Available"?: string[];
+  "Programs Available"?: string[];
   Expertise: string;
   Name: string;
   "Administer of"?: string[];
-  "Resource Names"?: string[];
+  "Program Names"?: string[];
   id: string;
   Contacts?: string[];
   Notes?: string;
@@ -21,7 +21,7 @@ export interface OrganizationSchema {
   "Affiliated Organizations"?: string[];
 }
 
-export interface ResourceSchema {
+export interface ProgramSchema {
   Contacts?: string[];
   Name: string;
   "Forms & Files"?: string[];
@@ -33,7 +33,7 @@ export interface ResourceSchema {
   Tags: string[];
   URL?: string;
   "Ease of Aid"?: string;
-  resources?: string[];
+  programs?: string[];
   Funding: string;
   "File Names"?: string[];
   id: string;
@@ -174,7 +174,7 @@ export const organizationRouter = router({
           },
           include: {
             exclusiveToCommunities: true,
-            resources: {
+            programs: {
               select: {
                 id: true,
               },
@@ -241,10 +241,10 @@ export const organizationRouter = router({
           input.exclusiveToCommunities &&
           input.exclusiveToCommunities.length > 0
         ) {
-          updatedOrg.resources.map(async (resource) => {
-            await ctx.prisma.resource.update({
+          updatedOrg.programs.map(async (program) => {
+            await ctx.prisma.program.update({
               where: {
-                id: resource.id,
+                id: program.id,
               },
               data: {
                 exclusiveToCommunities: input.exclusiveToCommunities
@@ -291,7 +291,7 @@ export const organizationRouter = router({
             id: input.id,
           },
           include: {
-            resources: true,
+            programs: true,
             tags: true,
             categoryMeta: true,
             helpfulToCommunities: true,

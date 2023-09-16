@@ -5,13 +5,13 @@ import { useEffect, useState } from "react";
 import { TagSelect } from "../../components/Selectors";
 import { prisma } from "../../server/db";
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { ResourceCard } from "../../components/DisplayCard";
+import { ProgramCard } from "../../components/DisplayCard";
 import { useSession } from "next-auth/react";
 import { getSessionDetails } from "../../utils";
 import { api } from "../../utils/api";
 
 export default function CategoryPage({
-  resources,
+  programs,
   tags: allTags,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { category: URI } = useRouter().query;
@@ -32,8 +32,8 @@ export default function CategoryPage({
 
   const [availableTags, setAvailableTags] = useState<string[]>([]);
 
-  const [visibleResources, setVisibleResources] =
-    useState<typeof resources>(resources);
+  const [visiblePrograms, setVisiblePrograms] =
+    useState<typeof programs>(programs);
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -41,27 +41,27 @@ export default function CategoryPage({
 
   useEffect(() => {
     console.log("dammit");
-    const filteredResources = resources.filter((resource) => {
+    const filteredPrograms = programs.filter((program) => {
       if (selectedTags.length === 0) return true;
-      const resourceTags = resource.tags.map((tag) => tag.tag);
+      const programTags = program.tags.map((tag) => tag.tag);
       if (strictFilter) {
-        return selectedTags.every((tag) => resourceTags.includes(tag));
+        return selectedTags.every((tag) => programTags.includes(tag));
       } else {
-        return selectedTags.some((tag) => resourceTags.includes(tag));
+        return selectedTags.some((tag) => programTags.includes(tag));
       }
     });
-    setVisibleResources(filteredResources);
+    setVisiblePrograms(filteredPrograms);
 
-    const tagsInVisibleResources = filteredResources
-      .map((resource) => resource.tags.map((tag) => tag.tag))
+    const tagsInVisiblePrograms = filteredPrograms
+      .map((program) => program.tags.map((tag) => tag.tag))
       .flat();
 
     if (strictFilter === false) {
       return setAvailableTags(allTags);
     } else {
-      return setAvailableTags(tagsInVisibleResources);
+      return setAvailableTags(tagsInVisiblePrograms);
     }
-  }, [selectedTags, strictFilter, resources, allTags]);
+  }, [selectedTags, strictFilter, programs, allTags]);
 
   return (
     <div>
@@ -101,13 +101,13 @@ export default function CategoryPage({
         />
         <label htmlFor="strictFilter">Strict Filter?</label>
       </div>
-      {visibleResources.map((resource) => (
-        <ResourceCard
-          resource={resource}
-          key={resource.id}
+      {visiblePrograms.map((program) => (
+        <ProgramCard
+          program={program}
+          key={program.id}
           admin={sessionDetails.admin}
           loggedIn={sessionDetails.loggedIn}
-          favoritesArray={favorites?.resources || []}
+          favoritesArray={favorites?.programs || []}
         />
       ))}
     </div>
@@ -115,12 +115,12 @@ export default function CategoryPage({
 }
 
 type ServerSideProps = {
-  resources: ResourceReturn;
+  programs: ProgramReturn;
   category: string;
   tags: string[];
 };
 
-type ResourceReturn = {
+type ProgramReturn = {
   category: string;
   organization: {
     name: string;
@@ -144,7 +144,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 ) => {
   const category = context.query.category as string;
 
-  const resources = await prisma.resource.findMany({
+  const programs = await prisma.program.findMany({
     where: {
       category: {
         equals: category,
@@ -174,8 +174,8 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     },
   });
 
-  const tags = resources
-    .map((resource) => resource.tags.map((tag) => tag.tag))
+  const tags = programs
+    .map((program) => program.tags.map((tag) => tag.tag))
     .flat();
 
   const uniqueTags = [...new Set(tags)];
@@ -183,7 +183,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   return {
     props: {
       category: category,
-      resources: resources,
+      programs: programs,
       tags: uniqueTags,
     },
   };

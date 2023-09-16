@@ -28,8 +28,8 @@ export const communityRouter = router({
         slug: z.string().optional(),
         exclusiveOrgs: z.string().array().optional(),
         helpfulOrgs: z.string().array().optional(),
-        exclusiveResources: z.string().array().optional(),
-        helpfulResources: z.string().array().optional(),
+        exclusivePrograms: z.string().array().optional(),
+        helpfulPrograms: z.string().array().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -38,8 +38,8 @@ export const communityRouter = router({
         slug,
         exclusiveOrgs,
         helpfulOrgs,
-        exclusiveResources,
-        helpfulResources,
+        exclusivePrograms,
+        helpfulPrograms,
       } = input;
 
       return await ctx.prisma.community.create({
@@ -60,19 +60,19 @@ export const communityRouter = router({
                 return { id: org };
               }),
           },
-          exclusiveResources: {
+          exclusivePrograms: {
             connect:
-              exclusiveResources &&
-              exclusiveResources.map((resource) => {
-                return { id: resource };
+              exclusivePrograms &&
+              exclusivePrograms.map((program) => {
+                return { id: program };
               }),
           },
 
-          helpfulResources: {
+          helpfulPrograms: {
             connect:
-              helpfulResources &&
-              helpfulResources.map((resource) => {
-                return { id: resource };
+              helpfulPrograms &&
+              helpfulPrograms.map((program) => {
+                return { id: program };
               }),
           },
         },
@@ -87,8 +87,8 @@ export const communityRouter = router({
         slug: z.string().optional(),
         exclusiveOrgs: z.string().array().optional(),
         helpfulOrgs: z.string().array().optional(),
-        exclusiveResources: z.string().array().optional(),
-        helpfulResources: z.string().array().optional(),
+        exclusivePrograms: z.string().array().optional(),
+        helpfulPrograms: z.string().array().optional(),
         parentCommunityIds: z.string().array().optional(),
         subCommunityIds: z.string().array().optional(),
       })
@@ -100,8 +100,8 @@ export const communityRouter = router({
         slug,
         exclusiveOrgs,
         helpfulOrgs,
-        exclusiveResources,
-        helpfulResources,
+        exclusivePrograms,
+        helpfulPrograms,
         parentCommunityIds,
         subCommunityIds,
       } = input;
@@ -125,18 +125,18 @@ export const communityRouter = router({
                 }),
               }
             : undefined,
-          exclusiveResources: exclusiveResources
+          exclusivePrograms: exclusivePrograms
             ? {
-                connect: exclusiveResources.map((resource) => {
-                  return { id: resource };
+                connect: exclusivePrograms.map((program) => {
+                  return { id: program };
                 }),
               }
             : undefined,
 
-          helpfulResources: helpfulResources
+          helpfulPrograms: helpfulPrograms
             ? {
-                connect: helpfulResources.map((resource) => {
-                  return { id: resource };
+                connect: helpfulPrograms.map((program) => {
+                  return { id: program };
                 }),
               }
             : undefined,
@@ -180,20 +180,20 @@ export const communityRouter = router({
       });
     }),
 
-  connectExclusiveResource: adminProcedure
+  connectExclusiveProgram: adminProcedure
     .input(
       z.object({
         community: z.string(),
-        resourceId: z.string(),
+        programId: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.community.update({
         where: { name: input.community },
         data: {
-          exclusiveResources: {
+          exclusivePrograms: {
             connect: {
-              id: input.resourceId,
+              id: input.programId,
             },
           },
         },
@@ -220,20 +220,20 @@ export const communityRouter = router({
       });
     }),
 
-  disconnectExclusiveResource: adminProcedure
+  disconnectExclusiveProgram: adminProcedure
     .input(
       z.object({
         community: z.string(),
-        resourceId: z.string(),
+        programId: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.community.update({
         where: { name: input.community },
         data: {
-          exclusiveResources: {
+          exclusivePrograms: {
             disconnect: {
-              id: input.resourceId,
+              id: input.programId,
             },
           },
         },
@@ -260,20 +260,20 @@ export const communityRouter = router({
       });
     }),
 
-  connectHelpfulResource: adminProcedure
+  connectHelpfulProgram: adminProcedure
     .input(
       z.object({
         community: z.string(),
-        resourceId: z.string(),
+        programId: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.community.update({
         where: { name: input.community },
         data: {
-          helpfulResources: {
+          helpfulPrograms: {
             connect: {
-              id: input.resourceId,
+              id: input.programId,
             },
           },
         },
@@ -300,20 +300,20 @@ export const communityRouter = router({
       });
     }),
 
-  disconnectHelpfulResource: adminProcedure
+  disconnectHelpfulProgram: adminProcedure
     .input(
       z.object({
         community: z.string(),
-        resourceId: z.string(),
+        programId: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.community.update({
         where: { name: input.community },
         data: {
-          helpfulResources: {
+          helpfulPrograms: {
             disconnect: {
-              id: input.resourceId,
+              id: input.programId,
             },
           },
         },

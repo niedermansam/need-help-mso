@@ -55,7 +55,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     adminOf       Organization[]
-    resources     ResourceContact[]
+    programs      ProgramContact[]
     organizations OrganizationContact[]
     roles         OrganizationRole[]
     admin         Boolean               @default(false)
@@ -73,12 +73,12 @@ model VerificationToken {
 }
 
 model Category {
-    category      String         @id @unique
-    slug          String         @unique @default(cuid()) 
-    description   String?        @db.Text
-    organizations Organization[]
-    resources     Resource[]
-    tags          Tag[]
+    category         String         @id @unique
+    slug             String         @unique @default(cuid())
+    description      String?        @db.Text
+    organizations    Organization[]
+    programs         Program[]
+    tags             Tag[]
     allOrganizations Organization[] @relation("OrganizationCategory")
 
     @@index([category])
@@ -89,23 +89,23 @@ model Tag {
     tag           String         @id @unique
     description   String?        @db.Text
     organizations Organization[]
-    resources     Resource[]
+    programs      Program[]
     categories    Category[]
 
     @@index([tag])
 }
 
 model Community {
-    name               String         @id @unique
-    id                 String         @unique @default(cuid())
-    slug               String         @unique @default(cuid())
-    description        String?        @db.Text
-    exclusiveOrgs      Organization[] @relation("ExclusiveOrg")
-    exclusiveResources Resource[]     @relation("ExclusiveResource")
-    helpfulOrgs        Organization[] @relation("HelpfulOrg")
-    helpfulResources   Resource[]     @relation("HelpfulResource")
-    parentCommunities  Community[]    @relation("SubCommunity")
-    subCommunities     Community[]    @relation("SubCommunity")
+    name              String         @id @unique
+    id                String         @unique @default(cuid())
+    slug              String         @unique @default(cuid())
+    description       String?        @db.Text
+    exclusiveOrgs     Organization[] @relation("ExclusiveOrg")
+    exclusivePrograms Program[]      @relation("ExclusiveProgram")
+    helpfulOrgs       Organization[] @relation("HelpfulOrg")
+    helpfulPrograms   Program[]      @relation("HelpfulProgram")
+    parentCommunities Community[]    @relation("SubCommunity")
+    subCommunities    Community[]    @relation("SubCommunity")
 
     @@index([name])
 }
@@ -119,7 +119,7 @@ model Organization {
     description            String                @db.Text
     category               String
     categoryMeta           Category              @relation(fields: [category], references: [category])
-    categories             Category[]           @relation("OrganizationCategory")
+    categories             Category[]            @relation("OrganizationCategory")
     tags                   Tag[]
     website                String?
     logo                   String?
@@ -127,8 +127,8 @@ model Organization {
     email                  String?
     adminOf                Organization[]        @relation("AffiliatedOrgs")
     administeringOrg       Organization[]        @relation("AffiliatedOrgs")
-    resources              Resource[]
-    assistsWith            Resource[]            @relation("HelpingOrgs")
+    programs               Program[]
+    assistsWith            Program[]             @relation("HelpingOrgs")
     exclusiveToCommunities Community[]           @relation("ExclusiveOrg")
     helpfulToCommunities   Community[]           @relation("HelpfulOrg")
     roles                  OrganizationRole[]
@@ -157,7 +157,7 @@ model OrganizationRole {
 model Location {
     id          String        @id @unique @default(cuid())
     name        String?
-    description String?      @db.Text
+    description String?       @db.Text
     latitude    Float?
     longitude   Float?
     address     String?
@@ -166,7 +166,7 @@ model Location {
     zip         String?
     orgId       String?
     org         Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
-    resources   Resource[]
+    programs    Program[]
 
     @@index([name])
     @@index([id])
@@ -188,25 +188,25 @@ enum SpeedOfAid {
     YEARS
 }
 
-model Resource {
-    id                     String            @id @unique @default(cuid())
+model Program {
+    id                     String           @id @unique @default(cuid())
     name                   String
-    description            String          @db.Text
+    description            String           @db.Text
     url                    String?
     organizationId         String
-    organization           Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-    helpingOrganizations   Organization[]    @relation("HelpingOrgs")
+    organization           Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    helpingOrganizations   Organization[]   @relation("HelpingOrgs")
     category               String
-    categoryMeta           Category          @relation(fields: [category], references: [category])
+    categoryMeta           Category         @relation(fields: [category], references: [category])
     tags                   Tag[]
-    exclusiveToCommunities Community[]       @relation("ExclusiveResource")
-    helpfulToCommunities   Community[]       @relation("HelpfulResource")
-    contacts               ResourceContact[]
+    exclusiveToCommunities Community[]      @relation("ExclusiveProgram")
+    helpfulToCommunities   Community[]      @relation("HelpfulProgram")
+    contacts               ProgramContact[]
     barriersToEntry        BarriersToEntry?
     barriersToEntryDetails String?
     speedOfAidDetails      String?
     lists                  FavoritesList[]
-    free                   Boolean           @default(false)
+    free                   Boolean          @default(false)
     locations              Location[]
 
     @@index([name])
@@ -215,18 +215,18 @@ model Resource {
     @@index([organizationId])
 }
 
-model ResourceContact {
-    userId     String
-    resourceId String
-    user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+model ProgramContact {
+    userId    String
+    programId String
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
 
     phone String?
     email String?
 
-    @@id([userId, resourceId])
+    @@id([userId, programId])
     @@index([userId])
-    @@index([resourceId])
+    @@index([programId])
 }
 
 model OrganizationContact {
@@ -252,7 +252,7 @@ model FavoritesList {
     authorizedUsers User[]         @relation("AuthorizedUsers")
     name            String         @default("Favorites")
     notes           String?
-    resources       Resource[]
+    programs        Program[]
     organizations   Organization[]
     public          Boolean        @default(true)
 

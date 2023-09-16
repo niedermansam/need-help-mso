@@ -14,7 +14,7 @@ import type {
   Category,
   Community,
   Organization,
-  Resource,
+  Program,
   Tag,
 } from "@prisma/client";
 import type { MultiValue } from "react-select";
@@ -23,8 +23,8 @@ import { prisma } from "../../../server/db";
 import { getSession } from "next-auth/react";
 import type { Session } from "next-auth";
 
-type ResourceReturn =
-  | (Resource & {
+type ProgramReturn =
+  | (Program & {
       organization: Organization;
       tags: Tag[];
       categoryMeta: Category;
@@ -35,42 +35,42 @@ type ResourceReturn =
   | null
   | undefined;
 
-export function getPartnerOrgArray(resource: ResourceReturn) {
-  if (!resource) return [];
-  return resource.helpingOrganizations.map((org) => ({
+export function getPartnerOrgArray(program: ProgramReturn) {
+  if (!program) return [];
+  return program.helpingOrganizations.map((org) => ({
     value: org.name,
     label: org.name,
   }));
 }
 
-export default function EditResourcePage(props: ServerSideProps) {
-  const { resource, communityList, orgList } = props;
+export default function EditProgramPage(props: ServerSideProps) {
+  const { program, communityList, orgList } = props;
 
   const [adminOrg, setAdminOrg] = useState<{ value: string; label: string }>({
-    value: resource?.organization?.name || "",
-    label: resource?.organization?.name || "",
+    value: program?.organization?.name || "",
+    label: program?.organization?.name || "",
   });
 
-  const updateResource = api.resource.update.useMutation();
+  const updateProgram = api.program.update.useMutation();
 
-  const newAdminOrg = api.resource.reassignAdministeringOrg.useMutation();
+  const newAdminOrg = api.program.reassignAdministeringOrg.useMutation();
 
   const [formData, setFormData] = useState({
-    ...resource,
-    helpingOrganizations: resource.helpingOrganizations,
+    ...program,
+    helpingOrganizations: program.helpingOrganizations,
     organization: {
-      name: resource?.organization?.name,
-      id: resource?.organizationId,
+      name: program?.organization?.name,
+      id: program?.organizationId,
     },
   });
 
-  if (!resource) return <div>Loading...</div>;
+  if (!program) return <div>Loading...</div>;
 
   return (
     <div className="bg-stone-50">
       <NavBar />
       <div className="bg-stone-50 px-9 pt-14 text-4xl font-bold capitalize">
-        Edit {resource.name}
+        Edit {program.name}
       </div>
 
       <div className="bg-stone-50">
@@ -162,8 +162,7 @@ export default function EditResourcePage(props: ServerSideProps) {
                   : undefined
               }
               onChange={(value, foo) => {
-
-                console.log(foo.action)
+                console.log(foo.action);
                 const communities = (
                   value as { value: string; label: string }[]
                 ).map((community) => {
@@ -172,7 +171,7 @@ export default function EditResourcePage(props: ServerSideProps) {
                 setFormData({
                   ...formData,
                   exclusiveToCommunities: communities,
-                }); 
+                });
               }}
             />
             <CommunitySelect
@@ -206,7 +205,7 @@ export default function EditResourcePage(props: ServerSideProps) {
                 console.log(organization);
 
                 newAdminOrg.mutate({
-                  resourceId: resource.id,
+                  programId: program.id,
                   orgId: organization.value,
                 });
 
@@ -241,9 +240,9 @@ export default function EditResourcePage(props: ServerSideProps) {
             type="button"
             onClick={() => {
               console.log(formData);
-              updateResource.mutate({
-                id: resource.id,
-                orgId: resource.organization.id,
+              updateProgram.mutate({
+                id: program.id,
+                orgId: program.organization.id,
                 tags: formData.tags
                   ? formData.tags.map((tag) => {
                       return tag.tag;
@@ -280,17 +279,17 @@ export default function EditResourcePage(props: ServerSideProps) {
 
 type SelectedOrgProps = Pick<Organization, "id" | "name">;
 
-type CommunityPick = Pick<Community, "name" | 'id'>;
+type CommunityPick = Pick<Community, "name" | "id">;
 
 type ServerSideProps = {
-  resource: Resource & {
+  program: Program & {
     tags: Tag[];
     organization: SelectedOrgProps;
     exclusiveToCommunities: CommunityPick[];
-    helpfulToCommunities:  CommunityPick[];
+    helpfulToCommunities: CommunityPick[];
     helpingOrganizations: SelectedOrgProps[];
   };
-  resourceId: string;
+  programId: string;
   session: Session;
   orgList: MultiValue<CategorySelectItem>;
   communityList: MultiValue<CategorySelectItem>;
@@ -299,7 +298,7 @@ type ServerSideProps = {
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   context
 ) => {
-  const resourceId = context.params?.id as string;
+  const programId = context.params?.id as string;
 
   const session = await getSession(context);
 
@@ -321,9 +320,9 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     };
   }
 
-  const resource = await prisma.resource.findUnique({
+  const program = await prisma.program.findUnique({
     where: {
-      id: resourceId,
+      id: programId,
     },
     include: {
       tags: true,
@@ -359,7 +358,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     },
   });
 
-  if (!resource) {
+  if (!program) {
     return {
       notFound: true,
     };
@@ -367,8 +366,8 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 
   return {
     props: {
-      resource: { ...resource },
-      resourceId: resourceId,
+      program: { ...program },
+      programId: programId,
       session: session,
       orgList: allOrgs.map((org) => {
         return { label: org.name, value: org.id };

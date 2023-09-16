@@ -1,6 +1,6 @@
 import { router, publicProcedure } from "./trpc";
 import { organizationRouter } from "./routers/organization";
-import { resourceRouter } from "./routers/resources";
+import { programRouter } from "./routers/programs";
 import { tagRouter } from "./routers/tag";
 import { communityRouter } from "./routers/community";
 import { userRouter } from "./routers/user";
@@ -12,7 +12,7 @@ import { userRouter } from "./routers/user";
  */
 export const appRouter = router({
   organization: organizationRouter,
-  resource: resourceRouter,
+  program: programRouter,
   tag: tagRouter,
   community: communityRouter,
   user: userRouter,

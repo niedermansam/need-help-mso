@@ -6,14 +6,14 @@ import NavBar from "../../components/Nav";
 import { api } from "../../utils/api";
 import { decodeTag, encodeTag } from "../../utils/manageUrl";
 import { LoadingAnimation } from "../../components";
-import { OrganizationCard, ResourceCard } from "../../components/DisplayCard";
+import { OrganizationCard, ProgramCard } from "../../components/DisplayCard";
 import { prisma } from "../../server/db";
 import { useSession } from "next-auth/react";
 
 export default function TagPage({
   tag,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { data, isLoading, isError, error } = api.tag.getResources.useQuery({
+  const { data, isLoading, isError, error } = api.tag.getPrograms.useQuery({
     tag,
   });
 
@@ -36,15 +36,15 @@ export default function TagPage({
       </h1>
       <div className="mx-6">
         <h2 className=" -mb-2 text-2xl font-extrabold text-stone-600">
-          Resources
+          Programs
         </h2>
         {data &&
-          data?.resources.map((resource) => {
+          data?.programs.map((program) => {
             return (
-              <ResourceCard
-                resource={resource}
-                key={resource.id}
-                favoritesArray={userFavorites?.resources || []}
+              <ProgramCard
+                program={program}
+                key={program.id}
+                favoritesArray={userFavorites?.programs || []}
               />
             );
           })}

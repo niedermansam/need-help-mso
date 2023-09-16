@@ -39,7 +39,7 @@ Table User {
   accounts Account [not null]
   sessions Session [not null]
   adminOf Organization [not null]
-  resources ResourceContact [not null]
+  programs ProgramContact [not null]
   organizations OrganizationContact [not null]
   roles OrganizationRole [not null]
   admin Boolean [not null, default: false]
@@ -62,7 +62,7 @@ Table Category {
   category String [pk]
   description String
   organizations Organization [not null]
-  resources Resource [not null]
+  programs Program [not null]
   tags Tag [not null]
 }
 
@@ -70,7 +70,7 @@ Table Tag {
   tag String [pk]
   description String
   organizations Organization [not null]
-  resources Resource [not null]
+  programs Program [not null]
   categories Category [not null]
 }
 
@@ -80,9 +80,9 @@ Table Community {
   slug String [unique, not null]
   description String
   exclusiveOrgs Organization [not null]
-  exclusiveResources Resource [not null]
+  exclusivePrograms Program [not null]
   helpfulOrgs Organization [not null]
-  helpfulResources Resource [not null]
+  helpfulPrograms Program [not null]
   parentCommunities Community [not null]
   subCommunities Community [not null]
 }
@@ -103,8 +103,8 @@ Table Organization {
   email String
   adminOf Organization [not null]
   administeringOrg Organization [not null]
-  resources Resource [not null]
-  assistsWith Resource [not null]
+  programs Program [not null]
+  assistsWith Program [not null]
   exclusiveToCommunities Community [not null]
   helpfulToCommunities Community [not null]
   roles OrganizationRole [not null]
@@ -123,7 +123,7 @@ Table OrganizationRole {
   }
 }
 
-Table Resource {
+Table Program {
   id String [pk]
   name String [not null]
   description String [not null]
@@ -136,7 +136,7 @@ Table Resource {
   tags Tag [not null]
   exclusiveToCommunities Community [not null]
   helpfulToCommunities Community [not null]
-  contacts ResourceContact [not null]
+  contacts ProgramContact [not null]
   barriersToEntry BarriersToEntry
   barriersToEntryDetails String
   speedOfAid SpeedOfAid[] [not null]
@@ -145,16 +145,16 @@ Table Resource {
   free Boolean [not null, default: false]
 }
 
-Table ResourceContact {
+Table ProgramContact {
   userId String [not null]
-  resourceId String [not null]
+  programId String [not null]
   user User [not null]
-  resource Resource [not null]
+  program Program [not null]
   phone String
   email String
 
   indexes {
-    (userId, resourceId) [pk]
+    (userId, programId) [pk]
   }
 }
 
@@ -180,7 +180,7 @@ Table FavoritesList {
   authorizedUsers User [not null]
   name String [not null, default: 'Favorites']
   notes String
-  resources Resource [not null]
+  programs Program [not null]
   organizations Organization [not null]
   public Boolean [not null, default: true]
 }
@@ -210,13 +210,13 @@ Ref: OrganizationRole.userId > User.id [delete: Cascade]
 
 Ref: OrganizationRole.orgId > Organization.id [delete: Cascade]
 
-Ref: Resource.organizationId > Organization.id [delete: Cascade]
+Ref: Program.organizationId > Organization.id [delete: Cascade]
 
-Ref: Resource.category > Category.category
+Ref: Program.category > Category.category
 
-Ref: ResourceContact.userId > User.id [delete: Cascade]
+Ref: ProgramContact.userId > User.id [delete: Cascade]
 
-Ref: ResourceContact.resourceId > Resource.id [delete: Cascade]
+Ref: ProgramContact.programId > Program.id [delete: Cascade]
 
 Ref: OrganizationContact.userId > User.id [delete: Cascade]
 

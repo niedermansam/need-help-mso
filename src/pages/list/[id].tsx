@@ -7,27 +7,27 @@ import { getSession, useSession } from "next-auth/react";
 import { prisma } from "../../server/db";
 import {
   OrganizationCard,
-  ResourceCard,
-  type ResourceCardInformation,
+  ProgramCard,
+  type ProgramCardInformation,
 } from "../../components/DisplayCard";
 import { api } from "../../utils/api";
 
-function ResourceSection({
-  resources,
+function ProgramSection({
+  programs,
   session,
   userFavorites,
 }: {
-  resources: ResourceCardInformation[];
+  programs: ProgramCardInformation[];
   session: ReturnType<typeof useSession>;
   userFavorites: string[] | undefined;
 }) {
   return (
     <div className="mt-6">
-      <h2 className="text-3xl font-bold text-stone-500">Resources</h2>
-      {resources.map((resource) => (
-        <ResourceCard
-          key={resource.id}
-          resource={resource}
+      <h2 className="text-3xl font-bold text-stone-500">Programs</h2>
+      {programs.map((program) => (
+        <ProgramCard
+          key={program.id}
+          program={program}
           favoritesArray={userFavorites || []}
           loggedIn={!!session.data?.user}
         />
@@ -75,7 +75,7 @@ export default function ListsPage({
   listDetails: favorites,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const session = useSession();
-  const hasFavoriteResources = favorites.resources.length > 0;
+  const hasFavoritePrograms = favorites.programs.length > 0;
   const hasFavoriteOrganizations = favorites.organizations.length > 0;
 
   const { data: userFavorites } = api.user.getCurrentFavoritesList.useQuery(
@@ -89,11 +89,11 @@ export default function ListsPage({
       <NavBar />
       <div className="mx-6 pt-14">
         <h1 className=" text-5xl font-extrabold text-stone-500">Favorites</h1>
-        {hasFavoriteResources && (
-          <ResourceSection
-            resources={favorites.resources}
+        {hasFavoritePrograms && (
+          <ProgramSection
+            programs={favorites.programs}
             session={session}
-            userFavorites={userFavorites?.resources}
+            userFavorites={userFavorites?.programs}
           />
         )}
         {hasFavoriteOrganizations && (
@@ -112,7 +112,7 @@ type ServerSideProps = {
   listDetails: {
     name: string;
     id: number;
-    resources: {
+    programs: {
       name: string;
       id: string;
       url: string | null;
@@ -159,7 +159,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     select: {
       name: true,
       id: true,
-      resources: {
+      programs: {
         select: {
           name: true,
           id: true,
@@ -229,7 +229,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 
     return {
       props: {
-        listDetails: { ...newList, resources: [], organizations: [] },
+        listDetails: { ...newList, programs: [], organizations: [] },
       },
     };
   } else if (listDetails === null) {

@@ -52,7 +52,7 @@ export const userRouter = router({
       select: {
         name: true,
         id: true,
-        resources: {
+        programs: {
           select: {
             id: true,
           },
@@ -65,17 +65,17 @@ export const userRouter = router({
       },
     });
 
-    const resourceArray = favoriteList?.resources.map((x) => x.id);
+    const programArray = favoriteList?.programs.map((x) => x.id);
     const orgArray = favoriteList?.organizations.map((x) => x.id);
 
     return {
       ...favoriteList,
-      resources: resourceArray || [],
+      programs: programArray || [],
       organizations: orgArray || [],
     };
   }),
-  toggleFavoriteResource: protectedProcedure
-    .input(z.object({ resourceId: z.string(), newState: z.boolean() }))
+  toggleFavoriteProgram: protectedProcedure
+    .input(z.object({ programId: z.string(), newState: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
       let userList = ctx.session.user.currentListId;
 
@@ -90,9 +90,9 @@ export const userRouter = router({
             id: userList,
           },
           data: {
-            resources: {
+            programs: {
               [input.newState ? "connect" : "disconnect"]: {
-                id: input.resourceId,
+                id: input.programId,
               },
             },
           },
@@ -208,7 +208,11 @@ export const userRouter = router({
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      const newList = await createFavoriteList(userId, ctx.prisma, input?.name || "" + " (Copy)");
+      const newList = await createFavoriteList(
+        userId,
+        ctx.prisma,
+        input?.name || "" + " (Copy)"
+      );
 
       return newList;
     }),
@@ -225,13 +229,16 @@ export const userRouter = router({
         name: true,
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
-    ctx.session.user.currentListId
+    ctx.session.user.currentListId;
 
-    return lists.map((x) => ({...x, current: x.id === ctx.session.user.currentListId }));
+    return lists.map((x) => ({
+      ...x,
+      current: x.id === ctx.session.user.currentListId,
+    }));
   }),
 
   setCurrentFavoritesList: protectedProcedure
@@ -248,9 +255,9 @@ export const userRouter = router({
           id: true,
           organizations: {
             select: {
-              id: true
+              id: true,
             },
-          }
+          },
         },
       });
 
@@ -266,10 +273,9 @@ export const userRouter = router({
       });
 
       return list;
-    }
-    ),
+    }),
 
-   copyFavoritesList: protectedProcedure
+  copyFavoritesList: protectedProcedure
     .input(z.object({ listId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
@@ -282,34 +288,32 @@ export const userRouter = router({
           name: true,
           organizations: {
             select: {
-              id: true
+              id: true,
             },
           },
-          resources: {
+          programs: {
             select: {
-              id: true
+              id: true,
             },
-          }
+          },
         },
       });
-
 
       const newList = await ctx.prisma.favoritesList.create({
         data: {
           adminId: userId,
           name: list?.name || "Favorites " + " (Copy)",
           organizations: {
-            connect: list?.organizations.map(x => ({id: x.id}))
+            connect: list?.organizations.map((x) => ({ id: x.id })),
           },
-          resources: {
-            connect: list?.resources.map(x => ({id: x.id}))
-          }
+          programs: {
+            connect: list?.programs.map((x) => ({ id: x.id })),
+          },
         },
       });
 
       return newList;
-    }
-    ),
+    }),
 
   deleteFavoritesList: protectedProcedure
     .input(z.object({ listId: z.number() }))
@@ -325,7 +329,11 @@ export const userRouter = router({
         },
       });
 
-      if (list?.adminId !== userId) throw new TRPCError({code: 'FORBIDDEN', message: 'You do not have permission to delete this list'});
+      if (list?.adminId !== userId)
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have permission to delete this list",
+        });
 
       await ctx.prisma.favoritesList.delete({
         where: {
@@ -333,7 +341,7 @@ export const userRouter = router({
         },
       });
 
-      // get most recent favorites list 
+      // get most recent favorites list
       const recentlyCreatedListArr = await ctx.prisma.favoritesList.findMany({
         where: {
           adminId: userId,
@@ -342,31 +350,36 @@ export const userRouter = router({
           id: true,
         },
         orderBy: {
-          createdAt: 'desc'
+          createdAt: "desc",
         },
-        take: 1
+        take: 1,
       });
 
-      if (ctx.session.user.currentListId !== input.listId) return {success: true, listId: input.listId, };
-      
-      
+      if (ctx.session.user.currentListId !== input.listId)
+        return { success: true, listId: input.listId };
+
       let recentlyCreatedListId = recentlyCreatedListArr[0]?.id;
 
-      if(!recentlyCreatedListId) recentlyCreatedListId =  await createFavoriteList(userId, ctx.prisma);
+      if (!recentlyCreatedListId)
+        recentlyCreatedListId = await createFavoriteList(userId, ctx.prisma);
 
-      if(!recentlyCreatedListId) throw new Error('Could not create favorites list');
+      if (!recentlyCreatedListId)
+        throw new Error("Could not create favorites list");
 
+      if (ctx.session.user.currentListId === input.listId)
+        await ctx.prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            currentListId: recentlyCreatedListId,
+          },
+        });
 
-      if(ctx.session.user.currentListId === input.listId) await ctx.prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          currentListId: recentlyCreatedListId,
-        },
-      });
-
-      return {success: true, listId: input.listId, currentListId: recentlyCreatedListId };
-    }
-    ),
+      return {
+        success: true,
+        listId: input.listId,
+        currentListId: recentlyCreatedListId,
+      };
+    }),
 });

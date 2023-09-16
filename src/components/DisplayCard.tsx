@@ -4,14 +4,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { ContactIcons, ContactInfo } from "./ContactInfo";
 import { TagList } from "./Tags";
-import type { Organization, Resource, Tag } from "@prisma/client";
+import type { Organization, Program, Tag } from "@prisma/client";
 import { faStar } from "@fortawesome/free-regular-svg-icons";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { api } from "../utils/api";
 import { useEffect, useState } from "react";
 
-export type ResourceCardInformation = Pick<
-  Resource,
+export type ProgramCardInformation = Pick<
+  Program,
   "name" | "id" | "url" | "category" | "organizationId"
 > & {
   organization: {
@@ -23,45 +23,44 @@ export type ResourceCardInformation = Pick<
   tags: Pick<Tag, "tag">[];
 };
 
-
-
-
-type ResourceCardProps = {
-  resource: ResourceCardInformation;
+type ProgramCardProps = {
+  program: ProgramCardInformation;
   favoritesArray: string[];
   showOrg?: boolean;
   admin?: boolean;
   loggedIn?: boolean;
-} 
+};
 
-export function ResourceCard({
-  resource,
+export function ProgramCard({
+  program,
   favoritesArray,
   loggedIn,
   showOrg = true,
   admin,
-}: ResourceCardProps) {
-  const resourceName = resource.name;
-  const orgName = resource.organization.name;
+}: ProgramCardProps) {
+  const programName = program.name;
+  const orgName = program.organization.name;
 
-  const orgId = resource.organizationId;
-  const resourceId = resource.id;
+  const orgId = program.organizationId;
+  const programId = program.id;
 
-  const phone = resource.organization.phone;
-  const email = resource.organization.email;
-  const website = resource.url || resource.organization.website;
+  const phone = program.organization.phone;
+  const email = program.organization.email;
+  const website = program.url || program.organization.website;
 
-  const [isFavoriteResource, setIsFavoriteResource] = useState(favoritesArray.includes(resourceId));
+  const [isFavoriteProgram, setIsFavoriteProgram] = useState(
+    favoritesArray.includes(programId)
+  );
 
   useEffect(() => {
-    setIsFavoriteResource(favoritesArray.includes(resourceId));
-  }, [favoritesArray, resourceId]);
+    setIsFavoriteProgram(favoritesArray.includes(programId));
+  }, [favoritesArray, programId]);
 
-  const toggleFavorite = api.user.toggleFavoriteResource.useMutation({
-    onMutate: ({ newState }) => setIsFavoriteResource(newState),
+  const toggleFavorite = api.user.toggleFavoriteProgram.useMutation({
+    onMutate: ({ newState }) => setIsFavoriteProgram(newState),
     onSettled: (data, err, input) => {
       const oldState = !input.newState;
-      if (err || data === undefined) return setIsFavoriteResource(oldState);
+      if (err || data === undefined) return setIsFavoriteProgram(oldState);
     },
   });
   return (
@@ -77,7 +76,7 @@ export function ResourceCard({
           )}
           <div className="flex">
             {admin && (
-              <Link href={`/resource/${resourceId}/edit`} className="">
+              <Link href={`/program/${programId}/edit`} className="">
                 <FontAwesomeIcon
                   className="mr-1 text-stone-500 hover:text-rose-500"
                   icon={faEdit}
@@ -85,11 +84,11 @@ export function ResourceCard({
               </Link>
             )}
             <Link
-              href={`/resource/${resourceId}`}
+              href={`/program/${programId}`}
               className="hover:text-rose-500"
             >
               <h2 className="mb-2 truncate text-2xl font-bold tracking-tight text-stone-600 hover:text-rose-500 md:text-xl">
-                {resourceName}
+                {programName}
               </h2>
             </Link>
           </div>
@@ -97,27 +96,27 @@ export function ResourceCard({
         <ContactIconSection phone={phone} email={email} website={website} />
       </div>
       <DesktopContactInfo phone={phone} email={email} website={website} />
-      <CategoryTagSection category={resource.category} tags={resource.tags} />
+      <CategoryTagSection category={program.category} tags={program.tags} />
       <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
         {loggedIn && (
           <button
             onClick={() =>
               toggleFavorite.mutate({
-                resourceId,
-                newState: !isFavoriteResource,
+                programId,
+                newState: !isFavoriteProgram,
               })
             }
             className="mr-1 flex h-4 items-center justify-center"
           >
             <FontAwesomeIcon
-              icon={isFavoriteResource ? faStarSolid : faStar}
+              icon={isFavoriteProgram ? faStarSolid : faStar}
               className="text-gold-500 h-4 text-amber-400 "
             />
           </button>
         )}
         <Link
           className="mr-2 flex w-1/2 justify-center justify-self-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md sm:w-2/3 md:w-32"
-          href={`/resource/${resource.id}`}
+          href={`/program/${program.id}`}
         >
           More Info
         </Link>
@@ -144,7 +143,7 @@ const DesktopContactInfo = ({
 
 const CardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="my-4 mx-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">
+    <div className="mx-4 my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">
       {children}
     </div>
   );
@@ -212,20 +211,15 @@ export function OrganizationCard({
   admin: boolean;
   loggedIn: boolean;
   favoriteIds: string[];
-
 }) {
   const orgId = org.id;
   const [isFavoriteOrg, setIsFavoriteOrg] = useState(
-    
     favoriteIds.includes(orgId)
   );
 
   useEffect(() => {
     setIsFavoriteOrg(favoriteIds.includes(orgId));
   }, [favoriteIds, orgId]);
-
-  
-
 
   const toggleFavorite = api.user.toggleFavoriteOrganization.useMutation({
     onMutate: ({ newState }) => setIsFavoriteOrg(newState),
