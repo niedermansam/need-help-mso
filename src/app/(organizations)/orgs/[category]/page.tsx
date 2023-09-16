@@ -37,7 +37,8 @@ export default async function OrganizationByCategoryPage({
   );
 }
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  /*
   const slugs = [
     "case-management",
     "clothing",
@@ -50,6 +51,17 @@ export function generateStaticParams() {
     "shelter",
     "transportation",
   ];
+  */
+
+  const slugsJson = await prisma.category.findMany({
+    select: {
+      slug: true,
+    },
+  });
+
+  const slugs = slugsJson.map((x) => x.slug);
+
+
 
   return slugs.map((slug) => {
     return { category: slug };
