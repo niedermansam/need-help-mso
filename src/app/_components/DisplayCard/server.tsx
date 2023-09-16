@@ -240,7 +240,7 @@ export function OrganizationCard({
 
       <div className="flex h-fit flex-col p-3 xs:row-span-2 xs:mt-4 md:col-span-6 md:row-span-1 md:mt-0 md:p-1 lg:col-span-5">
         {showDescription ? (
-          <p>{org.description}</p>
+          <p className="text-sm font-light text-stone-600 tracking-wide">{org.description}</p>
         ) : (
           <CategoryTagSection category={org.category} tags={org.tags} />
         )}

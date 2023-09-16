@@ -5,11 +5,13 @@ import React from "react";
 import { OrganizationCard } from "@/app/_components/DisplayCard/server";
 import { prisma } from "@/server/db";
 import { BackButton } from "@/app/_components/BackButton";
+import { SearchComponent } from "@/app/search/SearchComponent";
 
 async function OrganizationPage() {
   const orgs = await prisma.organization.findMany({
     include: {
       tags: { select: { tag: true } },
+      categories: true,
     },
   });
   return (
@@ -18,9 +20,7 @@ async function OrganizationPage() {
         {" "}
         <BackButton /> All Organizations
       </h1>
-      {orgs.map((org) => (
-        <OrganizationCard key={org.id} org={org} />
-      ))}
+      <SearchComponent searchOptions={orgs} />
     </div>
   );
 }
