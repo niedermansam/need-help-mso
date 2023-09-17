@@ -1,10 +1,7 @@
 import { BackButton } from "@/app/_components/BackButton";
-import { OrganizationCard } from "@/app/_components/DisplayCard/server";
 import { SearchComponent } from "@/app/search/SearchComponent";
 import { prisma } from "@/server/db";
 import React from "react";
-
-export const dynamic = "auto";
 
 export default async function OrganizationByCategoryPage({
   params,
