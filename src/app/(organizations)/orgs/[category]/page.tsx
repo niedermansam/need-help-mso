@@ -4,6 +4,8 @@ import { SearchComponent } from "@/app/search/SearchComponent";
 import { prisma } from "@/server/db";
 import React from "react";
 
+export const dynamic = "auto";
+
 export default async function OrganizationByCategoryPage({
   params,
 }: {
