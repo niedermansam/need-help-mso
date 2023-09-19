@@ -7,9 +7,12 @@ import {
   useMapEvents,
   Tooltip,
 } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import "leaflet/dist/leaflet.css";import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; // Re-uses images from ~leaflet package
 import type { LocationData } from "./page";
 import Link from "next/link";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import * as _L from "leaflet";
+import "leaflet-defaulticon-compatibility";
 
 function jitter(num: number) {
   return num + Math.random() * 0.0001;
