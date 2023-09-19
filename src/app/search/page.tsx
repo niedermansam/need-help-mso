@@ -1,7 +1,5 @@
-import { prisma } from "@/server/db";
+
 import React from "react";
-import { OrganizationCard } from "../_components/DisplayCard/server";
-import { Return } from "@prisma/client/runtime/library";
 import { SearchComponent } from "./SearchComponent";
 import { fetchAllOrgs } from "../_components/organization/utils/fetchAllOrgs";
 

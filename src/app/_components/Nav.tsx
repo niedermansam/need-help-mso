@@ -95,6 +95,11 @@ export default function NavBar() {
             label="Organizations"
             isActive={/\/org/.test(pathname)}
           />
+          <NavLink
+            href="/map"
+            label="Map"
+            isActive={/\/map/.test(pathname)}
+          />
           {loggedIn && (
             <NavLink
               href="/favorites"

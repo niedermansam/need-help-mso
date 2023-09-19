@@ -17,16 +17,7 @@ export default function AboutPage() {
           for them, and that it can help people who need a helping hand find the
           programs they need.
         </p>
-        <p className="mb-2">
-          Check out the development timeline for more information on when this
-          application will be publicly available!
-        </p>
-        <Link
-          href="/timeline"
-          className="umami--click--timeline mb-6 mr-2 flex basis-32 justify-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md"
-        >
-          Development Timeline
-        </Link>
+        
         <h2 className="text-2xl font-semibold text-stone-600">
           Who&apos;s Need Help Missoula for?
         </h2>

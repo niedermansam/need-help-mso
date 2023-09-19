@@ -1,12 +1,10 @@
 "use client";
 import { OrganizationCard } from "@/app/_components/DisplayCard/server";
-import LoadingPage from "@/app/_components/LoadingPage";
 import { trpc } from "@/app/providers";
 import { LoadingAnimation } from "@/components";
 import { api } from "@/utils/api";
 import { useFavoriteOrgStore } from "@/utils/userStore";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 const invalidateFavorites = () => {
   const utils = trpc.useContext();
@@ -49,6 +47,8 @@ export function DeleteListButton({
         .catch((err) => {
           console.log(err);
         });
+
+      if (afterDelete) afterDelete();
     },
   });
 
@@ -87,7 +87,6 @@ export function FavoritesActionButtons({ listId }: { listId: number }) {
     },
   });
 
-  const router = useRouter();
 
   const handleCreateList = () => {
     createList.mutate();

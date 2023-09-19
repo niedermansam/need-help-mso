@@ -3,7 +3,6 @@ import React from "react";
 import {
   TileLayer,
   Marker,
-  Popup,
   MapContainer,
   useMapEvents,
   Tooltip,
@@ -11,7 +10,10 @@ import {
 import "leaflet/dist/leaflet.css";
 import type { LocationData } from "./page";
 import Link from "next/link";
-import { truncate } from "../_components/DisplayCard/server";
+
+function jitter(num: number) {
+  return num + Math.random() * 0.0001;
+}
 
 function isOrgInView({
   latitude,
@@ -208,7 +210,7 @@ function ZoomHandler({
   return null;
 }
 
-function PaginatedList({ locations }: { locations: LocationData }) {
+function PaginatedList({ locations, className, ...props }: { locations: LocationData, className?:string; props?: React.ComponentProps<"div"> }) {
   const resultsPerPage = 5;
   const [page, setPage] = React.useState(1);
   const maxPage = Math.ceil(locations.length / resultsPerPage);
@@ -231,7 +233,7 @@ function PaginatedList({ locations }: { locations: LocationData }) {
   }, [locations]);
 
   return (
-    <div>
+    <div {...props} className={className}>
       {locationList.map((location) => {
         const { org } = location;
         if (!org) return null;
@@ -240,7 +242,9 @@ function PaginatedList({ locations }: { locations: LocationData }) {
             key={org.id}
             className="mb-2 rounded-md border border-gray-300 bg-white p-2"
           >
-            <h2 className="text-lg font-semibold">{org.name}</h2>
+            <Link href={`/org/${org.id}`}>
+            <h2 className="text-lg font-semibold hover:text-rose-600">{org.name}</h2>
+            </Link>
             <p>{org.description}</p>
           </div>
         );
@@ -291,7 +295,7 @@ const filterLocations = (location: LocationData[number], search: string) => {
     for (const program of programs) {
       const tagsString = program.tags.map((tag) => tag.tag).join(" ");
 
-      const { name, description, category, tags } = program;
+      const { name, description, category } = program;
       if (!name || !description) return false;
       if (name.toLowerCase().includes(term.toLowerCase())) return true;
       if (description.toLowerCase().includes(term.toLowerCase())) return true;
@@ -325,49 +329,60 @@ function OrganizationMap({
   }, [search, locations]);
 
   return (
-    <div className="grid grid-cols-3">
-      <PaginatedList locations={displayedMapLocations} />
-      <MapContainer
-        center={[46.873, -114]}
-        zoom={13}
-        style={{
-          height: 500,
-          width: "100%",
-        }}
-        className="col-span-2"
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {displayedMapLocations.map((location) => {
-          const { latitude, longitude, org } = location;
-          if (!latitude || !longitude) return null;
-          if (!org) return null;
-          if (!org.name) return null;
-          return (
-            <Marker
-              key={`${latitude}, ${longitude}, ${org.name} ${Math.random()}`}
-              position={[latitude, longitude]}
-            >
-              <Tooltip className="block max-w-sm">
-                <div className="flex max-w-xs flex-wrap ">
-                  <h2>{org.name}</h2>
-                  {
-                    location.address && location.city && location.state && location.zip &&
-                    <p>{location.address}, {location.city}, {location.state} {location.zip}</p>
-                  }
-                </div>
-              </Tooltip>
-            </Marker>
-          );
-        })}
-        <ZoomHandler
-          locations={locations}
-          setLocations={setDisplayedMapLocations}
-          search={search}
-        />
-      </MapContainer>
+    <div className="grid grid-cols-2 xl:grid-cols-3">
+      <PaginatedList
+        className="order-last col-span-2 py-4 xl:order-first xl:col-span-1 xl:px-4"
+        locations={displayedMapLocations}
+      />
+      <div          className="col-span-2 "
+>
+        <MapContainer
+          center={[46.873, -114]}
+          zoom={13}
+          style={{
+            height: 500,
+            width: "100%",
+          }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {displayedMapLocations.map((location) => {
+            const { latitude, longitude, org } = location;
+            if (!latitude || !longitude) return null;
+            if (!org) return null;
+            if (!org.name) return null;
+            return (
+              <Marker
+                key={`${latitude}, ${longitude}, ${org.name} ${Math.random()}`}
+                position={[jitter(latitude), jitter(longitude)]}
+              >
+                <Tooltip className="block max-w-sm">
+                  <div className="flex max-w-xs flex-wrap ">
+                    <h2>{org.name}</h2>
+                    {location.address &&
+                      location.city &&
+                      location.state &&
+                      location.zip && (
+                        <p>
+                          {location.address}, {location.city}, {location.state}{" "}
+                          {location.zip}
+                        </p>
+                      )}
+                  </div>
+                </Tooltip>
+              </Marker>
+            );
+          })}
+          <ZoomHandler
+            locations={locations}
+            setLocations={setDisplayedMapLocations}
+            search={search}
+          />
+        </MapContainer>
+        <p className="text-xs md:text-sm xl:text-base font-light text-center">Enter a search phrase above, or zoom/scroll the map to filter organizations in the list <span className="xl:hidden">below.</span><span className="hidden  xl:inline">to the left.</span> Locations closer to the center of the map will appear in the list first.</p>
+      </div>
     </div>
   );
 }

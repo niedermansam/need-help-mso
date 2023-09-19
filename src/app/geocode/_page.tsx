@@ -1,4 +1,3 @@
-import { env } from '@/env.mjs';
 import { prisma } from '@/server/db';
 import  NodeGeocoder from 'node-geocoder'
 
@@ -26,8 +25,7 @@ const {address, city, state, zip} = location
 
 if(!address || ! city || !state || !zip ) return;
 
-const locationRequest = `${address}, ${city}, ${state} ${zip}`
-/*
+// const locationRequest = `${address}, ${city}, ${state} ${zip}`
 for (const loc of locations) {
     const {address, city, state, zip} = loc
 
@@ -44,7 +42,7 @@ for (const loc of locations) {
         console.log('waiting')
 
         if(!res[0]) return;
-        const upate = await prisma.location.update({
+        const update = await prisma.location.update({
             where:  {
                 id: loc.id
             },
@@ -55,13 +53,17 @@ for (const loc of locations) {
             }
 
         })
+
+        return update
         });
 
+      
 
 
 
 
-}*/
+
+}
 // const res = await geocoder.geocode(locationRequest)
 
 // console.log(res)

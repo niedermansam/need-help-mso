@@ -59,6 +59,7 @@ const orgInput = z.object({
 });
 
 const orgUpdateInput = z.object({
+  
   id: z.string(),
   name: z.string().nullish(),
   description: z.string().nullish(),
@@ -209,31 +210,6 @@ export const organizationRouter = router({
                 : undefined,
             },
 
-            helpfulToCommunities: input.helpfulToCommunities
-              ? {
-                  connectOrCreate: input.helpfulToCommunities.map(
-                    (community) => ({
-                      where: { name: community },
-                      create: {
-                        name: community,
-                      },
-                    })
-                  ),
-                }
-              : undefined,
-
-            exclusiveToCommunities: input.exclusiveToCommunities
-              ? {
-                  connectOrCreate: input.exclusiveToCommunities.map(
-                    (community) => ({
-                      where: { name: community },
-                      create: {
-                        name: community,
-                      },
-                    })
-                  ),
-                }
-              : undefined,
           },
         });
 

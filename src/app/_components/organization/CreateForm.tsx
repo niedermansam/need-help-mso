@@ -38,6 +38,16 @@ export function NewOrganizationForm() {
 
   const [formData, setFormData] = React.useState<Partial<CreateOrg>>(DEFAULT_OBJECT);
 
+  const [exclusiveToCommunities, setExclusiveToCommunities] = React.useState<{
+    value: string;
+    label: string;
+  }>();
+
+  const [helpfulToCommunities, setHelpfulToCommunities] = React.useState<{
+    value: string;
+    label: string;
+  }>();
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formData) return;
@@ -86,7 +96,7 @@ export function NewOrganizationForm() {
           />
         </FormItemWrapper>
 
-        <div className=" min-h-[170px] md:row-span-4 ">
+        <div className=" min-h-[170px] md:row-span-4  flex flex-col col-span-2">
           <label
             className="text-sm font-light lowercase text-stone-600 "
             htmlFor="description"
@@ -277,13 +287,16 @@ export function NewOrganizationForm() {
           <CommunitySelect
             title=""
             onChange={(value) => {
-              if (!value)
+              if (!value){
+                setExclusiveToCommunities(undefined)
                 return setFormData({
                   ...formData,
                   exclusiveToCommunities: [],
-                });
+                });}
 
-              const newTags = (value as CategorySelectItem[]).map(
+                setExclusiveToCommunities(value as CategorySelectItem)
+
+              const newTagIds = (value as CategorySelectItem[]).map(
                 (x) => x.value
               );
 
@@ -294,22 +307,14 @@ export function NewOrganizationForm() {
               )
                 return setFormData({
                   ...formData,
-                  exclusiveToCommunities: newTags,
+                  exclusiveToCommunities: newTagIds,
                 });
 
-              const oldTags = formData.exclusiveToCommunities.map((x) =>
-                x.trim()
-              );
 
-              setFormData({ ...formData, exclusiveToCommunities: newTags });
+              setFormData({ ...formData, exclusiveToCommunities: newTagIds });
             }}
             value={
-              formData?.exclusiveToCommunities
-                ? formData.exclusiveToCommunities.map((x) => ({
-                    label: x,
-                    value: x,
-                  }))
-                : []
+              exclusiveToCommunities
             }
           />
         </FormItemWrapper>
@@ -323,8 +328,11 @@ export function NewOrganizationForm() {
           <CommunitySelect
             title=""
             onChange={(value) => {
-              if (!value)
-                return setFormData({ ...formData, helpfulToCommunities: [] });
+              if (!value){
+                setHelpfulToCommunities(undefined)
+                return setFormData({ ...formData, helpfulToCommunities: [] });}
+
+                setHelpfulToCommunities(value as CategorySelectItem)
 
               const newTags = (value as CategorySelectItem[]).map(
                 (x) => x.value
@@ -343,10 +351,7 @@ export function NewOrganizationForm() {
               setFormData({ ...formData, helpfulToCommunities: newTags });
             }}
             value={
-              formData?.helpfulToCommunities?.map((x) => ({
-                label: x,
-                value: x,
-              })) || undefined
+              helpfulToCommunities
             }
           />
         </FormItemWrapper>

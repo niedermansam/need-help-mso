@@ -1,9 +1,9 @@
 import { BackButton } from "@/app/_components/BackButton";
-import { ContactInfo } from "@/app/_components/DisplayCard/server";
+import { ContactInfo, ProgramCard } from "@/app/_components/DisplayCard/server";
 import { prisma } from "@/server/db";
 import React from "react";
 
-export const revalidate = 60 * 60;
+export const revalidate = 60 * 60 * 6;
 
 async function Page({ params }: { params: { id: string } }) {
   const orgData = await prisma.organization.findUnique({
@@ -48,6 +48,20 @@ async function Page({ params }: { params: { id: string } }) {
           <h3 className="font-semibold text-stone-500">Description:</h3>
           <p>{orgData.description}</p>
         </div>
+        {
+          orgData.programs.length > 0 && (
+            <div className="mx-6">
+              <h2 className="mt-12 mb-4 text-2xl font-bold">Programs</h2>
+              <ul className="list-disc list-inside">
+                {orgData.programs.map((program) => (
+                  <ProgramCard  key={program.id} program={{...program, organization: orgData}} />
+
+                ))}
+              </ul>
+            </div>
+          )
+
+        }
       </div>
     </div>
   );

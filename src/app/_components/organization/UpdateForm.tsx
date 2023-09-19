@@ -20,12 +20,23 @@ export function UpdateOrganizationForm({
   const editOrganization = api.organization.update.useMutation();
   const disconnectTag = api.organization.disconnectTag.useMutation();
 
+
+
   type MutationOptions = Parameters<typeof editOrganization.mutate>;
 
   type FormValues = MutationOptions[0];
   const [formData, setFormData] = React.useState<FormValues>({
     id: org.id,
   });
+
+  const [exclusiveToCommunities, setExclusiveToCommunities] = React.useState<
+    {
+      label: string;
+      value: string;
+    }[]> (org.exclusiveToCommunities.map((x) => ({
+      label: x.name,
+      value: x.id,
+      })))
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -196,10 +207,18 @@ export function UpdateOrganizationForm({
           <CommunitySelect
             title=""
             onChange={(value) => {
-              if (!value)
-                return setFormData({ ...formData, exclusiveToCommunities: [] });
+              const newValue = value as {
+                label: string;
+                value: string;
+              }[]
+              if (!newValue){
+                setExclusiveToCommunities(
+                  []
+                )
+                return setFormData({ ...formData, exclusiveToCommunities: [] });}
 
-              const newTags = (value as CategorySelectItem[]).map(
+                setExclusiveToCommunities(newValue)
+              const newTags = (newValue as CategorySelectItem[]).map(
                 (x) => x.value
               );
 
@@ -231,15 +250,7 @@ export function UpdateOrganizationForm({
               setFormData({ ...formData, exclusiveToCommunities: newTags });
             }}
             value={
-              formData.exclusiveToCommunities
-                ? formData.exclusiveToCommunities.map((x) => ({
-                    label: x,
-                    value: x,
-                  }))
-                : org.exclusiveToCommunities.map((x) => ({
-                    label: x.name,
-                    value: x.name,
-                  }))
+              exclusiveToCommunities
             }
           />
         </FormItemWrapper>

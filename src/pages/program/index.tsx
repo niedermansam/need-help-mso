@@ -16,7 +16,7 @@ import {
   type ProgramCardInformation,
 } from "../../components/DisplayCard";
 import LoadingPage from "../../components/LoadingPage";
-import Custom404 from "../404";
+import Custom404 from "../old_404";
 import { useSession } from "next-auth/react";
 
 type CreateProgramProps = {

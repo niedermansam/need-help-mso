@@ -46,10 +46,6 @@ export const useFavoriteOrgStore = create<FavoriteOrgsStore>((set) => ({
     set({ favoriteListId }),
 }));
 
-type FavoriteProgramArray = {
-  programId: string;
-  programName: string;
-}[];
 
 type FavoriteProgramStore = {
   favoritePrograms: string[];

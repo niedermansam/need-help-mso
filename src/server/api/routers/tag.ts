@@ -90,6 +90,24 @@ export const tagRouter = router({
 
       return true;
     }),
+  disconnectOrganization: adminProcedure
+    .input(z.object({ orgId: z.string(), tag: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.tag.update({
+        where: { tag: input.tag },
+        data: {
+          organizations: {
+            disconnect: {
+              id: input.orgId,
+            },
+          },
+        },
+      });
+
+      return true;
+    }),
+
+
 
   connectProgram: adminProcedure
     .input(z.object({ programId: z.string(), tag: z.string() }))

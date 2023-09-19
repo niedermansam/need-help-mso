@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { OrganizationSearchProps } from "./page";
+import type { OrganizationSearchProps } from "./page";
 import { OrganizationCard } from "../_components/DisplayCard/server";
 import { useRouter, useSearchParams } from "next/navigation";
 

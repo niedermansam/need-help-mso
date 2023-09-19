@@ -1,21 +1,17 @@
 import { TagList } from "@/components/Tags";
 import type { OrgProps } from "@/pages/old_org";
 import { getRawPhoneNumber, prettyUrl } from "@/utils";
-import { faStar } from "@fortawesome/free-regular-svg-icons";
 import {
   faEnvelope,
   faGlobe,
   faPhone,
-  faStar as faStarSolid,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { Organization, Program, Tag } from "@prisma/client";
 import Link from "next/link";
 import {
   EditOrgButton,
-  EditProgramButton,
   FavoriteOrgButton,
-  FavoriteProgramButton,
   ProgramDetailsModal,
 } from "./client";
 
@@ -158,7 +154,7 @@ const DesktopContactInfo = ({
 
 const CardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">
+    <div className="my-4 grid w-full  auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">
       {children}
     </div>
   );
@@ -337,11 +333,7 @@ export function ProgramCard({
   const orgName = program.organization.name;
 
   const orgId = program.organizationId;
-  const programId = program.id;
 
-  const phone = program.organization.phone;
-  const email = program.organization.email;
-  const website = program.url || program.organization.website;
 
   return (
     <div className="my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white px-4 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-4 md:pb-2">

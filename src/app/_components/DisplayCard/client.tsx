@@ -7,16 +7,13 @@ import {
 } from "@/utils/userStore";
 import { faStar } from "@fortawesome/free-regular-svg-icons";
 import {
-  faChevronDown,
-  faChevronUp,
   faEdit,
   faStar as faStarSolid,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import React, { HTMLAttributes } from "react";
-import { twMerge } from "tailwind-merge";
-import { CategoryTag, ProgramCardInformation } from "./server";
+import React from "react";
+import { CategoryTag, type ProgramCardInformation } from "./server";
 import ReactModal from "react-modal";
 
 export function FavoriteOrgButton({ orgId }: { orgId: string }) {
