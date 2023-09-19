@@ -397,6 +397,15 @@ function MapSearchBar({
   search: string;
   setSearch: (search: string) => void;
 }) {
+
+  const onEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    console.log(e.type)
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+
   return (
     <div className="flex items-center pb-2">
       <label className="mr-2 text-lg font-light">Search:</label>
@@ -406,6 +415,14 @@ function MapSearchBar({
         value={search}
         placeholder="Enter a keyword like 'food' or 'shelter'"
         onChange={(e) => setSearch(e.target.value)}
+        onKeyDown={
+          (e) => {
+            if(e.key === "Enter") {
+              e.preventDefault();
+              e.currentTarget.blur()
+            }
+          }
+        }
       />
     </div>
   );
