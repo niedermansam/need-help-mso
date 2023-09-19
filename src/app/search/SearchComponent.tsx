@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import type { OrganizationSearchProps } from "./page";
+import type { OrganizationSearchListProps } from "./page";
 import { OrganizationCard } from "../_components/DisplayCard/server";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -8,7 +8,7 @@ export const SearchBar = ({
   searchInput,
   setSearchInput,
 }: {
-  searchOptions: OrganizationSearchProps;
+  searchOptions: OrganizationSearchListProps;
   searchInput: string;
   setSearchInput: (searchInput: string) => void;
 }) => {
@@ -23,42 +23,42 @@ export const SearchBar = ({
   );
 };
 
-const PageButtons = ({
-    setPage,
-    page,
-    maxPage,
+export const PageButtons = ({
+  setPage,
+  page,
+  maxPage,
 }: {
-    setPage: (page: number) => void;
-    page: number;
-    maxPage: number;
+  setPage: (page: number) => void;
+  page: number;
+  maxPage: number;
 }) => {
-    return (
-        <div className="flex justify-center">
-            <button
-                className="bg-gray-200 rounded-md p-2 m-2"
-                onClick={() => setPage(page - 1)}
-                disabled={page === 1}
-            >
-                Prev
-            </button>
-            <span className="p-2 m-2">
-                Page {page} of {maxPage}
-            </span>
-            <button
-                className="bg-gray-200 rounded-md p-2 m-2"
-                onClick={() => setPage(page + 1)}
-                disabled={page === maxPage}
-            >
-                Next
-            </button>
-        </div>
-    );
-}
+  return (
+    <div className="flex justify-center">
+      <button
+        className="m-2 rounded-md bg-gray-200 p-2"
+        onClick={() => setPage(page - 1)}
+        disabled={page === 1}
+      >
+        Prev
+      </button>
+      <span className="m-2 p-2">
+        Page {page} of {maxPage}
+      </span>
+      <button
+        className="m-2 rounded-md bg-gray-200 p-2"
+        onClick={() => setPage(page + 1)}
+        disabled={page === maxPage}
+      >
+        Next
+      </button>
+    </div>
+  );
+};
 
 export const SearchResults = ({
   searchOptions,
 }: {
-  searchOptions: OrganizationSearchProps;
+  searchOptions: OrganizationSearchListProps;
 }) => {
   const pageLength = 10;
   const [page, setPage] = useState(1);
@@ -75,7 +75,7 @@ export const SearchResults = ({
       {pageOptions.map((org) => (
         <OrganizationCard org={org} key={org.id} showDescription={true} />
       ))}
-        <PageButtons setPage={setPage} page={page} maxPage={maxPage} />
+      <PageButtons setPage={setPage} page={page} maxPage={maxPage} />
     </>
   );
 };
@@ -83,7 +83,7 @@ export const SearchResults = ({
 export const SearchComponent = ({
   searchOptions,
 }: {
-  searchOptions: OrganizationSearchProps;
+  searchOptions: OrganizationSearchListProps;
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();

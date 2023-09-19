@@ -1,6 +1,7 @@
 import { prisma } from '@/server/db'
 import dynamic from 'next/dynamic';
 import React from 'react'
+import { jitter } from './utils';
 const OrganizationMap = dynamic(() => import("./OrganizationMap"), {
   loading: () => <p>loading...</p>,
   ssr: false,
@@ -57,7 +58,13 @@ export type LocationData = Awaited<ReturnType<typeof getLocationData>>;
 async function Page() {
 
     
-    const locations = await getLocationData()
+    let locations = await getLocationData()
+
+    locations = locations.map((location) => {
+      if( !location.latitude || !location.longitude) return location
+      return {...location, latitude: jitter(location.latitude), longitude: jitter(location.longitude)}
+    })
+
 
   return (
     <OrganizationMap locations={locations} />
