@@ -6,7 +6,7 @@ const OrganizationMap = dynamic(() => import("./OrganizationMap"), {
   ssr: false,
 });
 
-export const getLocationData = async () => {
+const getLocationData = async () => {
   const locations = await prisma.location.findMany({
     where: {
       NOT: {
