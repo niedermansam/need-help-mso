@@ -161,6 +161,7 @@ model Location {
     latitude    Float?
     longitude   Float?
     address     String?
+    apt         String?
     city        String?
     state       String?
     zip         String?

@@ -181,6 +181,7 @@ export function CreateProgramForm({ orgId }: { orgId: string }) {
                 tags: formData.tags,
                 category: formData.category,
                 orgId: orgId,
+                orgName: "",
                 exclusiveToCommunities: formData.exclusiveToCommunities,
                 helpfulToCommunities: formData.helpfulToCommunities,
                 free: formData.free,
