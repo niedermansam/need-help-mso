@@ -44,9 +44,15 @@ dependencies:
   airtable:
     specifier: ^0.11.6
     version: 0.11.6
+  i:
+    specifier: ^0.3.7
+    version: 0.3.7
   leaflet:
     specifier: ^1.9.4
     version: 1.9.4
+  leaflet-defaulticon-compatibility:
+    specifier: ^0.1.2
+    version: 0.1.2
   next:
     specifier: ^13.4.19
     version: 13.4.19(react-dom@18.2.0)(react@18.2.0)
@@ -2080,6 +2086,11 @@ packages:
       react-is: 16.13.1
     dev: false
 
+  /i@0.3.7:
+    resolution: {integrity: sha512-FYz4wlXgkQwIPqhzC5TdNMLSE5+GS1IIDJZY/1ZiEPCT2S3COUVZeT5OW4BmW4r5LHLQuOosSwsvnroG9GR59Q==}
+    engines: {node: '>=0.4'}
+    dev: false
+
   /ignore@5.2.4:
     resolution: {integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==}
     engines: {node: '>= 4'}
@@ -2370,6 +2381,10 @@ packages:
     dependencies:
       language-subtag-registry: 0.3.22
     dev: true
+
+  /leaflet-defaulticon-compatibility@0.1.2:
+    resolution: {integrity: sha512-IrKagWxkTwzxUkFIumy/Zmo3ksjuAu3zEadtOuJcKzuXaD76Gwvg2Z1mLyx7y52ykOzM8rAH5ChBs4DnfdGa6Q==}
+    dev: false
 
   /leaflet@1.9.4:
     resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
