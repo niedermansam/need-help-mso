@@ -50,7 +50,7 @@ const Description = () => {
   return (
     <div className="ml-8 flex max-w-full  items-center px-6 text-stone-900 lg:w-[40%] ">
       <p className=" text-xl font-light leading-8">
-        We a hub for organizations and groups that help
+        We are a hub for organizations and groups that help
         people who need a hand. Need Help Missoula is a friendly user interface where social workers, case managers, and
         other professionals can find programs for their clients. Consider supporting
         our efforts on Patreon.
