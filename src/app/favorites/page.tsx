@@ -4,7 +4,7 @@ import LoadingPage from "@/app/_components/LoadingPage";
 import { trpc } from "@/app/providers";
 import { LoadingAnimation } from "@/components";
 import { api } from "@/utils/api";
-import { useFavoriteStore } from "@/utils/userStore";
+import { useFavoriteOrgStore } from "@/utils/userStore";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -34,7 +34,7 @@ export function DeleteListButton({
 }) {
   const utils = trpc.useContext();
 
-  const favoriteStore = useFavoriteStore((state) => state.setFavoriteListId);
+  const favoriteStore = useFavoriteOrgStore((state) => state.setFavoriteListId);
 
   const { data: userOwnsList, isLoading } =
     api.user.userOwnsFavoritesList.useQuery({ listId });
@@ -69,7 +69,7 @@ export function DeleteListButton({
 }
 
 export function FavoritesActionButtons({ listId }: { listId: number }) {
-  const favoriteStore = useFavoriteStore((state) => state.setFavoriteListId);
+  const favoriteStore = useFavoriteOrgStore((state) => state.setFavoriteListId);
 
   const invalidate = invalidateFavorites;
 
@@ -188,11 +188,11 @@ export function FavoritesHeader({
 }
 
 function Page() {
-  const favoriteListId = useFavoriteStore((state) => state.favoriteListId);
-  const setFavoriteListId = useFavoriteStore(
+  const favoriteListId = useFavoriteOrgStore((state) => state.favoriteListId);
+  const setFavoriteListId = useFavoriteOrgStore(
     (state) => state.setFavoriteListId
   );
-  const setFavoriteListOrgs = useFavoriteStore(
+  const setFavoriteListOrgs = useFavoriteOrgStore(
     (state) => state.setFavoriteOrgs
   );
 

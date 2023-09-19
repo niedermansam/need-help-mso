@@ -3,7 +3,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useFavoriteStore, useUserStore } from "@/utils/userStore";
+import { useFavoriteOrgStore, useUserStore } from "@/utils/userStore";
 import { api } from "@/utils/api";
 
 const NavLink = ({
@@ -40,8 +40,8 @@ export default function NavBar() {
 
   const loggedIn = useUserStore((state) => state.loggedIn);
 
-  const setFavoriteOrgs = useFavoriteStore((state) => state.setFavoriteOrgs);
-  const setFavoriteListId = useFavoriteStore(
+  const setFavoriteOrgs = useFavoriteOrgStore((state) => state.setFavoriteOrgs);
+  const setFavoriteListId = useFavoriteOrgStore(
     (state) => state.setFavoriteListId
   );
 
@@ -50,7 +50,12 @@ export default function NavBar() {
   useEffect(() => {
     setFavoriteOrgs(favorites?.organizations || []);
     setFavoriteListId(favorites?.id);
-  }, [favorites?.organizations, setFavoriteOrgs, favorites?.id, setFavoriteListId]);
+  }, [
+    favorites?.organizations,
+    setFavoriteOrgs,
+    favorites?.id,
+    setFavoriteListId,
+  ]);
 
   return (
     <nav className="sticky z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">

@@ -86,7 +86,7 @@ export function NewOrganizationForm() {
           />
         </FormItemWrapper>
 
-        <FormItemWrapper className=" min-h-[170px] md:row-span-4 ">
+        <div className=" min-h-[170px] md:row-span-4 ">
           <label
             className="text-sm font-light lowercase text-stone-600 "
             htmlFor="description"
@@ -100,7 +100,7 @@ export function NewOrganizationForm() {
             onChange={handleChange}
             value={formData?.description || ""}
           ></textarea>
-        </FormItemWrapper>
+        </div>
         <FormItemWrapper>
           <label
             className="text-sm font-light lowercase text-stone-600"

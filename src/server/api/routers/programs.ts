@@ -2,50 +2,37 @@ import { z } from "zod";
 
 import { adminProcedure, router, publicProcedure } from "../trpc";
 import { getTagsFromPrograms } from "./tag";
-import type { PrismaClient, Prisma } from "@prisma/client";
 
-const createProgramId = async (
-  name: string,
-  orgId: string,
-  prisma: PrismaClient<Prisma.PrismaClientOptions>
-) => {
-  let newId = name.replace(/\s/g, "-").toLowerCase();
 
-  const newIdIsUnique =
-    (await prisma.program.findUnique({
-      where: {
-        id: newId,
-      },
-      select: {
-        id: true,
-      },
-    })) === null;
 
-  if (!newIdIsUnique) {
-    const orgName = await prisma.organization.findUnique({
-      where: {
-        id: orgId,
-      },
-      select: {
-        name: true,
-      },
-    });
+const createProgramId = (name:string, orgName: string) => {
+  let newId = name.trim().replace(/\s/g, "-").toLowerCase();
 
-    // remove any punctuation and get organization initials
-    const orgInitials = orgName
-      ? orgName.name
-          .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
-          .split(" ")
-          .map((word) => word[0])
-          .join("")
-          .toLowerCase()
-      : Math.random().toString(36).substring(10);
+  // remove any punctuation
+  newId = newId.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
 
-    newId = `${newId}-${orgInitials}`;
-  }
+  // remove any special characters
+  newId = newId.replace(/[^\w\s]/gi, "");
 
-  return `${newId}-${orgId}`;
-};
+  // remove any duplicate dashes
+  newId = newId.replace(/-+/g, "-");
+
+
+  // remove any dashes at the beginning or end
+  newId = newId.replace(/^-+|-+$/g, "");
+
+  // get organization initials
+  const orgInitials = orgName 
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .toLowerCase()
+
+
+
+  return newId + "-" + orgInitials;
+}
 
 export const programRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -112,6 +99,7 @@ export const programRouter = router({
         description: z.string(),
         category: z.string(),
         orgId: z.string(),
+        orgName: z.string(),
         helpingOrganizations: z.array(z.string()).optional(),
         url: z.string().nullish(),
         tags: z.array(z.string()).optional(),
@@ -134,6 +122,7 @@ export const programRouter = router({
         description,
         category,
         orgId,
+        orgName,
         helpingOrganizations,
         url,
         tags,
@@ -142,7 +131,11 @@ export const programRouter = router({
         free,
       } = input;
 
-      let newId = name.replace(/\s/g, "-").toLowerCase();
+
+
+      let newId = name.replace(/\s/g, "-")
+      
+      .toLowerCase();
 
       const newIdIsUnique =
         (await ctx.prisma.program.findUnique({
@@ -179,7 +172,7 @@ export const programRouter = router({
 
       const newProgram = await ctx.prisma.program.create({
         data: {
-          id: await createProgramId(name, orgId, ctx.prisma),
+          id:  createProgramId(name, orgName),
           name: name,
           description: description,
           url: url,
@@ -285,7 +278,6 @@ export const programRouter = router({
           id: id,
         },
         data: {
-          id: name ? await createProgramId(name, orgId, ctx.prisma) : undefined,
           name: name || undefined,
           description: description || undefined,
           categoryMeta: category

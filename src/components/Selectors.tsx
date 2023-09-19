@@ -281,7 +281,6 @@ export function OrganizationMultiSelect({
 }
 
 export function OrganizationSingleSelect({
-  title,
   options,
   ...attributes
 }: CategorySelectProps) {
@@ -290,8 +289,6 @@ export function OrganizationSingleSelect({
   });
 
   return (
-    <>
-      <label className="text-lg font-light">{title || "Organization"}</label>
       <Select
         className="mb-2.5"
         {...attributes}
@@ -304,6 +301,5 @@ export function OrganizationSingleSelect({
               })) ?? []
         }
       />
-    </>
   );
 }

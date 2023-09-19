@@ -11,6 +11,10 @@ import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
 import superjson from "superjson";
 import type { AppRouter } from "../server/api/root";
+import ReactModal from "react-modal";
+
+
+ReactModal.setAppElement("#app");
 
 export type RouterOutputs = inferRouterOutputs<AppRouter>;
 export type RouterInputs = inferRouterInputs<AppRouter>;
@@ -55,10 +59,11 @@ export const Providers: React.FC<{ children: React.ReactNode }> = ({
     })
   );
   return (
+    <div id="app">
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         <SessionProvider>{children}</SessionProvider>
       </QueryClientProvider>
-    </trpc.Provider>
+    </trpc.Provider></div>
   );
 };

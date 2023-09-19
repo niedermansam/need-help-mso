@@ -2,7 +2,6 @@
 import React from "react";
 // import { SITE_URL } from '@/utils/constants'
 // import type { Organization } from '@prisma/client'
-import { OrganizationCard } from "@/app/_components/DisplayCard/server";
 import { prisma } from "@/server/db";
 import { BackButton } from "@/app/_components/BackButton";
 import { SearchComponent } from "@/app/search/SearchComponent";

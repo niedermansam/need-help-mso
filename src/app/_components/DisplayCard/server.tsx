@@ -9,9 +9,15 @@ import {
   faStar as faStarSolid,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { Organization } from "@prisma/client";
+import type { Organization, Program, Tag } from "@prisma/client";
 import Link from "next/link";
-import { EditButton, FavoriteOrgButton } from "./client";
+import {
+  EditOrgButton,
+  EditProgramButton,
+  FavoriteOrgButton,
+  FavoriteProgramButton,
+  ProgramDetailsModal,
+} from "./client";
 
 export type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
 
@@ -152,7 +158,7 @@ const DesktopContactInfo = ({
 
 const CardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border bg-white border-stone-200 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">
+    <div className="my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">
       {children}
     </div>
   );
@@ -207,7 +213,13 @@ export function OrganizationCard({
   org,
   showDescription,
 }: {
-  org: OrgCardProps;
+  org: 
+  Pick<
+    Organization,
+    "id" | "name" | "phone" | "email" | "website" | "category" | "description"
+    > & {
+      tags: { tag: string }[];
+    };
   showDescription?: boolean;
 }) {
   const orgId = org.id;
@@ -216,7 +228,7 @@ export function OrganizationCard({
     <CardWrapper>
       <div className="flex w-full flex-wrap items-start justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left">
         <div className="flex truncate">
-          <EditButton orgId={orgId} />
+          <EditOrgButton orgId={orgId} />
           <Link
             className="flex items-center justify-center"
             href={`/org/${org.id}`}
@@ -240,7 +252,9 @@ export function OrganizationCard({
 
       <div className="flex h-fit flex-col p-3 xs:row-span-2 xs:mt-4 md:col-span-6 md:row-span-1 md:mt-0 md:p-1 lg:col-span-5">
         {showDescription ? (
-          <p className="text-sm font-light text-stone-600 tracking-wide">{org.description}</p>
+          <p className="text-sm font-light tracking-wide text-stone-600">
+            {org.description}
+          </p>
         ) : (
           <CategoryTagSection category={org.category} tags={org.tags} />
         )}
@@ -255,5 +269,105 @@ export function OrganizationCard({
         </Link>
       </div>
     </CardWrapper>
+  );
+}
+
+export type ProgramCardInformation = Pick<
+  Program,
+  "name" | "id" | "url" | "category" | "organizationId" | "description"
+> & {
+  organization: {
+    name: string;
+    phone: string | null;
+    email: string | null;
+    website: string | null;
+  };
+  tags: Pick<Tag, "tag">[];
+};
+
+type ProgramCardDisplayOptions = {
+  showDescription?: boolean;
+  showOrgName?: boolean;
+};
+
+export function truncate(str: string, n: number) {
+  const trimmed = str.slice(0, n + 1);
+  return trimmed.slice(0, Math.min(trimmed.length, trimmed.lastIndexOf(" ")));
+}
+
+export const CategoryTag = ({
+  category,
+  tags,
+}: {
+  category: string;
+  tags: string[];
+}) => {
+  return (
+    <>
+      <p className=" col-span-full">
+        <span className="rounded bg-stone-500 px-2 text-sm text-white">
+          {category}
+        </span>
+        {tags.map((tag) => (
+          <span
+            key={tag}
+            className="ml-2 rounded bg-stone-400 px-2 text-sm text-white"
+          >
+            {tag}
+          </span>
+        ))}
+      </p>
+    </>
+  );
+};
+
+export function ProgramCard({
+  program,
+  options,
+}: {
+  program: ProgramCardInformation;
+  options?: ProgramCardDisplayOptions;
+}) {
+  const { showDescription, showOrgName } = options ?? {
+    showDescription: false,
+    showOrgName: false,
+  };
+
+  const programName = program.name;
+  const orgName = program.organization.name;
+
+  const orgId = program.organizationId;
+  const programId = program.id;
+
+  const phone = program.organization.phone;
+  const email = program.organization.email;
+  const website = program.url || program.organization.website;
+
+  return (
+    <div className="my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white px-4 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-4 md:pb-2">
+      <div className="flex w-full flex-wrap items-start justify-start text-start md:col-span-4 lg:col-span-3 lg:justify-start lg:text-left">
+        {showOrgName && (
+          <Link href={`/org/${orgId}`}>
+            <h3 className="truncate text-xl font-light hover:text-rose-600  md:text-lg">
+              {orgName}
+            </h3>
+          </Link>
+        )}
+        <div className="flex">
+          {/* <EditProgramButton programId={programId} orgId={orgId} /> */}
+          <h2 className=" truncate text-2xl font-bold tracking-tight text-stone-600  md:text-xl">
+            {programName}
+          </h2>
+        </div>
+      </div>
+      <CategoryTag
+        category={program.category}
+        tags={program.tags.map((tag) => tag.tag)}
+      />
+      <div className="col-span-full ">
+        {truncate(program.description, 250) + "..."}
+        <ProgramDetailsModal program={program} />
+      </div>
+    </div>
   );
 }
