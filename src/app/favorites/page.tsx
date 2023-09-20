@@ -5,6 +5,7 @@ import { LoadingAnimation } from "@/components";
 import { api } from "@/utils/api";
 import { useFavoriteOrgStore } from "@/utils/userStore";
 import React, { useEffect } from "react";
+import ReactModal from "react-modal";
 
 const invalidateFavorites = () => {
   const utils = trpc.useContext();
@@ -86,7 +87,6 @@ export function FavoritesActionButtons({ listId }: { listId: number }) {
       invalidate();
     },
   });
-
 
   const handleCreateList = () => {
     createList.mutate();
@@ -186,6 +186,51 @@ export function FavoritesHeader({
   );
 }
 
+type ContactProps = {
+  name: string | null;
+  email?: string | null;
+  phone?: string | null;
+  website?: string | null;
+};
+
+const PlainTextContactModal = ({ contact }: { contact?: ContactProps[] | null }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  if(!contact) return undefined;
+  const contactsString = contact.map((contact) => {
+    const { name,  phone, website } = contact;
+    
+    return  `Name: ${name || "N/A"}\nPhone: ${phone || "N/A"}\nWebsite: ${website || "N/A"}\n\n`;
+  });
+
+  const customStyles = {
+    content: {
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      width: "80%",
+      height: "80%",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+    },
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => setIsOpen(true)}
+        className="rounded bg-rose-500 px-2 py-1 text-white text-sm"
+      >
+        View Contacts as Plain Text
+      </button>
+
+    <ReactModal style={customStyles} isOpen={isOpen}  onRequestClose={() => setIsOpen(false)} >
+      <textarea className="w-full h-full">{contactsString.join("")}</textarea>;
+    </ReactModal>
+    </>
+  );
+};
+
 function Page() {
   const favoriteListId = useFavoriteOrgStore((state) => state.favoriteListId);
   const setFavoriteListId = useFavoriteOrgStore(
@@ -244,6 +289,7 @@ function Page() {
           <OrganizationCard org={org} key={org.id} showDescription />
         ))
       )}
+      <PlainTextContactModal contact={favoriteList?.organizations } />
       <h2 className="text-2xl font-bold text-stone-600">Your other lists:</h2>
       <p className="mb-2 text-sm">Click to view and edit</p>
       {userLists?.map((list) => {
