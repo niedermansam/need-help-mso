@@ -15,12 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-        <Script
-          async
-          defer
-          data-website-id="02fa300e-06b5-43d0-a7e7-002ff7deb11e"
-          src="https://umami-sepia.vercel.app/umami.js"
-        ></Script>
+      <Script
+        async
+        src="https://umami-sepia.vercel.app/script.js"
+        data-website-id="ed667ccd-6ef9-4998-bc96-010bbc03a0e0"
+      ></Script>
       <body className="bg-stone-50">
         <Providers>
           <NavBar />
