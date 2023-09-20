@@ -1,7 +1,7 @@
-import Head from "next/head";
 import "../styles/globals.css";
 import NavBar from "./_components/Nav";
 import { Providers } from "./providers";
+import  Script  from "next/script";
 
 export const metadata = {
   title: "Need Help Missoula",
@@ -15,14 +15,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <Head>
-        <script
+        <Script
           async
           defer
           data-website-id="02fa300e-06b5-43d0-a7e7-002ff7deb11e"
           src="https://umami-sepia.vercel.app/umami.js"
-        ></script>
-      </Head>
+        ></Script>
       <body className="bg-stone-50">
         <Providers>
           <NavBar />
