@@ -16,6 +16,7 @@ import * as _L from "leaflet";
 import "leaflet-defaulticon-compatibility";
 import { isOrgInView,  sortLocationsByDistanceFromCenter } from "./utils";
 import { orgIsFilteredByString } from "../search/utils";
+import { FavoriteOrgButton } from "../_components/DisplayCard/client";
 
 function ZoomHandler({
   locations,
@@ -168,11 +169,14 @@ function PaginatedList({
             key={org.id}
             className="mb-2 rounded-md border border-gray-300 bg-white p-2"
           >
+            <div className="flex">
+            <FavoriteOrgButton orgId={org.id} />
             <Link href={`/org/${org.id}`}>
               <h2 className="text-lg font-semibold hover:text-rose-600">
                 {org.name}
               </h2>
             </Link>
+            </div>
             <p>{org.description}</p>
           </div>
         );
