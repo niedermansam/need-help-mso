@@ -21,6 +21,8 @@ const NavLink = ({
       className={`mr-4 mt-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block ${
         isActive ? "font-bold text-white" : ""
       }`}
+      data-umami-event="nav-link"
+      data-umami-event-page={label}
     >
       {label}
     </Link>
@@ -60,7 +62,7 @@ export default function NavBar() {
   return (
     <nav className="sticky z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
       <div className="mr-6 flex flex-shrink-0 items-center text-white">
-        <Link href="/" className="text-xl font-semibold tracking-tight">
+        <Link data-umami-event="nav-link" data-umami-event-name="Home" href="/" className="text-xl font-semibold tracking-tight">
           Need Help Missoula
         </Link>
       </div>
@@ -119,9 +121,9 @@ export default function NavBar() {
           }
           <button
             onClick={loggedIn ? () => void signOut() : () => void signIn()}
-            className={`${
-              loggedIn ? "umami--click--sign-out" : "umami--click-sign-in"
-            } mt-4 inline-block rounded border border-white px-4 py-2 text-sm leading-none text-white hover:border-transparent hover:bg-white hover:text-indigo-800 md:mt-0`}
+            className={`mt-4 inline-block rounded border border-white px-4 py-2 text-sm leading-none text-white hover:border-transparent hover:bg-white hover:text-indigo-800 md:mt-0`}
+            data-umami-event={loggedIn ? "sign-out" : "sign-in"}
+
           >
             {loggedIn ? "Sign Out" : "Sign In"}
           </button>

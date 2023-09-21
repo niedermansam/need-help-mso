@@ -63,6 +63,7 @@ export function DeleteListButton({
     <button
       onClick={handleDelete}
       className="ml-2 rounded bg-rose-500 px-2 py-1 text-white"
+      data-umami-event="delete-list"
     >
       Delete List
     </button>
@@ -97,6 +98,7 @@ export function FavoritesActionButtons({ listId }: { listId: number }) {
     <div className="flex">
       <button
         onClick={handleCreateList}
+        data-umami-event="create-list"
         className="rounded bg-stone-500 px-2 py-1 text-white"
       >
         Create New List
@@ -105,6 +107,8 @@ export function FavoritesActionButtons({ listId }: { listId: number }) {
         <button
           onClick={() => copyList.mutate({ listId })}
           className="ml-2 rounded bg-stone-500 px-2 py-1 text-white"
+          data-umami-event="copy-list"
+          data-umami-event-id={listId}
         >
           Copy List
         </button>
@@ -166,6 +170,7 @@ export function FavoritesHeader({
             <button
               type="submit"
               className="rounded bg-stone-500 px-2 py-1 text-white"
+              data-umami-event="update-list-name"
             >
               Save
             </button>
@@ -219,6 +224,7 @@ const PlainTextContactModal = ({ contact }: { contact?: ContactProps[] | null })
     <>
       <button
         onClick={() => setIsOpen(true)}
+        data-umami-event="plain-text-contact-modal"
         className="rounded bg-rose-500 px-2 py-1 text-white text-sm"
       >
         View Contacts as Plain Text
