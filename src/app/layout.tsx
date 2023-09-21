@@ -17,8 +17,8 @@ export default function RootLayout({
     <html lang="en">
       <Script
         async
-        src="https://umami-sepia.vercel.app/script.js"
-        data-website-id="ed667ccd-6ef9-4998-bc96-010bbc03a0e0"
+        src="https://analytics.needhelpmissoula.org/script.js"
+        data-website-id="5654ddf8-3858-4e37-88a5-4f0873970aa4"
       ></Script>
       <body className="bg-stone-50">
         <Providers>
