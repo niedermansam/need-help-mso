@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { router, publicProcedure, adminProcedure } from "../trpc";
 import { SITE_URL } from "@/utils/constants";
+import NodeGeocoder from "node-geocoder";
 //import Airtable from "airtable";
 
 export interface OrganizationSchema {
@@ -58,8 +59,12 @@ const orgInput = z.object({
   zip: z.string().optional(),
 });
 
+const communityUpdate = z.object({
+  id: z.string(),
+  name: z.string(),
+})
+
 const orgUpdateInput = z.object({
-  
   id: z.string(),
   name: z.string().nullish(),
   description: z.string().nullish(),
@@ -68,8 +73,8 @@ const orgUpdateInput = z.object({
   phone: z.string().nullish(),
   tags: z.array(z.string()).nullish(),
   website: z.string().nullish(),
-  helpfulToCommunities: z.array(z.string()).nullish(),
-  exclusiveToCommunities: z.array(z.string()).nullish(),
+  helpfulToCommunities: z.array(communityUpdate).nullish(),
+  exclusiveToCommunities: z.array(communityUpdate).nullish(),
   address: z.string().nullish(),
   city: z.string().nullish(),
   state: z.string().nullish(),
@@ -175,6 +180,7 @@ export const organizationRouter = router({
           },
           include: {
             exclusiveToCommunities: true,
+            helpfulToCommunities: true,
             programs: {
               select: {
                 id: true,
@@ -209,36 +215,61 @@ export const organizationRouter = router({
                   }
                 : undefined,
             },
-
           },
         });
 
-        if (
-          input.exclusiveToCommunities &&
-          input.exclusiveToCommunities.length > 0
-        ) {
-          updatedOrg.programs.map(async (program) => {
-            await ctx.prisma.program.update({
-              where: {
-                id: program.id,
+
+          await ctx.prisma.organization.update({
+            where: {
+              id: input.id,
+            },
+            data: {
+              exclusiveToCommunities: {
+                disconnect: updatedOrg.exclusiveToCommunities.filter(
+                  (community) =>
+                  {
+                    if(!input.exclusiveToCommunities) return true;
+                    return !input.exclusiveToCommunities.find((community2) => community2.id === community.id)
+                  }
+                ),
+                connectOrCreate: input.exclusiveToCommunities ? input.exclusiveToCommunities.map(
+                  (community) => ({
+                    where: { name: community.name },
+                    create: {
+                      name: community.name,
+                    },
+                  })
+                ) : undefined,
               },
-              data: {
-                exclusiveToCommunities: input.exclusiveToCommunities
-                  ? {
-                      connectOrCreate: input.exclusiveToCommunities.map(
-                        (community) => ({
-                          where: { name: community },
-                          create: {
-                            name: community,
-                          },
-                        })
-                      ),
-                    }
-                  : undefined,
-              },
-            });
+            },
           });
-        }
+
+          await ctx.prisma.organization.update({
+            where: {
+              id: input.id,
+            },
+              data: {
+                helpfulToCommunities: {
+                  disconnect: updatedOrg.helpfulToCommunities.filter(
+                    (community) =>
+                    {
+                      if(!input.helpfulToCommunities) return true;
+                      return !input.helpfulToCommunities.find((community2) => community2.id === community.id)
+                    }
+                  ),
+                  connectOrCreate: input.helpfulToCommunities ? input.helpfulToCommunities.map(
+                    (community) => ({
+                      where: { name: community.name },
+                      create: {
+                        name: community.name,
+                      },
+                    })
+                  ) : undefined,
+                }, 
+              }
+            }
+          );
+          
 
         return updatedOrg;
       } catch (err) {
@@ -293,6 +324,57 @@ export const organizationRouter = router({
                 tag: input.tag,
               },
             },
+          },
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }),
+
+  updateLocation: adminProcedure
+    .input(
+      z.object({
+        locationid: z.string(),
+        address: z.string(),
+        apt: z.string(),
+        city: z.string(),
+        state: z.string(),
+        zip: z.string(),
+        lat: z.number().optional(),
+        lng: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      let { lat, lng } = input;
+
+      if (!lat || !lng) {
+        const options = {
+          provider: "openstreetmap",
+        } as const;
+
+        const geocoder = NodeGeocoder(options);
+
+        const res = await geocoder.geocode(
+          `${input.address}, ${input.city}, ${input.state}, ${input.zip}`
+        );
+
+        lat = res[0]?.latitude;
+        lng = res[0]?.longitude;
+
+      }
+      try {
+        return await ctx.prisma.location.update({
+          where: {
+            id: input.locationid,
+          },
+          data: {
+            address: input.address,
+            apt: input.apt,
+            city: input.city,
+            state: input.state,
+            zip: input.zip,
+            latitude: lat,
+            longitude: lng,
           },
         });
       } catch (err) {

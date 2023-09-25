@@ -1,6 +1,7 @@
 import { prisma } from "@/server/db";
 import React from "react";
 import { UpdateOrganizationForm } from "../../../_components/organization/UpdateForm";
+import next from "next";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ const getOrganization = async (id: string) => {
           categoryMeta: true,
         },
       },
+      locations: true,
       exclusiveToCommunities: true,
       helpfulToCommunities: true,
       tags: true,
@@ -33,13 +35,45 @@ export type OrganizationFormProps = NonNullable<
 async function Page({ params }: { params: { id: string } }) {
   const orgData = await getOrganization(params.id);
 
+  const nextOrg =  await prisma.organization.findFirst({
+    where: {
+      id: {
+        gt: params.id,
+      },
+    },
+    select: {
+      id: true,
+    },
+    orderBy: {
+      id: 'asc'
+    }
+  
+  })
+
+  const prevOrg =  await prisma.organization.findFirst({
+    where: {
+      id: {
+        lt: params.id,
+      },
+    },
+    select: {
+      id: true,
+    },
+    orderBy: {
+      id: 'desc'
+    }
+  
+  })
+  
+
+
   if (!orgData) {
     return {
       notFound: true,
     };
   }
 
-  return <UpdateOrganizationForm org={orgData} />;
+  return <UpdateOrganizationForm org={orgData} nextOrgId={nextOrg?.id} prevOrgId={prevOrg?.id} />;
 }
 
 export default Page;

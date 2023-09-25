@@ -11,16 +11,67 @@ import {
 } from "@/components/Selectors";
 import { api } from "@/utils/api";
 import { FormItemWrapper } from "../FormItemWrapper";
+import Link from "next/link";
+
+function NavigateNextPrevious({ nextOrgId, prevOrgId }: { nextOrgId?: string; prevOrgId?: string }) {
+  return (
+    <div className="py-4 flex gap-2">
+      <Link href={`/admin/org/${prevOrgId}`}>
+        <button className="col-span-1  rounded bg-stone-500 p-2 text-white md:col-span-2">
+          Previous Organization
+
+        </button>
+      </Link>
+      <Link href={`/admin/org/${nextOrgId}`}>
+        <button className="col-span-1  rounded bg-stone-500 p-2 text-white md:col-span-2">
+          Next Organization
+        </button>
+      </Link>
+    </div>
+  )
+}
+
+type LocationProps = Pick<
+  OrganizationFormProps,
+  "locations" 
+>;
+
+function LocationForm({ locations }: LocationProps) {
+
+    return (
+      <div>
+      <h2>Locations</h2>
+      {
+
+        locations.map((location) => {
+          return (
+            <div>
+              
+              <p>{location.address}</p>
+              <p>{location.apt}</p>
+              <p>{location.city}, {location.state} {location.zip}</p>
+              <p>{location.latitude}, {location.longitude}</p>
+            </div>
+          )
+        })
+
+        }</div>
+    )
+}
 
 export function UpdateOrganizationForm({
   org,
+  nextOrgId,
+  prevOrgId,
 }: {
   org: OrganizationFormProps;
+  nextOrgId?: string;
+  prevOrgId?: string;
 }) {
   const editOrganization = api.organization.update.useMutation();
   const disconnectTag = api.organization.disconnectTag.useMutation();
 
-
+  console.log('locations',org.locations)
 
   type MutationOptions = Parameters<typeof editOrganization.mutate>;
 
@@ -33,14 +84,24 @@ export function UpdateOrganizationForm({
     {
       label: string;
       value: string;
-    }[]> (org.exclusiveToCommunities.map((x) => ({
+    }[]
+  >(
+    org.exclusiveToCommunities.map((x) => ({
       label: x.name,
       value: x.id,
-      })))
+    }))
+  );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    editOrganization.mutate(formData);
+    editOrganization.mutate({...formData, 
+      exclusiveToCommunities: exclusiveToCommunities.map(x => {
+        return {
+          id: x.value,
+          name: x.label
+        }
+      })
+    });
   };
 
   const handleChange = (
@@ -128,13 +189,15 @@ export function UpdateOrganizationForm({
           >
             Website
           </label>
+          <div className="flex gap-1">
           <input
             type="text"
             name="website"
-            className="text-bold rounded border border-stone-200 p-2 "
+            className="text-bold rounded border border-stone-200 p-2 w-5/6"
             id="website"
             defaultValue={org.website || ""}
-          />
+            onChange={handleChange}
+          /> {org.website && <Link target="_blank" className="bg-stone-300 px-2 rounded text-center text-xs items-center justify-center flex" href={org.website}>Visit Site</Link>}</div>
         </FormItemWrapper>
         <FormItemWrapper>
           <label
@@ -210,48 +273,24 @@ export function UpdateOrganizationForm({
               const newValue = value as {
                 label: string;
                 value: string;
-              }[]
-              if (!newValue){
-                setExclusiveToCommunities(
-                  []
-                )
-                return setFormData({ ...formData, exclusiveToCommunities: [] });}
-
-                setExclusiveToCommunities(newValue)
-              const newTags = (newValue as CategorySelectItem[]).map(
-                (x) => x.value
-              );
-
-              if (
-                formData.exclusiveToCommunities === undefined ||
-                formData.exclusiveToCommunities === null
-              )
-                return setFormData({
-                  ...formData,
-                  exclusiveToCommunities: newTags,
-                });
-
-              const oldTags = formData.exclusiveToCommunities.map((x) =>
-                x.trim()
-              );
-
-              // check if any tags have been removed from oldTags
-              const removedTags = oldTags.filter((x) => !newTags.includes(x));
-
-              console.log(removedTags);
-
-              if (removedTags.length > 0) {
-                // remove the tags from the org
-                removedTags.forEach((tag) => {
-                  disconnectTag.mutate({ orgId: org.id, tag: tag });
-                });
+              }[];
+              if (!newValue) {
+                setExclusiveToCommunities([]);
+                return setFormData({ ...formData, exclusiveToCommunities: [] });
               }
 
-              setFormData({ ...formData, exclusiveToCommunities: newTags });
+              setExclusiveToCommunities(newValue);
+
+
+              setFormData({ ...formData, exclusiveToCommunities: newValue.map(x => {
+                return {
+                  id: x.value,
+                  name: x.label
+                }
+              }
+              ) });
             }}
-            value={
-              exclusiveToCommunities
-            }
+            value={exclusiveToCommunities}
           />
         </FormItemWrapper>
         <FormItemWrapper>
@@ -264,49 +303,36 @@ export function UpdateOrganizationForm({
           <CommunitySelect
             title=""
             onChange={(value) => {
-              if (!value)
+              {
+              const newValue = value as {
+                label: string;
+                value: string;
+              }[];
+              if (!newValue) {
                 return setFormData({ ...formData, helpfulToCommunities: [] });
-
-              const newTags = (value as CategorySelectItem[]).map(
-                (x) => x.value
-              );
-
-              if (
-                formData.helpfulToCommunities === undefined ||
-                formData.helpfulToCommunities === null
-              )
-                return setFormData({
-                  ...formData,
-                  helpfulToCommunities: newTags,
-                });
-
-              const oldTags = formData.helpfulToCommunities.map((x) =>
-                x.trim()
-              );
-
-              // check if any tags have been removed from oldTags
-              const removedTags = oldTags.filter((x) => !newTags.includes(x));
-
-              console.log(removedTags);
-
-              if (removedTags.length > 0) {
-                // remove the tags from the org
-                removedTags.forEach((tag) => {
-                  disconnectTag.mutate({ orgId: org.id, tag: tag });
-                });
               }
 
-              setFormData({ ...formData, helpfulToCommunities: newTags });
+
+
+              setFormData({ ...formData, helpfulToCommunities: newValue.map(x => {
+                return {
+                  id: x.value,
+                  name: x.label
+                }
+              }
+              ) });
             }}
+            }
+            
             value={
               formData.helpfulToCommunities
                 ? formData.helpfulToCommunities.map((x) => ({
-                    label: x,
-                    value: x,
+                    label: x.name,
+                    value: x.id,
                   }))
                 : org.helpfulToCommunities.map((x) => ({
                     label: x.name,
-                    value: x.name,
+                    value: x.id,
                   }))
             }
           />
@@ -315,7 +341,14 @@ export function UpdateOrganizationForm({
         <button className="col-span-1  rounded bg-rose-500 p-2 text-white md:col-span-2">
           Submit
         </button>
+        <Link href={`/admin/org/${org.id}/programs`}>
+          <button className="col-span-1  rounded bg-rose-500 p-2 text-white md:col-span-2">
+            Go to Programs
+          </button>
+        </Link>
       </form>
+      <LocationForm locations={org.locations} />
+      <NavigateNextPrevious nextOrgId={nextOrgId} prevOrgId={prevOrgId} />
     </>
   );
 }
