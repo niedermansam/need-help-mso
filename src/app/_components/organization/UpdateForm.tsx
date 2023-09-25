@@ -13,23 +13,6 @@ import { api } from "@/utils/api";
 import { FormItemWrapper } from "../FormItemWrapper";
 import Link from "next/link";
 
-function NavigateNextPrevious({ nextOrgId, prevOrgId }: { nextOrgId?: string; prevOrgId?: string }) {
-  return (
-    <div className="py-4 flex gap-2">
-      <Link href={`/admin/org/${prevOrgId}`}>
-        <button className="col-span-1  rounded bg-stone-500 p-2 text-white md:col-span-2">
-          Previous Organization
-
-        </button>
-      </Link>
-      <Link href={`/admin/org/${nextOrgId}`}>
-        <button className="col-span-1  rounded bg-stone-500 p-2 text-white md:col-span-2">
-          Next Organization
-        </button>
-      </Link>
-    </div>
-  )
-}
 
 type LocationProps = Pick<
   OrganizationFormProps,
@@ -348,7 +331,6 @@ export function UpdateOrganizationForm({
         </Link>
       </form>
       <LocationForm locations={org.locations} />
-      <NavigateNextPrevious nextOrgId={nextOrgId} prevOrgId={prevOrgId} />
     </>
   );
 }

@@ -35,36 +35,7 @@ export type OrganizationFormProps = NonNullable<
 async function Page({ params }: { params: { id: string } }) {
   const orgData = await getOrganization(params.id);
 
-  const nextOrg =  await prisma.organization.findFirst({
-    where: {
-      id: {
-        gt: params.id,
-      },
-    },
-    select: {
-      id: true,
-    },
-    orderBy: {
-      id: 'asc'
-    }
-  
-  })
 
-  const prevOrg =  await prisma.organization.findFirst({
-    where: {
-      id: {
-        lt: params.id,
-      },
-    },
-    select: {
-      id: true,
-    },
-    orderBy: {
-      id: 'desc'
-    }
-  
-  })
-  
 
 
   if (!orgData) {
@@ -73,7 +44,7 @@ async function Page({ params }: { params: { id: string } }) {
     };
   }
 
-  return <UpdateOrganizationForm org={orgData} nextOrgId={nextOrg?.id} prevOrgId={prevOrg?.id} />;
+  return <UpdateOrganizationForm org={orgData}  />;
 }
 
 export default Page;

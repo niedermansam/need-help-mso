@@ -307,6 +307,12 @@ function ProgramList({ programs, searchName }: { programs: ProgramCardInformatio
 
   const paginatedPrograms = filteredPrograms.slice(start, end);
 
+  if(!paginatedPrograms.length) return (
+    <div className="flex flex-col justify-center items-center h-full">
+      <h2 className="text-6xl font-bold text-stone-500">No Programs Found</h2>
+      <p className="text-2xl text-stone-700">Add a new program using the form on this page.</p>
+    </div>
+  )
 
   return (
     <>

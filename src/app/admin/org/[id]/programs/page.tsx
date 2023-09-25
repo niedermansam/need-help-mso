@@ -46,8 +46,6 @@ async function Page({
     };
   return (
     <div>
-      <h1 className="text-4xl font-bold text-stone-700">Add & Edit Programs</h1>
-      <h2 className="text-2xl font-bold text-stone-700">{orgData?.name}</h2>
 
         <AdminProgramSection org={orgData} />
     </div>
