@@ -18,6 +18,7 @@ import ReactModal from "react-modal";
 
 export function FavoriteOrgButton({ orgId }: { orgId: string }) {
   const favoriteOrgs = useFavoriteOrgStore((state) => state.favoriteOrgs);
+  const loggedIn = useUserStore((state) => state.loggedIn);
 
   const toggleFavoriteOrg = useFavoriteOrgStore(
     (state) => state.toggleFavoriteOrg
@@ -34,7 +35,7 @@ export function FavoriteOrgButton({ orgId }: { orgId: string }) {
     });
   };
   return (
-    <button
+   loggedIn && <button
       className="flex h-8 w-8 items-center justify-center "
       onClick={handleClick}
     >
@@ -56,6 +57,7 @@ export function FavoriteProgramButton({
   const favoritePrograms = useFavoriteProgramStore(
     (state) => state.favoritePrograms
   );
+  const loggedIn = useUserStore((state) => state.loggedIn);
 
   const toggleFavoriteProgram = useFavoriteProgramStore(
     (state) => state.toggleFavoriteProgram
@@ -71,7 +73,7 @@ export function FavoriteProgramButton({
     });
   };
   return (
-    <button
+    loggedIn && <button
       className="flex h-8 w-8 items-center justify-center "
       onClick={handleClick}
     >
