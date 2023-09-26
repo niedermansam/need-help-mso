@@ -9,11 +9,16 @@ function EmailLink() {
         needhelp&#109;&#105;&#115;soula&#64;&#103;mail&#46;com
       </a>
       <button
-        onClick={async () => {
-          await navigator.clipboard.writeText(
+        onClick={() => {
+          navigator.clipboard.writeText(
             "needhelpmissoula@gmail.com"
-          );
-            setButtonText("Copied!");
+          ).catch((err) => {
+            console.error("Failed to copy: ", err);
+            }
+            );
+            
+            
+            return void setButtonText("Copied!");
         }}
         className="ml-2 rounded bg-stone-500 px-1 text-sm text-white"
       >
