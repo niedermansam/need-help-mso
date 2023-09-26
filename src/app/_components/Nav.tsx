@@ -47,7 +47,9 @@ export default function NavBar() {
     (state) => state.setFavoriteListId
   );
 
-  const { data: favorites } = api.user.getCurrentFavoritesList.useQuery();
+  const { data: favorites } = api.user.getCurrentFavoritesList.useQuery(undefined ,{
+    enabled: loggedIn,
+  });
 
   useEffect(() => {
     setFavoriteOrgs(favorites?.organizations || []);
