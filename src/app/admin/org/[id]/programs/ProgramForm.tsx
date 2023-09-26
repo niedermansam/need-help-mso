@@ -10,6 +10,7 @@ import {
   TagSelect,
 } from "@/components/Selectors";
 import { api } from "@/utils/api";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 type DefaultsFromOrganization = {
@@ -22,10 +23,10 @@ type DefaultsFromOrganization = {
 };
 
 function CreateProgramForm({ org, setSearchName }: { org: DefaultsFromOrganization, setSearchName: (name: string) => void }) {
+  const router = useRouter( )
   const { id: orgId, category: orgCategory } = org;
   const createProgram = api.program.create.useMutation({
     onSuccess: () => {
-      alert("Program Created");
       setFormState({
         orgId,
         category: formState.category,
@@ -39,6 +40,7 @@ function CreateProgramForm({ org, setSearchName }: { org: DefaultsFromOrganizati
       setExclusiveToCommunities([]);
       setHelpfulToCommunities([]);
       setSelectedTags([]);
+      router.refresh()
     },
   });
   type ProgramFormProps = Partial<Parameters<typeof createProgram.mutate>[0]>;
