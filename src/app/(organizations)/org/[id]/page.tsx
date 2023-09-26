@@ -1,6 +1,5 @@
 import { BackButton } from "@/app/_components/BackButton";
-import { ContactInfo, ProgramCard } from "@/app/_components/DisplayCard/server";
-import { prisma } from "@/server/db";
+import { ContactInfo } from "@/app/_components/DisplayCard/server";
 import React from "react";
 import { getOrgData } from "./getOrgData";
 import ProgramSection from "./ProgramSection";

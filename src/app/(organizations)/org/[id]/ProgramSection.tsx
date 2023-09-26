@@ -1,9 +1,9 @@
 "use client"
-import React, { Dispatch, SetStateAction } from 'react'
-import { ProgramData } from './getOrgData'
+import React, { type Dispatch, type SetStateAction } from 'react'
+import type { ProgramData } from './getOrgData'
 import { ProgramCard } from '@/app/_components/DisplayCard/server'
 import { twMerge } from 'tailwind-merge'
-import { useRouter, useSearchParams } from 'next/navigation'
+// import { useSearchParams, useRouter } from 'next/navigation'
 
 function PaginatedProgramList({
   programs,
@@ -22,7 +22,7 @@ function PaginatedProgramList({
   currentPage: number;
   setCurrentPage: Dispatch<SetStateAction<number>>;
 }) {
-  const [programsPerPage, setProgramsPerPage] = React.useState(3);
+  const programsPerPage = 3;
 
   const indexOfLastProgram = (currentPage + 1) * programsPerPage;
   const indexOfFirstProgram = indexOfLastProgram - programsPerPage;
@@ -131,11 +131,11 @@ function ProgramSection({programs, organization}: {
     }
 }) {
 
-    const router  = useRouter()
-    const searchParams = useSearchParams()
+    //const router  = useRouter()
+    // const searchParams = useSearchParams()
 
-    const category = searchParams?.get('category')
-    const page = parseInt( searchParams?.get('page') || '0')
+    //const category = searchParams?.get('category')
+    //const page = parseInt( searchParams?.get('page') || '0')
 
 
 

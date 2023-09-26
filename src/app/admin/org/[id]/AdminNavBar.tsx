@@ -13,8 +13,8 @@ export function NavigateNextPrevious({
 }) {
   return (
     <div className="flex gap-2 text-sm ">
-      <Link href={`/admin/org/${prevOrgId}`}>&larr; Previous Organization</Link>{" "}
-      |<Link href={`/admin/org/${nextOrgId}`}>Next Organization&rarr;</Link>
+      <Link aria-disabled={!prevOrgId} href={`/admin/org/${prevOrgId || ''}`}>&larr; Previous Organization</Link>{" "}
+      |<Link aria-disabled={!nextOrgId} href={`/admin/org/${nextOrgId || ''}`}>Next Organization&rarr;</Link>
     </div>
   );
 }

@@ -28,7 +28,7 @@ function LocationForm({ locations }: LocationProps) {
 
         locations.map((location) => {
           return (
-            <div>
+            <div key={`${location.id}`}>
               
               <p>{location.address}</p>
               <p>{location.apt}</p>
@@ -44,12 +44,8 @@ function LocationForm({ locations }: LocationProps) {
 
 export function UpdateOrganizationForm({
   org,
-  nextOrgId,
-  prevOrgId,
 }: {
   org: OrganizationFormProps;
-  nextOrgId?: string;
-  prevOrgId?: string;
 }) {
   const editOrganization = api.organization.update.useMutation();
   const disconnectTag = api.organization.disconnectTag.useMutation();

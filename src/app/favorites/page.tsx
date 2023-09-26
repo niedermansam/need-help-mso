@@ -286,7 +286,7 @@ function Page() {
     (state) => state.setFavoriteOrgs
   );
 
-  const { data: userLists, refetch } = api.user.getOwnFavoritesLists.useQuery();
+  const { data: userLists } = api.user.getOwnFavoritesLists.useQuery();
 
   const [listName, setListName] = React.useState("Favorites");
 

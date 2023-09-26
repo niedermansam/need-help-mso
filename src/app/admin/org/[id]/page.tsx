@@ -1,7 +1,6 @@
 import { prisma } from "@/server/db";
 import React from "react";
 import { UpdateOrganizationForm } from "../../../_components/organization/UpdateForm";
-import next from "next";
 
 export const dynamic = "force-dynamic";
 

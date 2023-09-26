@@ -45,7 +45,7 @@ function CreateOrganizationForm({ orgData }: ServerSideProps) {
   } as const;
 
   const [formData, setFormData] = useState({ ...INITIAL_STATE });
-  const addOrg = api.organization.update.useMutation();
+  // const addOrg = api.organization.update.useMutation();
   const disconnectTag = api.organization.disconnectTag.useMutation();
   return (
     <div className="bg-stone-50 text-stone-600">
@@ -79,7 +79,7 @@ function CreateOrganizationForm({ orgData }: ServerSideProps) {
               }
             />
 
-            <button
+            {/*<button
               type="button"
               className="mb-6 rounded bg-rose-500 px-2 py-1.5 font-bold uppercase tracking-wider text-rose-50"
               onClick={() =>
@@ -92,7 +92,7 @@ function CreateOrganizationForm({ orgData }: ServerSideProps) {
               }
             >
               Submit
-            </button>
+            </button>*/}
           </div>
 
           <div className="mx-3 flex w-2/12 flex-col">

@@ -1,4 +1,4 @@
-import { LocationData } from "./page";
+import type { LocationData } from "./page";
 
 export function isOrgInView({
   latitude,

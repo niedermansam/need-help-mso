@@ -63,7 +63,7 @@ const orgInput = z.object({
 const communityUpdate = z.object({
   id: z.string(),
   name: z.string(),
-})
+});
 
 const orgUpdateInput = z.object({
   id: z.string(),
@@ -94,20 +94,23 @@ const createOrgId = (name: string) => {
 
 export const organizationRouter = router({
   create: adminProcedure.input(orgInput).mutation(async ({ input, ctx }) => {
-
     const options = {
       provider: "openstreetmap",
     } as const;
 
-    const geocoder = NodeGeocoder(options);
+    let geocoded;
 
-    const res = await geocoder.geocode(
-      `${input.address}, ${input.city}, ${input.state}, ${input.zip}`
-    );
+    if (input.address) {
+      const geocoder = NodeGeocoder(options);
 
-    let geocoded = res[0];
+      const res = await geocoder.geocode(
+        `${input.address || ""}, ${input.city || ""}, ${input.state || ""}, ${
+          input.zip || ""
+        }`
+      );
 
-
+      geocoded = res[0];
+    }
 
     try {
       const newOrg = await ctx.prisma.organization.create({
@@ -163,7 +166,7 @@ export const organizationRouter = router({
                   city: input.city,
                   state: input.state,
                   zip: input.zip,
-                  latitude: geocoded &&  geocoded.latitude,
+                  latitude: geocoded && geocoded.latitude,
                   longitude: geocoded && geocoded.longitude,
                 },
               }
@@ -237,58 +240,57 @@ export const organizationRouter = router({
           },
         });
 
-
-          await ctx.prisma.organization.update({
-            where: {
-              id: input.id,
-            },
-            data: {
-              exclusiveToCommunities: {
-                disconnect: updatedOrg.exclusiveToCommunities.filter(
-                  (community) =>
-                  {
-                    if(!input.exclusiveToCommunities) return true;
-                    return !input.exclusiveToCommunities.find((community2) => community2.id === community.id)
-                  }
-                ),
-                connectOrCreate: input.exclusiveToCommunities ? input.exclusiveToCommunities.map(
-                  (community) => ({
+        await ctx.prisma.organization.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            exclusiveToCommunities: {
+              disconnect: updatedOrg.exclusiveToCommunities.filter(
+                (community) => {
+                  if (!input.exclusiveToCommunities) return true;
+                  return !input.exclusiveToCommunities.find(
+                    (community2) => community2.id === community.id
+                  );
+                }
+              ),
+              connectOrCreate: input.exclusiveToCommunities
+                ? input.exclusiveToCommunities.map((community) => ({
                     where: { name: community.name },
                     create: {
                       name: community.name,
                     },
-                  })
-                ) : undefined,
-              },
+                  }))
+                : undefined,
             },
-          });
+          },
+        });
 
-          await ctx.prisma.organization.update({
-            where: {
-              id: input.id,
+        await ctx.prisma.organization.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            helpfulToCommunities: {
+              disconnect: updatedOrg.helpfulToCommunities.filter(
+                (community) => {
+                  if (!input.helpfulToCommunities) return true;
+                  return !input.helpfulToCommunities.find(
+                    (community2) => community2.id === community.id
+                  );
+                }
+              ),
+              connectOrCreate: input.helpfulToCommunities
+                ? input.helpfulToCommunities.map((community) => ({
+                    where: { name: community.name },
+                    create: {
+                      name: community.name,
+                    },
+                  }))
+                : undefined,
             },
-              data: {
-                helpfulToCommunities: {
-                  disconnect: updatedOrg.helpfulToCommunities.filter(
-                    (community) =>
-                    {
-                      if(!input.helpfulToCommunities) return true;
-                      return !input.helpfulToCommunities.find((community2) => community2.id === community.id)
-                    }
-                  ),
-                  connectOrCreate: input.helpfulToCommunities ? input.helpfulToCommunities.map(
-                    (community) => ({
-                      where: { name: community.name },
-                      create: {
-                        name: community.name,
-                      },
-                    })
-                  ) : undefined,
-                }, 
-              }
-            }
-          );
-          
+          },
+        });
 
         return updatedOrg;
       } catch (err) {
@@ -379,7 +381,6 @@ export const organizationRouter = router({
 
         lat = res[0]?.latitude;
         lng = res[0]?.longitude;
-
       }
       try {
         return await ctx.prisma.location.update({

@@ -1,18 +1,16 @@
 "use client";
 import {
   ProgramCard,
-  ProgramCardInformation,
+  type ProgramCardInformation,
 } from "@/app/_components/DisplayCard/server";
 import { FormItemWrapper } from "@/app/_components/FormItemWrapper";
 import {
   CategorySelect,
   CommunitySelect,
-  OrganizationSingleSelect,
   TagSelect,
 } from "@/components/Selectors";
 import { api } from "@/utils/api";
 import React from "react";
-import { set } from "zod";
 
 type DefaultsFromOrganization = {
   id: string;
