@@ -3,15 +3,15 @@ import Link from "next/link";
 export default function AboutPage() {
   return (
     <div>
-      <div className="relative mx-12 mb-20 max-w-4xl pt-16 text-lg font-light text-stone-800 md:mx-auto md:pl-6">
-        <h1 className=" mb-2 text-5xl">About The App</h1>
-        <h3 className="mb-4 text-2xl text-stone-500">
+      <div className="relative mx-12 mb-20 max-w-4xl text-lg font-light text-stone-800 md:mx-auto md:pl-6">
+        <h1 className="text-stone-600 mb-4 text-5xl font-thin">About <span className="text-rose-700 font-bold ml-2">Need Help Missoula</span></h1>
+        <h3 className="text-2xl text-stone-500 font-extralight">
           Hi there! My name is Sam!
         </h3>
-        <p className="my-2 leading-relaxed">
+        <p className="my-2 mb-8 leading-relaxed">
           I&apos;m the developer behind Need Help Missoula, and I like to think
           that software can make the world a better place. The project was born
-          out of a desire to make life a little easier for the hundred of case
+          out of a desire to make life a little easier for the hundreds of case
           workers, social workers, and other professionals who work tirelessly
           to help people in need. I hope that this project can be a useful tool
           for them, and that it can help people who need a helping hand find the
@@ -21,7 +21,7 @@ export default function AboutPage() {
         <h2 className="text-2xl font-semibold text-stone-600">
           Who&apos;s Need Help Missoula for?
         </h2>
-        <p className="my-2 leading-relaxed">
+        <p className="my-2 mb-8 leading-relaxed">
           The inspiration for this project came from my wonderful partner,
           Kenzie, who works as a liaison of sorts between University students
           who are having trouble making ends meet and the programs that can help
@@ -37,7 +37,7 @@ export default function AboutPage() {
         <h2 className="text-2xl font-semibold text-stone-600">
           Why am I building this?
         </h2>
-        <p className="my-2 leading-relaxed">
+        <p className="my-2 mb-8 leading-relaxed">
           As I started showing the project to other people, I realized that I
           might be on to something here. There are hundreds of nonprofits,
           organizations, and other groups in Missoula that are doing amazing
@@ -56,7 +56,7 @@ export default function AboutPage() {
         <h2 className="text-2xl font-semibold text-stone-600">
           What makes Need Help Missoula different?
         </h2>
-        <p className="my-2 leading-relaxed">
+        <p className="my-2 mb-8 leading-relaxed">
           There&apos;s a thousand different directories of programs and
           nonprofits, but most public facing versions are geared towards
           fundraising, not care providers. Need Help Missoula is a directory for
