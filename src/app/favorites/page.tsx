@@ -4,6 +4,8 @@ import { trpc } from "@/app/providers";
 import { LoadingAnimation } from "@/components";
 import { api } from "@/utils/api";
 import { useFavoriteOrgStore } from "@/utils/userStore";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import ReactModal from "react-modal";
 
@@ -72,26 +74,25 @@ export function DeleteListButton({
 
 export function FavoritesActionButtons({ listId }: { listId: number }) {
   const favoriteStore = useFavoriteOrgStore((state) => state.setFavoriteListId);
+  const router = useRouter()
 
-  const invalidate = invalidateFavorites;
 
   const createList = api.user.createFavoriteList.useMutation({
     onSuccess: (data) => {
       favoriteStore(data);
-      invalidate();
+      router.refresh();
     },
   });
 
   const copyList = api.user.copyFavoritesList.useMutation({
     onSuccess: (data) => {
       favoriteStore(data.id);
-      invalidate();
+      router.refresh();
     },
   });
 
   const handleCreateList = () => {
     createList.mutate();
-    invalidate();
   };
 
   return (
@@ -237,7 +238,46 @@ const PlainTextContactModal = ({ contact }: { contact?: ContactProps[] | null })
   );
 };
 
+
+type OrganizationProps = Parameters<typeof OrganizationCard>[0]["org"];
+
+function FavoritesList({organizations}: {organizations: OrganizationProps[]}) {
+
+  if(!organizations.length) return (
+    <div className="flex h-[40vh] flex-col items-center justify-center text-center">
+      <p className="text-3xl font-bold text-stone-500">
+        No organizations in this list, yet.
+      </p>
+      <p className="text-stone-500">
+        Click the star next to an organization to change that.
+      </p>
+      <div className="flex gap-1 pt-2">
+        <Link
+          href="/orgs/all"
+          className="rounded bg-rose-500 px-2 py-1 text-white"
+        >
+          Browse Organizations
+        </Link>
+        <Link className="rounded bg-rose-500 px-2 py-1 text-white" href="/map">
+          View Map
+        </Link>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      {organizations.map((org) => (
+        <OrganizationCard org={org} key={org.id} showDescription />
+      ))}
+
+      <PlainTextContactModal contact={organizations} />
+    </div>
+  );
+}
+
 function Page() {
+  const router = useRouter();
   const favoriteListId = useFavoriteOrgStore((state) => state.favoriteListId);
   const setFavoriteListId = useFavoriteOrgStore(
     (state) => state.setFavoriteListId
@@ -275,7 +315,7 @@ function Page() {
   });
 
   const afterDelete = () => {
-    return void refetch();
+    router.refresh()
   };
 
   return (
@@ -290,12 +330,7 @@ function Page() {
           {" "}
           <LoadingAnimation />{" "}
         </div>
-      ) : (
-        favoriteList?.organizations.map((org) => (
-          <OrganizationCard org={org} key={org.id} showDescription />
-        ))
-      )}
-      <PlainTextContactModal contact={favoriteList?.organizations } />
+      ) :  <FavoritesList organizations={favoriteList?.organizations || []} />}
       <h2 className="text-2xl font-bold text-stone-600">Your other lists:</h2>
       <p className="mb-2 text-sm">Click to view and edit</p>
       {userLists?.map((list) => {
