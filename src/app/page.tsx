@@ -19,6 +19,7 @@ const CallToAction: React.FC = () => {
       <Link
         className="my-2 rounded-lg bg-rose-200 px-4 py-2 font-bold text-rose-600 shadow transition-all hover:bg-rose-300 hover:shadow-lg focus:bg-rose-300 focus:shadow-lg"
         href="https://www.patreon.com/NeedHelpMissoula"
+        data-umami-event="patreon-link"
       >
         Support on Patreon
       </Link>
