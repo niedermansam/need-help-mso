@@ -46,6 +46,13 @@ model Session {
     @@index([userId])
 }
 
+enum Role {
+    SUPERADMIN
+    ADMIN
+    VOLUNTEER
+    USER
+}
+
 model User {
     id            String                @id @default(cuid())
     name          String?
@@ -59,6 +66,7 @@ model User {
     organizations OrganizationContact[]
     roles         OrganizationRole[]
     admin         Boolean               @default(false)
+    role          Role                  @default(USER)
     lists         FavoritesList[]       @relation("AuthorizedUsers")
     createdLists  FavoritesList[]       @relation("Admin")
     currentListId Int?
