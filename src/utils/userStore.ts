@@ -3,14 +3,14 @@ import { create } from "zustand";
 type UserStore = {
   userId: string | null;
   loggedIn: boolean;
-  admin: boolean;
+  admin: boolean | null; 
   setUser: (userId: string | null, loggedIn: boolean, admin: boolean) => void;
 };
 
 export const useUserStore = create<UserStore>((set) => ({
   userId: null,
   loggedIn: false,
-  admin: false,
+  admin: null,
   setUser: (userId: string | null, loggedIn: boolean, admin: boolean) =>
     set({ userId, loggedIn, admin }),
 }));
