@@ -96,7 +96,6 @@ export function UpdateOrganizationForm({
 
   return (
     <>
-      <h1 className="pb-3 text-2xl ">Edit Organization</h1>
       <form
         className="grid-rows-auto grid grid-cols-1 gap-x-6 md:grid-cols-4"
         onSubmit={handleSubmit}
