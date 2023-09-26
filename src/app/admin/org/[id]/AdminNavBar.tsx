@@ -34,7 +34,7 @@ function AdminNavLink({
     <Link
       href={href}
       className={twMerge(
-        pathname === href ? "pr-4  font-bold" : " hover:text-rose-600",
+        pathname === href ? "pr-4  font-bold" : "pr-4 hover:text-rose-600",
         className
       )}
     >
