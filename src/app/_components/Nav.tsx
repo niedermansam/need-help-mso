@@ -104,6 +104,12 @@ export default function NavBar() {
             label="Map"
             isActive={/\/map/.test(pathname)}
           />
+          <NavLink
+            href="/contact"
+            label="Contact"
+            isActive={/\/contact/.test(pathname)}
+          />
+
           {loggedIn && (
             <NavLink
               href="/favorites"
