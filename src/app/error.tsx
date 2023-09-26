@@ -2,7 +2,6 @@
 import Link from "next/link";
 import {  useRouter } from "next/navigation";
 import Image from "next/image";
-import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 
 export default function Error() {
   const router = useRouter();
@@ -32,7 +31,7 @@ export default function Error() {
 
 interface BackToSafetyButtonsProps
   extends React.ComponentPropsWithoutRef<"div"> {
-    router: AppRouterInstance
+    router: ReturnType<typeof useRouter>;
 }
 
 export function BackToSafetyButtons({
