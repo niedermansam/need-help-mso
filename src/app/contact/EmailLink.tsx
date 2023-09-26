@@ -9,8 +9,8 @@ function EmailLink() {
         needhelp&#109;&#105;&#115;soula&#64;&#103;mail&#46;com
       </a>
       <button
-        onClick={() => {
-          navigator.clipboard.writeText(
+        onClick={async () => {
+          await navigator.clipboard.writeText(
             "needhelpmissoula@gmail.com"
           );
             setButtonText("Copied!");
