@@ -54,6 +54,7 @@ const orgInput = z.object({
   helpfulToCommunities: z.array(z.string()).optional(),
   exclusiveToCommunities: z.array(z.string()).optional(),
   address: z.string().optional(),
+  apt: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
   zip: z.string().optional(),
@@ -93,6 +94,21 @@ const createOrgId = (name: string) => {
 
 export const organizationRouter = router({
   create: adminProcedure.input(orgInput).mutation(async ({ input, ctx }) => {
+
+    const options = {
+      provider: "openstreetmap",
+    } as const;
+
+    const geocoder = NodeGeocoder(options);
+
+    const res = await geocoder.geocode(
+      `${input.address}, ${input.city}, ${input.state}, ${input.zip}`
+    );
+
+    let geocoded = res[0];
+
+
+
     try {
       const newOrg = await ctx.prisma.organization.create({
         data: {
@@ -143,9 +159,12 @@ export const organizationRouter = router({
             ? {
                 create: {
                   address: input.address,
+                  apt: input.apt,
                   city: input.city,
                   state: input.state,
                   zip: input.zip,
+                  latitude: geocoded &&  geocoded.latitude,
+                  longitude: geocoded && geocoded.longitude,
                 },
               }
             : undefined,

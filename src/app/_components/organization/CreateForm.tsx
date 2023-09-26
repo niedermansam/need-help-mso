@@ -10,6 +10,7 @@ import {
 import { api } from "@/utils/api";
 import { useUserStore } from "@/utils/userStore";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { twMerge } from "tailwind-merge";
 
@@ -25,16 +26,30 @@ const DEFAULT_OBJECT = {
   zip: DEFAULT_ZIP,
 } as const
 
+
 export function NewOrganizationForm() {
+  const router = useRouter()
   const createOrganization = api.organization.create.useMutation({
-    onSuccess: () => {
-      alert("Organization created successfully!");
-      setFormData({ ...DEFAULT_OBJECT, category: formData?.category  });
+    onSuccess: (data) => {
+      if (!data) return;
+      router.push("/admin/org/" + data.id);
     }
 
   });
 
   type CreateOrg = Parameters<typeof createOrganization.mutate>[0];
+
+  const submitIsDisabled = (formData: Partial<CreateOrg>) => {
+    const { category, name, description } = formData;
+
+    if (category === undefined || category === null) return true;
+    if (name === undefined || name === null) return true;
+
+    if (description === undefined || description === null) return true;
+
+    return false;
+  };
+
 
   const [formData, setFormData] = React.useState<Partial<CreateOrg>>(DEFAULT_OBJECT);
 
@@ -80,11 +95,8 @@ export function NewOrganizationForm() {
         onSubmit={handleSubmit}
       >
         <FormItemWrapper>
-          <label
-            className="text-sm font-light lowercase text-stone-600"
-            htmlFor="name"
-          >
-            Name
+          <label className="text-sm lowercase text-stone-600" htmlFor="name">
+            Name*
           </label>
           <input
             className="text-bold rounded border border-stone-200 p-2 text-xl"
@@ -96,12 +108,12 @@ export function NewOrganizationForm() {
           />
         </FormItemWrapper>
 
-        <div className=" min-h-[170px] md:row-span-4  flex flex-col col-span-2">
+        <div className=" col-span-1 flex min-h-[170px]  flex-col sm:col-span-2 md:row-span-4">
           <label
-            className="text-sm font-light lowercase text-stone-600 "
+            className="text-sm lowercase text-stone-600 "
             htmlFor="description"
           >
-            Description
+            Description*
           </label>
           <textarea
             className="text-bold h-full rounded border border-stone-200 p-2"
@@ -113,10 +125,10 @@ export function NewOrganizationForm() {
         </div>
         <FormItemWrapper>
           <label
-            className="text-sm font-light lowercase text-stone-600"
+            className="text-sm lowercase text-stone-600"
             htmlFor="category"
           >
-            Category
+            Category*
           </label>
           <CategorySelect
             onChange={(newValue) => {
@@ -134,7 +146,7 @@ export function NewOrganizationForm() {
             }
           />
         </FormItemWrapper>
-        <FormItemWrapper className="md:col-span-1">
+        <FormItemWrapper className="col-span-2 md:col-span-1">
           <label
             className="text-sm font-light lowercase text-stone-600"
             htmlFor="phone"
@@ -150,7 +162,7 @@ export function NewOrganizationForm() {
             value={formData?.phone || ""}
           />
         </FormItemWrapper>
-        <FormItemWrapper className="md:col-span-1">
+        <FormItemWrapper className="md:col-span-1 ">
           <label
             className="text-sm font-light lowercase text-stone-600"
             htmlFor="email"
@@ -167,7 +179,7 @@ export function NewOrganizationForm() {
             value={formData?.email || ""}
           />
         </FormItemWrapper>
-        <FormItemWrapper>
+        <FormItemWrapper className="col-span-2 md:col-span-1">
           <label
             className="text-sm font-light lowercase text-stone-600"
             htmlFor="website"
@@ -184,7 +196,7 @@ export function NewOrganizationForm() {
           />
         </FormItemWrapper>
         <FormItemWrapper className="flex w-full flex-row">
-          <FormItemWrapper className="w-1/2">
+          <FormItemWrapper className="w-6/12">
             <label
               className="text-sm font-light lowercase text-stone-600"
               htmlFor="address"
@@ -200,7 +212,23 @@ export function NewOrganizationForm() {
               onChange={handleChange}
             />
           </FormItemWrapper>
-          <FormItemWrapper className="w-1/6">
+          <FormItemWrapper className="w-1/12">
+            <label
+              className="text-sm font-light lowercase text-stone-600"
+              htmlFor="apt"
+            >
+              Suite
+            </label>
+            <input
+              type="text"
+              name="apt"
+              className="text-bold rounded border border-stone-200 p-2 "
+              id="apt"
+              value={formData?.apt || ""}
+              onChange={handleChange}
+            />
+          </FormItemWrapper>
+          <FormItemWrapper className="w-2/12">
             <label
               className="text-sm font-light lowercase text-stone-600"
               htmlFor="city"
@@ -216,7 +244,7 @@ export function NewOrganizationForm() {
               onChange={handleChange}
             />
           </FormItemWrapper>
-          <FormItemWrapper className="w-1/6">
+          <FormItemWrapper className="w-1/12">
             <label
               className="text-sm font-light lowercase text-stone-600"
               htmlFor="state"
@@ -232,7 +260,7 @@ export function NewOrganizationForm() {
               onChange={handleChange}
             />
           </FormItemWrapper>
-          <FormItemWrapper className="w-1/6">
+          <FormItemWrapper className="w-2/12">
             <label
               className="text-sm font-light lowercase text-stone-600"
               htmlFor="zip"
@@ -249,7 +277,7 @@ export function NewOrganizationForm() {
             />
           </FormItemWrapper>
         </FormItemWrapper>
-        <FormItemWrapper>
+        <FormItemWrapper className="col-span-2">
           <label
             className="text-sm font-light lowercase text-stone-600"
             htmlFor="tags"
@@ -277,7 +305,7 @@ export function NewOrganizationForm() {
             }
           />
         </FormItemWrapper>
-        <FormItemWrapper className="">
+        <FormItemWrapper className="col-span-2">
           <label
             className="text-sm font-light lowercase text-stone-600"
             htmlFor="exclusive-to-communities"
@@ -287,14 +315,15 @@ export function NewOrganizationForm() {
           <CommunitySelect
             title=""
             onChange={(value) => {
-              if (!value){
-                setExclusiveToCommunities(undefined)
+              if (!value) {
+                setExclusiveToCommunities(undefined);
                 return setFormData({
                   ...formData,
                   exclusiveToCommunities: [],
-                });}
+                });
+              }
 
-                setExclusiveToCommunities(value as CategorySelectItem)
+              setExclusiveToCommunities(value as CategorySelectItem);
 
               const newTagIds = (value as CategorySelectItem[]).map(
                 (x) => x.value
@@ -310,15 +339,12 @@ export function NewOrganizationForm() {
                   exclusiveToCommunities: newTagIds,
                 });
 
-
               setFormData({ ...formData, exclusiveToCommunities: newTagIds });
             }}
-            value={
-              exclusiveToCommunities
-            }
+            value={exclusiveToCommunities}
           />
         </FormItemWrapper>
-        <FormItemWrapper>
+        <FormItemWrapper className="col-span-2 ">
           <label
             className="text-sm font-light lowercase text-stone-600"
             htmlFor="helpful-for-communities"
@@ -328,11 +354,12 @@ export function NewOrganizationForm() {
           <CommunitySelect
             title=""
             onChange={(value) => {
-              if (!value){
-                setHelpfulToCommunities(undefined)
-                return setFormData({ ...formData, helpfulToCommunities: [] });}
+              if (!value) {
+                setHelpfulToCommunities(undefined);
+                return setFormData({ ...formData, helpfulToCommunities: [] });
+              }
 
-                setHelpfulToCommunities(value as CategorySelectItem)
+              setHelpfulToCommunities(value as CategorySelectItem);
 
               const newTags = (value as CategorySelectItem[]).map(
                 (x) => x.value
@@ -350,15 +377,20 @@ export function NewOrganizationForm() {
 
               setFormData({ ...formData, helpfulToCommunities: newTags });
             }}
-            value={
-              helpfulToCommunities
-            }
+            value={helpfulToCommunities}
           />
         </FormItemWrapper>
 
-        <button className="col-span-1  rounded bg-rose-500 p-2 text-white md:col-span-full">
+        <button
+          disabled={submitIsDisabled(formData)}
+          className={twMerge(
+            "col-span-1 rounded p-2 text-white md:col-span-full",
+            submitIsDisabled(formData) ? "bg-stone-500" : "bg-rose-500"
+          )}
+        >
           Submit
         </button>
+        <p className="font-light text-stone-600">*required</p>
       </form>
     </>
   );
