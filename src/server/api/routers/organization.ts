@@ -210,7 +210,6 @@ export const organizationRouter = router({
             },
           },
           data: {
-            id: input.name ? createOrgId(input.name) : undefined,
             name: input.name || undefined,
             description: input.description || undefined,
             email: input.email,
