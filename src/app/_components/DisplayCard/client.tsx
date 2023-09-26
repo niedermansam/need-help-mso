@@ -135,7 +135,7 @@ export function ProgramDetailsModal({
   return (
     <>
       <button
-        className="flex h-8 w-32 items-center justify-center rounded bg-rose-500 text-white"
+        className="flex h-6 w-32 items-center text-sm justify-center rounded bg-stone-200 text-stone-600"
         onClick={() => setShowDetails(true)}
       >
         More Details

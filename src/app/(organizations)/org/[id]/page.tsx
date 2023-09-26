@@ -2,27 +2,14 @@ import { BackButton } from "@/app/_components/BackButton";
 import { ContactInfo, ProgramCard } from "@/app/_components/DisplayCard/server";
 import { prisma } from "@/server/db";
 import React from "react";
+import { getOrgData } from "./getOrgData";
+import ProgramSection from "./ProgramSection";
+import { EditOrgButton } from "@/app/_components/DisplayCard/client";
 
 export const revalidate = 60 * 60 * 6;
 
 async function Page({ params }: { params: { id: string } }) {
-  const orgData = await prisma.organization.findUnique({
-    where: {
-      id: params.id,
-    },
-    include: {
-      programs: {
-        include: {
-          tags: true,
-          categoryMeta: true,
-        },
-      },
-      exclusiveToCommunities: true,
-      helpfulToCommunities: true,
-      tags: true,
-      categoryMeta: true,
-    },
-  });
+  const orgData = await getOrgData(params.id)
 
   if (!orgData) {
     return {
@@ -32,10 +19,10 @@ async function Page({ params }: { params: { id: string } }) {
 
   return (
     <div>
-      <div className="p-2 ">
+      <div className="p-2 pt-0">
         <div className="mx-6">
-          <h1 className="mb-4 pt-12 text-3xl font-bold">
-            <BackButton /> {orgData?.name}
+          <h1 className="mb-4 pt-6 text-3xl font-bold flex items-center gap-2">
+            <BackButton /> {orgData?.name} <span className="text-2xl">  <EditOrgButton orgId={orgData.id}/></span> 
           </h1>
           <div className="mb-6 flex flex-col">
             <h3 className="font-semibold text-stone-500">Contact Info:</h3>
@@ -48,20 +35,7 @@ async function Page({ params }: { params: { id: string } }) {
           <h3 className="font-semibold text-stone-500">Description:</h3>
           <p>{orgData.description}</p>
         </div>
-        {
-          orgData.programs.length > 0 && (
-            <div className="mx-6">
-              <h2 className="mt-12 mb-4 text-2xl font-bold">Programs</h2>
-              <ul className="list-disc list-inside">
-                {orgData.programs.map((program) => (
-                  <ProgramCard  key={program.id} program={{...program, organization: orgData}} />
-
-                ))}
-              </ul>
-            </div>
-          )
-
-        }
+        <ProgramSection programs={orgData.programs} organization={orgData} />
       </div>
     </div>
   );
