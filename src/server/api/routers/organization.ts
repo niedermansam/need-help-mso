@@ -354,9 +354,10 @@ export const organizationRouter = router({
   updateLocation: adminProcedure
     .input(
       z.object({
+        name: z.string().optional(),
         locationid: z.string(),
         address: z.string(),
-        apt: z.string(),
+        apt: z.string().optional(),
         city: z.string(),
         state: z.string(),
         zip: z.string(),
@@ -387,6 +388,7 @@ export const organizationRouter = router({
             id: input.locationid,
           },
           data: {
+            name: input.name,
             address: input.address,
             apt: input.apt,
             city: input.city,
@@ -400,4 +402,54 @@ export const organizationRouter = router({
         console.log(err);
       }
     }),
+
+    createLocation: adminProcedure
+    .input(
+      z.object({
+        orgId: z.string(),
+        name: z.string().optional(),
+        address: z.string(),
+        apt: z.string().optional(),
+        city: z.string(),
+        state: z.string(),
+        zip: z.string(),
+      })
+    ).mutation(async ({ input, ctx }) => {
+
+      const options = {
+        provider: "openstreetmap",
+      } as const;
+
+      const geocoder = NodeGeocoder(options);
+
+      const res = await geocoder.geocode(
+        `${input.address}, ${input.city}, ${input.state}, ${input.zip}`
+      );
+
+      const lat = res[0]?.latitude;
+      const lng = res[0]?.longitude;
+
+      try {
+        return await ctx.prisma.location.create({
+          data: {
+            name: input.name,
+            address: input.address,
+            apt: input.apt,
+            city: input.city,
+            state: input.state,
+            zip: input.zip,
+            latitude: lat,
+            longitude: lng,
+
+            org: {
+              connect: {
+                id: input.orgId
+              }
+            }
+          }
+        })
+      } catch (err) {
+        console.log(err)
+      }
+    })
 });

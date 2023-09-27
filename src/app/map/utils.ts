@@ -27,7 +27,6 @@ export function isOrgInView({
 }
 
 
-
 export function jitter(num: number) {
   return num + Math.random() * 0.0001;
 }

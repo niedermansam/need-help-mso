@@ -1,5 +1,6 @@
 "use client";
 import { FormItemWrapper } from "@/app/_components/FormItemWrapper";
+import { DEFAULT_LOCATION } from "@/app/admin/org/[id]/locations/LocationForm";
 import {
   CategorySelect,
   type CategorySelectItem,
@@ -16,15 +17,6 @@ import { twMerge } from "tailwind-merge";
 
 export const NEW_ORG_URL = "/admin/org/new";
 
-const DEFAULT_CITY = "Missoula"
-const DEFAULT_STATE = "MT"
-const DEFAULT_ZIP = "59801"
-
-const DEFAULT_OBJECT = {
-  city: DEFAULT_CITY,
-  state: DEFAULT_STATE,
-  zip: DEFAULT_ZIP,
-} as const
 
 
 export function NewOrganizationForm() {
@@ -51,7 +43,7 @@ export function NewOrganizationForm() {
   };
 
 
-  const [formData, setFormData] = React.useState<Partial<CreateOrg>>(DEFAULT_OBJECT);
+  const [formData, setFormData] = React.useState<Partial<CreateOrg>>(DEFAULT_LOCATION);
 
   const [exclusiveToCommunities, setExclusiveToCommunities] = React.useState<{
     value: string;

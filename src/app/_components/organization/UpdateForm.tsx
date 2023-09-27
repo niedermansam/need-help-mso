@@ -14,34 +14,6 @@ import { FormItemWrapper } from "../FormItemWrapper";
 import Link from "next/link";
 
 
-type LocationProps = Pick<
-  OrganizationFormProps,
-  "locations" 
->;
-
-function LocationForm({ locations }: LocationProps) {
-
-    return (
-      <div>
-      <h2>Locations</h2>
-      {
-
-        locations.map((location) => {
-          return (
-            <div key={`${location.id}`}>
-              
-              <p>{location.address}</p>
-              <p>{location.apt}</p>
-              <p>{location.city}, {location.state} {location.zip}</p>
-              <p>{location.latitude}, {location.longitude}</p>
-            </div>
-          )
-        })
-
-        }</div>
-    )
-}
-
 export function UpdateOrganizationForm({
   org,
 }: {
@@ -50,7 +22,7 @@ export function UpdateOrganizationForm({
   const editOrganization = api.organization.update.useMutation();
   const disconnectTag = api.organization.disconnectTag.useMutation();
 
-  console.log('locations',org.locations)
+  console.log("locations", org.locations);
 
   type MutationOptions = Parameters<typeof editOrganization.mutate>;
 
@@ -73,13 +45,14 @@ export function UpdateOrganizationForm({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    editOrganization.mutate({...formData, 
-      exclusiveToCommunities: exclusiveToCommunities.map(x => {
+    editOrganization.mutate({
+      ...formData,
+      exclusiveToCommunities: exclusiveToCommunities.map((x) => {
         return {
           id: x.value,
-          name: x.label
-        }
-      })
+          name: x.label,
+        };
+      }),
     });
   };
 
@@ -168,14 +141,24 @@ export function UpdateOrganizationForm({
             Website
           </label>
           <div className="flex gap-1">
-          <input
-            type="text"
-            name="website"
-            className="text-bold rounded border border-stone-200 p-2 w-5/6"
-            id="website"
-            defaultValue={org.website || ""}
-            onChange={handleChange}
-          /> {org.website && <Link target="_blank" className="bg-stone-300 px-2 rounded text-center text-xs items-center justify-center flex" href={org.website}>Visit Site</Link>}</div>
+            <input
+              type="text"
+              name="website"
+              className="text-bold w-5/6 rounded border border-stone-200 p-2"
+              id="website"
+              defaultValue={org.website || ""}
+              onChange={handleChange}
+            />{" "}
+            {org.website && (
+              <Link
+                target="_blank"
+                className="flex items-center justify-center rounded bg-stone-300 px-2 text-center text-xs"
+                href={org.website}
+              >
+                Visit Site
+              </Link>
+            )}
+          </div>
         </FormItemWrapper>
         <FormItemWrapper>
           <label
@@ -259,14 +242,15 @@ export function UpdateOrganizationForm({
 
               setExclusiveToCommunities(newValue);
 
-
-              setFormData({ ...formData, exclusiveToCommunities: newValue.map(x => {
-                return {
-                  id: x.value,
-                  name: x.label
-                }
-              }
-              ) });
+              setFormData({
+                ...formData,
+                exclusiveToCommunities: newValue.map((x) => {
+                  return {
+                    id: x.value,
+                    name: x.label,
+                  };
+                }),
+              });
             }}
             value={exclusiveToCommunities}
           />
@@ -282,26 +266,25 @@ export function UpdateOrganizationForm({
             title=""
             onChange={(value) => {
               {
-              const newValue = value as {
-                label: string;
-                value: string;
-              }[];
-              if (!newValue) {
-                return setFormData({ ...formData, helpfulToCommunities: [] });
-              }
-
-
-
-              setFormData({ ...formData, helpfulToCommunities: newValue.map(x => {
-                return {
-                  id: x.value,
-                  name: x.label
+                const newValue = value as {
+                  label: string;
+                  value: string;
+                }[];
+                if (!newValue) {
+                  return setFormData({ ...formData, helpfulToCommunities: [] });
                 }
+
+                setFormData({
+                  ...formData,
+                  helpfulToCommunities: newValue.map((x) => {
+                    return {
+                      id: x.value,
+                      name: x.label,
+                    };
+                  }),
+                });
               }
-              ) });
             }}
-            }
-            
             value={
               formData.helpfulToCommunities
                 ? formData.helpfulToCommunities.map((x) => ({
@@ -324,8 +307,17 @@ export function UpdateOrganizationForm({
             Go to Programs
           </button>
         </Link>
+        <FormItemWrapper className="flex flex-row">
+          <input type="checkbox" name="adminVerified" onChange={handleChange} />
+          <label
+            className="text-sm font-light lowercase text-stone-600"
+            htmlFor="adminVerified"
+          >
+            Verified by Admin
+          </label>
+        </FormItemWrapper>
       </form>
-      <LocationForm locations={org.locations} />
+
     </>
   );
 }

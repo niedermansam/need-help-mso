@@ -23,6 +23,7 @@ const getOrganization = async (id: string) => {
       categoryMeta: true,
     },
   });
+  
 
   return orgData;
 };
@@ -34,16 +35,13 @@ export type OrganizationFormProps = NonNullable<
 async function Page({ params }: { params: { id: string } }) {
   const orgData = await getOrganization(params.id);
 
-
-
-
   if (!orgData) {
     return {
       notFound: true,
     };
   }
 
-  return <UpdateOrganizationForm org={orgData}  />;
+  return <UpdateOrganizationForm org={orgData} />;
 }
 
 export default Page;

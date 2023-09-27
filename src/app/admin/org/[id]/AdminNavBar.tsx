@@ -76,6 +76,13 @@ export function AdminNavBar({
             >
               Programs
             </AdminNavLink>
+            <AdminNavLink
+              href={`/admin/org/${orgId}/locations`}
+              pathname={pathname}
+            > 
+              Locations
+
+              </AdminNavLink>
           </div>
         </div>
         <div className="md:order-2 ">
