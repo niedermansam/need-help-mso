@@ -313,13 +313,17 @@ function BusRoutes({ busRoutes }: { busRoutes: BusRoute[] }) {
         >
           <button
             className="rounded border border-stone-200 bg-stone-100 "
-            onClick={() => setVisibleRoutes([])}
+            onClick={(e) => {
+              e.preventDefault();
+              setVisibleRoutes([])}}
           >
             Hide All
           </button>
           <button
             className="my-1 rounded border border-stone-200 bg-stone-100"
-            onClick={() => setVisibleRoutes(routeNames)}
+            onClick={(e) => {
+              e.preventDefault();
+              setVisibleRoutes(routeNames)}}
           >
             Show All
           </button>
