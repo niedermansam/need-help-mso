@@ -2,8 +2,9 @@ import { prisma } from '@/server/db'
 import dynamic from 'next/dynamic';
 import React from 'react'
 import { jitter } from './utils';
-import { BusRoute } from '../api/bus-routes/route';
+import { BusRoute, createBusRoute } from '../api/bus-routes/route';
 import { env } from 'process';
+import { MountainLineRoutes } from '@/data/MountainLineRoutes';
 const OrganizationMap = dynamic(() => import("./OrganizationMapPage"), {
   loading: () => <p>loading...</p>,
   ssr: false,
@@ -67,12 +68,10 @@ async function Page() {
       return {...location, latitude: jitter(location.latitude), longitude: jitter(location.longitude)}
     })
 
-    const busRoutesJson = await fetch(env.NEXT_PUBLIC_SITE_URL + '/api/bus-routes', {
-      next: {
-        revalidate: 0
-      }
-    })
-    const busRoutes = await busRoutesJson.json() as BusRoute[]
+    //const busRoutesJson = await fetch(env.NEXT_PUBLIC_SITE_URL + '/api/bus-routes')
+    // const busRoutes = await busRoutesJson.json() as BusRoute[]
+
+    const busRoutes = MountainLineRoutes.features.map(createBusRoute)
 
 
   return (

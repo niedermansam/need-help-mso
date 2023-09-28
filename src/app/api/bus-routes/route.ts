@@ -3,7 +3,7 @@ import { BUS_ROUTE_COLORS } from "@/utils/constants";
 
 import { NextResponse } from "next/server";
 
-function createBusRoute(route: (typeof MountainLineRoutes.features)[0]) {
+export function createBusRoute(route: (typeof MountainLineRoutes.features)[0]) {
   // if (route.properties.DIR === "IB") return;
   const routeNumber = route.properties.ROUTE;
 
