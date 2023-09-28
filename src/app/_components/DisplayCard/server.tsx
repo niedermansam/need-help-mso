@@ -348,7 +348,7 @@ export function ProgramCard({
         <div className="flex">
           {/* <EditProgramButton programId={programId} orgId={orgId} /> */}
           <h2 className=" truncate text-2xl font-bold tracking-tight text-stone-600  md:text-xl">
-            {programName}
+            {program.url ? <Link className="text-rose-500 hover:text-rose-600 " target="_blank" href={program.url}>{programName} &rarr;</Link> : programName}
           </h2>
         </div>
       </div>
