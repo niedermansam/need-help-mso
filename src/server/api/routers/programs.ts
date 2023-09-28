@@ -91,7 +91,7 @@ export const programRouter = router({
     .input(
       z.object({
         name: z.string(),
-        description: z.string(),
+        description: z.string().nullish(),
         category: z.string(),
         orgId: z.string(),
         orgName: z.string(),
@@ -168,7 +168,7 @@ export const programRouter = router({
         data: {
           id: createProgramId(name, orgName),
           name: name,
-          description: description,
+          description: description || undefined,
           url: url,
           categoryMeta: {
             connectOrCreate: {

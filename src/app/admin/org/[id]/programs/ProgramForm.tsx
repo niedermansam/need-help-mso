@@ -148,7 +148,7 @@ function CreateProgramForm({ org, setSearchName }: { org: DefaultsFromOrganizati
           className="text-bold h-full rounded border border-stone-200 p-2"
           id="description"
           onChange={handleChange}
-          value={formState.description}
+          value={formState.description || ""}
         />
       </FormItemWrapper>{" "}
       <FormItemWrapper>

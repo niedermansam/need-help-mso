@@ -201,7 +201,7 @@ enum SpeedOfAid {
 model Program {
     id                     String           @id @unique @default(cuid())
     name                   String
-    description            String           @db.Text
+    description            String?           @db.Text
     url                    String?
     organizationId         String
     organization           Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
