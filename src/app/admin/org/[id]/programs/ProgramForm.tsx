@@ -294,7 +294,7 @@ function CreateProgramForm({ org, setSearchName }: { org: DefaultsFromOrganizati
 
 function ProgramList({ programs, searchName }: { programs: ProgramCardInformation[], searchName: string }) {
 
-  const filteredPrograms = programs.filter( (program) => program.name.toLowerCase().includes(searchName.toLowerCase()) );
+  const filteredPrograms = programs//.filter( (program) => program.name.toLowerCase().includes(searchName.toLowerCase()) );
 
   const [page, setPage] = React.useState(1);
 

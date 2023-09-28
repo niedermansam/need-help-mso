@@ -22,6 +22,8 @@ export function UpdateOrganizationForm({
   const editOrganization = api.organization.update.useMutation();
   const disconnectTag = api.organization.disconnectTag.useMutation();
 
+  const updateAdminVerified = api.organization.updateAdminVerified.useMutation();
+
   console.log("locations", org.locations);
 
   type MutationOptions = Parameters<typeof editOrganization.mutate>;
@@ -311,9 +313,11 @@ export function UpdateOrganizationForm({
         </Link>
         <FormItemWrapper className="flex flex-row">
           <input type="checkbox" name="adminVerified" onChange={
-            () => {
-              setFormData((prev) => ({ ...prev, adminVerified: !prev.adminVerified }));
+            (e) => {
+              setFormData((prev) => ({ ...prev, adminVerified: e.target.checked }));
+              updateAdminVerified.mutate({ orgId: org.id, adminVerified: e.target.checked });
             }
+          
           } checked={formData.adminVerified} />
           <label
             className="text-sm font-light lowercase text-stone-600"

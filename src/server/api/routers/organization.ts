@@ -453,5 +453,26 @@ export const organizationRouter = router({
       } catch (err) {
         console.log(err)
       }
-    })
+    }),
+
+    updateAdminVerified: adminProcedure
+    .input(
+      z.object({
+        orgId: z.string(),
+        adminVerified: z.boolean()
+      })
+    ).mutation(async ({ input, ctx }) => {
+      try {
+        return await ctx.prisma.organization.update({
+          where: {
+            id: input.orgId
+          },
+          data: {
+            adminVerified: input.adminVerified
+          }
+        })
+      } catch (err) {
+        console.log(err)
+      }
+    }),
 });

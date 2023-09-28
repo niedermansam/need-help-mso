@@ -203,7 +203,7 @@ export const programRouter = router({
           exclusiveToCommunities: exclusiveToCommunities
             ? {
                 connectOrCreate: exclusiveToCommunities.map((community) => ({
-                  where: { name: community },
+                  where: { id: community },
                   create: {
                     name: community,
                   },
@@ -214,7 +214,7 @@ export const programRouter = router({
           helpfulToCommunities: helpfulToCommunities
             ? {
                 connectOrCreate: helpfulToCommunities.map((community) => ({
-                  where: { name: community },
+                  where: { id: community },
                   create: {
                     name: community,
                   },
@@ -370,4 +370,6 @@ export const programRouter = router({
       });
       return program;
     }),
+
+    
 });
