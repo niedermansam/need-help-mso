@@ -5,7 +5,7 @@ const cache = createClient({
   password: env.REDIS_PASSWORD,
   socket: {
     host: env.REDIS_HOST,
-    port: env.REDIS_PORT,
+    port: parseInt(env.REDIS_PORT),
   },
 });
 
