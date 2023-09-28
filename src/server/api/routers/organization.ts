@@ -80,6 +80,7 @@ const orgUpdateInput = z.object({
   city: z.string().nullish(),
   state: z.string().nullish(),
   zip: z.string().nullish(),
+  adminVerified: z.boolean().optional(),
 });
 
 // regex to replace all punctuation with a space
@@ -215,6 +216,7 @@ export const organizationRouter = router({
             email: input.email,
             phone: input.phone,
             website: input.website,
+            adminVerified: input.adminVerified,
             tags: {
               connectOrCreate: input.tags
                 ? input.tags.map((tag) => ({

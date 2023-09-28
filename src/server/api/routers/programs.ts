@@ -3,9 +3,7 @@ import { z } from "zod";
 import { adminProcedure, router, publicProcedure } from "../trpc";
 import { getTagsFromPrograms } from "./tag";
 
-
-
-const createProgramId = (name:string, orgName: string) => {
+const createProgramId = (name: string, orgName: string) => {
   let newId = name.trim().replace(/\s/g, "-").toLowerCase();
 
   // remove any punctuation
@@ -17,22 +15,19 @@ const createProgramId = (name:string, orgName: string) => {
   // remove any duplicate dashes
   newId = newId.replace(/-+/g, "-");
 
-
   // remove any dashes at the beginning or end
   newId = newId.replace(/^-+|-+$/g, "");
 
   // get organization initials
-  const orgInitials = orgName 
-        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
-        .split(" ")
-        .map((word) => word[0])
-        .join("")
-        .toLowerCase()
-
-
+  const orgInitials = orgName
+    .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toLowerCase();
 
   return newId + "-" + orgInitials;
-}
+};
 
 export const programRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -131,11 +126,10 @@ export const programRouter = router({
         free,
       } = input;
 
+      let newId = name
+        .replace(/\s/g, "-")
 
-
-      let newId = name.replace(/\s/g, "-")
-      
-      .toLowerCase();
+        .toLowerCase();
 
       const newIdIsUnique =
         (await ctx.prisma.program.findUnique({
@@ -172,7 +166,7 @@ export const programRouter = router({
 
       const newProgram = await ctx.prisma.program.create({
         data: {
-          id:  createProgramId(name, orgName),
+          id: createProgramId(name, orgName),
           name: name,
           description: description,
           url: url,

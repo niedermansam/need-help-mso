@@ -29,6 +29,7 @@ export function UpdateOrganizationForm({
   type FormValues = MutationOptions[0];
   const [formData, setFormData] = React.useState<FormValues>({
     id: org.id,
+    adminVerified: org.adminVerified,
   });
 
   const [exclusiveToCommunities, setExclusiveToCommunities] = React.useState<
@@ -53,6 +54,7 @@ export function UpdateOrganizationForm({
           name: x.label,
         };
       }),
+      adminVerified: !!formData.adminVerified,
     });
   };
 
@@ -308,7 +310,11 @@ export function UpdateOrganizationForm({
           </button>
         </Link>
         <FormItemWrapper className="flex flex-row">
-          <input type="checkbox" name="adminVerified" onChange={handleChange} />
+          <input type="checkbox" name="adminVerified" onChange={
+            () => {
+              setFormData((prev) => ({ ...prev, adminVerified: !prev.adminVerified }));
+            }
+          } checked={formData.adminVerified} />
           <label
             className="text-sm font-light lowercase text-stone-600"
             htmlFor="adminVerified"
