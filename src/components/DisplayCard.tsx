@@ -9,6 +9,7 @@ import { faStar } from "@fortawesome/free-regular-svg-icons";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { api } from "../utils/api";
 import { useEffect, useState } from "react";
+import { UpdateProgramModal } from "@/app/admin/org/[id]/programs/ProgramForm";
 
 export type ProgramCardInformation = Pick<
   Program,
@@ -120,6 +121,7 @@ export function ProgramCard({
         >
           More Info
         </Link>
+        <UpdateProgramModal program={{...program, orgId, tags: program.tags.map(x => x.tag)}} />
       </div>
     </CardWrapper>
   );

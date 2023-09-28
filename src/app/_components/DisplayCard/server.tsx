@@ -14,6 +14,7 @@ import {
   FavoriteOrgButton,
   ProgramDetailsModal,
 } from "./client";
+import { UpdateProgramModal } from "@/app/admin/org/[id]/programs/ProgramForm";
 
 export type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
 
@@ -357,9 +358,11 @@ export function ProgramCard({
         tags={program.tags.map((tag) => tag.tag)}
       />
       <div className="col-span-full ">
-        {truncate(program.description, 250) + "..."}
-        <ProgramDetailsModal program={program} />
-      </div>
+        {program.description ? truncate(program.description || '', 250) + "..." : null}
+        <div className="flex justify-between mt-2">
+        {program.description && <ProgramDetailsModal buttonClassName="w-1/3" program={program} />}
+        <UpdateProgramModal buttonClassName="w-1/3" program={{...program, orgId, tags: program.tags.map(x=>x.tag)}} />
+      </div></div>
     </div>
   );
 }

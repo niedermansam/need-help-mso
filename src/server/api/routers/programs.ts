@@ -92,6 +92,7 @@ export const programRouter = router({
       z.object({
         name: z.string(),
         description: z.string().nullish(),
+        phone: z.string().nullish(),
         category: z.string(),
         orgId: z.string(),
         orgName: z.string(),
@@ -232,24 +233,22 @@ export const programRouter = router({
       z.object({
         id: z.string(),
         name: z.string().nullish(),
+        phone: z.string().nullish(),
         description: z.string().nullish(),
         category: z.string().nullish(),
         url: z.string().nullish(),
         tags: z.array(z.string()).optional(),
         helpfulTo: z.array(z.string()).optional(),
         exclusiveTo: z.array(z.string()).optional(),
-        barriersToEntry: z
-          .enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"])
-          .optional(),
-        barriersToEntryDetails: z.string().optional(),
+        barriersToEntry: z.enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"]).nullish(),
+        barriersToEntryDetails: z.string().nullish(),
 
         speedOfAid: z
           .array(z.enum(["IMMEDIATE", "DAYS", "WEEKS", "MONTHS", "YEARS"]))
-          .optional(),
-        speedOfAidDetails: z.string().optional(),
-        free: z.boolean().optional(),
-        helpingOrganizations: z.array(z.string()).optional(),
-        orgId: z.string(),
+          .nullish(),
+        speedOfAidDetails: z.string().nullish(),
+        free: z.boolean().nullish(),
+        helpingOrganizations: z.array(z.string()).nullish(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -261,19 +260,25 @@ export const programRouter = router({
         url,
         tags,
         helpfulTo,
+        phone,
         exclusiveTo,
         free,
         helpingOrganizations,
-        orgId,
       } = input;
 
-      const program = await ctx.prisma.program.update({
+      const oldProgram = await ctx.prisma.program.update({
         where: {
           id: id,
+        },
+        include: {
+          tags: true,
+          exclusiveToCommunities: true,
+          helpfulToCommunities: true,
         },
         data: {
           name: name || undefined,
           description: description || undefined,
+          phone: phone || undefined,
           categoryMeta: category
             ? {
                 connectOrCreate: {
@@ -284,11 +289,13 @@ export const programRouter = router({
                 },
               }
             : undefined,
-          helpingOrganizations: helpingOrganizations && {
-            connect: helpingOrganizations.map((org) => ({
-              id: org,
-            })),
-          },
+          helpingOrganizations:
+            (helpingOrganizations && {
+              connect: helpingOrganizations.map((org) => ({
+                id: org,
+              })),
+            }) ||
+            undefined,
 
           tags: {
             connectOrCreate: tags
@@ -312,38 +319,82 @@ export const programRouter = router({
               : [],
           },
 
-          exclusiveToCommunities: {
-            connectOrCreate: exclusiveTo
-              ? exclusiveTo.map((community) => ({
-                  where: { name: community },
-                  create: {
-                    name: community,
-                  },
-                }))
-              : [],
-          },
 
-          free: free,
+          free: free || undefined,
         },
       });
 
       // update org with new tags
-      if (tags) {
-        await ctx.prisma.organization.update({
+
+        await ctx.prisma.program.update({
           where: {
-            id: orgId,
+            id: input.id,
           },
           data: {
             tags: {
-              connect: tags.map((tag) => ({
-                tag,
-              })),
+              disconnect: oldProgram.tags.filter((tag) => {
+                if (!input.tags) return true;
+                return !input.tags.find((tag2) => tag2 === tag.tag);
+              }),
             },
           },
         });
-      }
 
-      return program;
+      // get exclusiveToCommunities that were removed from old program
+      
+        await ctx.prisma.program.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            exclusiveToCommunities: {
+              disconnect: oldProgram.exclusiveToCommunities.filter(
+                (community) => {
+                  if (!input.exclusiveTo) return true;
+                  return !input.exclusiveTo.find(
+                    (community2) => community2 === community.id
+                  );
+                }
+              ),
+              connectOrCreate: input.exclusiveTo
+                ? input.exclusiveTo.map((community) => ({
+                    where: { name: community},
+                    create: {
+                      name: community,
+                    },
+                  }))
+                : undefined,
+            },
+          },
+        });
+
+      // get helpfulToCommunities that were removed from old program
+        await ctx.prisma.program.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            helpfulToCommunities: {
+              disconnect: oldProgram.helpfulToCommunities.filter(
+                (community) => {
+                  if (!input.helpfulTo) return true;
+                  return !input.helpfulTo.find(
+                    (community2) => community2 === community.id
+                  );
+                }
+              ),
+              connectOrCreate: input.helpfulTo
+                ? input.helpfulTo.map((community) => ({
+                    where: { name: community },
+                    create: {
+                      name: community,
+                    },
+                  }))
+                : undefined,
+            },
+          },
+        });
+      return oldProgram;
     }),
 
   reassignAdministeringOrg: adminProcedure
@@ -370,6 +421,4 @@ export const programRouter = router({
       });
       return program;
     }),
-
-    
 });

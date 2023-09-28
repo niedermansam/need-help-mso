@@ -15,6 +15,7 @@ import Link from "next/link";
 import React from "react";
 import { CategoryTag, type ProgramCardInformation } from "./server";
 import ReactModal from "react-modal";
+import { twMerge } from "tailwind-merge";
 
 export function FavoriteOrgButton({ orgId }: { orgId: string }) {
   const favoriteOrgs = useFavoriteOrgStore((state) => state.favoriteOrgs);
@@ -125,8 +126,10 @@ const modalStyles = {
 
 export function ProgramDetailsModal({
   program,
+  buttonClassName,
 }: {
   program: ProgramCardInformation;
+  buttonClassName?: string;
 }) {
   const [showDetails, setShowDetails] = React.useState(false);
 
@@ -135,7 +138,7 @@ export function ProgramDetailsModal({
   return (
     <>
       <button
-        className="flex h-6 w-32 items-center text-sm justify-center rounded bg-stone-200 text-stone-600"
+        className={twMerge("flex w-32 items-center text-sm justify-center rounded bg-stone-200 text-stone-600", buttonClassName)}
         onClick={() => setShowDetails(true)}
       >
         More Details

@@ -3,8 +3,19 @@ import React from 'react'
 
 async function Page() {
   const users =  await prisma.user.findMany({})
+  const totalOrgs = await prisma.organization.count(
+    
+  )
+  
+  const verifiedOrgs = await prisma.organization.count({
+    where: {
+      adminVerified: true
+    }
+  })
   return (
     <div>
+      <p> {totalOrgs} organizations</p>
+      <p> {verifiedOrgs} verified organizations</p>
       <h1
        className='text-4xl font-bold  text-stone-600'
       >Users</h1>

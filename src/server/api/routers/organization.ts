@@ -204,6 +204,7 @@ export const organizationRouter = router({
           include: {
             exclusiveToCommunities: true,
             helpfulToCommunities: true,
+            tags: true,
             programs: {
               select: {
                 id: true,
@@ -292,6 +293,20 @@ export const organizationRouter = router({
             },
           },
         });
+
+        await ctx.prisma.organization.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            tags: {
+              disconnect: updatedOrg.tags.filter((tag) => {
+                if (!input.tags) return true;
+                return !input.tags.find((tag2) => tag2 === tag.tag);
+              }),
+          }
+          }
+        })
 
         return updatedOrg;
       } catch (err) {

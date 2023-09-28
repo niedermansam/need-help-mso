@@ -9,9 +9,14 @@ import {
   CommunitySelect,
   TagSelect,
 } from "@/components/Selectors";
+import { UnwrapTRPCMutation } from "@/types/trpc";
 import { api } from "@/utils/api";
+import { useUserStore } from "@/utils/userStore";
+import { UseTRPCMutationOptions } from "@trpc/react-query/shared";
 import { useRouter } from "next/navigation";
 import React from "react";
+import ReactModal from "react-modal";
+import { twMerge } from "tailwind-merge";
 
 type DefaultsFromOrganization = {
   id: string;
@@ -20,7 +25,304 @@ type DefaultsFromOrganization = {
   phone: string | null;
   email: string | null;
   website: string | null;
+
+
 };
+
+type UpdateProgramProps = UnwrapTRPCMutation<typeof api.program.update.useMutation>
+
+function UpdateProgramForm({
+  program, onUpdate }: { program: UpdateProgramProps , onUpdate?: () => void}) {
+
+  const [formState, setFormState] = React.useState<UpdateProgramProps>(program);
+
+
+  const updateProgram = api.program.update.useMutation({
+    onSuccess: () => {
+      onUpdate?.();
+    },
+  }); 
+
+
+  const [exclusiveToCommunities, setExclusiveToCommunities] = React.useState<
+    { value: string; label: string }[]
+  >(program.exclusiveTo?.map(x => ({ value: x, label: x})) || []);
+  const [helpfulToCommunities, setHelpfulToCommunities] = React.useState<
+    { value: string; label: string }[]
+  >(program.helpfulTo?.map(x => ({ value: x, label: x})) || []);
+
+  const [selectedTags, setSelectedTags] = React.useState<
+    { value: string; label: string }[]
+  >(program.tags?.map(x => ({ value: x, label: x})) || []);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+
+
+    if (name === "website")
+      return setFormState((prevState) => ({
+        ...prevState,
+        url: value,
+      }));
+
+    if (name === "category")
+      return setFormState((prevState) => ({
+        ...prevState,
+        category: value,
+      }));
+
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { name, description, category } = formState;
+    if (!name) return alert("Please enter a name");
+    if (!category) return alert("Please select a category");
+
+    const exluciveToCommunitiesIds = exclusiveToCommunities.map(
+      (community) => community.value
+    );
+    const helpfulToCommunitiesIds = helpfulToCommunities.map(
+      (community) => community.value
+    );
+
+    const tags = selectedTags.map((tag) => tag.value);
+
+    updateProgram.mutate({
+      ...formState,
+      name,
+      description,
+      category,
+      exclusiveTo: exluciveToCommunitiesIds,
+      helpfulTo: helpfulToCommunitiesIds,
+      tags,
+    });
+  };
+
+  return (
+    <>
+      <form
+        onSubmit={handleSubmit}
+        className="grid-rows-auto grid grid-cols-1 gap-x-6 md:grid-cols-2"
+      >
+        <FormItemWrapper>
+          <label
+            className="text-sm font-light lowercase text-stone-600"
+            htmlFor="name"
+          >
+            Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            className="text-bold rounded border border-stone-200 p-2 text-xl"
+            id="name"
+            onChange={handleChange}
+            value={formState.name || ""}
+          />
+        </FormItemWrapper>
+        <FormItemWrapper className=" min-h-[170px] md:row-span-4 ">
+          <label
+            htmlFor="description"
+            className="text-sm font-light lowercase text-stone-600"
+          >
+            Description
+          </label>
+          <textarea
+            name="description"
+            className="text-bold h-full rounded border border-stone-200 p-2"
+            id="description"
+            onChange={handleChange}
+            value={formState.description || ""}
+          />
+        </FormItemWrapper>{" "}
+        <FormItemWrapper>
+          <label
+            className="text-sm font-light lowercase text-stone-600"
+            htmlFor="category"
+          >
+            Category
+          </label>
+          <CategorySelect
+            name="category"
+            id="category"
+            title=""
+            onChange={(e) => {
+              const newValue = e as { value: string; label: string } | null;
+
+              if (!newValue)
+                return setFormState((prevState) => ({
+                  ...prevState,
+                  category: "",
+                }));
+
+              setFormState((prevState) => ({
+                ...prevState,
+                category: newValue.value,
+              }));
+            }}
+            value={{
+              value: formState.category || "",
+              label: formState.category || "",
+            }}
+          />
+        </FormItemWrapper>
+        <FormItemWrapper>
+          <label
+            className="text-sm font-light lowercase text-stone-600"
+            htmlFor="tags"
+          >
+            Tags
+          </label>
+          <TagSelect
+            name="tags"
+            id="tags"
+            title=""
+            onChange={(e) => {
+              const newValue = e as { value: string; label: string }[];
+
+              setFormState((prevState) => ({
+                ...prevState,
+                tags: newValue.map((tag) => tag.value),
+              }));
+
+              setSelectedTags([...newValue]);
+            }}
+            value={selectedTags}
+          />
+        </FormItemWrapper>
+        {/*<FormItemWrapper>
+        <label
+          className="text-sm font-light lowercase text-stone-600"
+          htmlFor="orgId"
+        >
+          Organization
+        </label>
+        <OrganizationSingleSelect
+          title=""
+          value={{
+            value: orgId,
+            label: orgName,
+          }}
+        />
+        </FormItemWrapper>*/}
+        <FormItemWrapper>
+          <label
+            className="text-sm font-light lowercase text-stone-600"
+            htmlFor="website"
+          >
+            Website
+          </label>
+          <input
+            type="text"
+            name="website"
+            className="text-bold rounded border border-stone-200 p-2 text-xl"
+            id="website"
+            onChange={handleChange}
+            value={formState.url || ""}
+          />
+        </FormItemWrapper>{" "}
+        <FormItemWrapper>
+          <label
+            className="text-sm font-light lowercase text-stone-600"
+            htmlFor="phone"
+          >
+            Phone
+          </label>
+          <input
+            type="text"
+            name="phone"
+            className="text-bold rounded border border-stone-200 p-2 text-xl"
+            id="phone"
+            onChange={handleChange}
+            value={formState.phone || ""}
+          />
+        </FormItemWrapper>
+        <FormItemWrapper>
+          <label
+            className="text-sm font-light lowercase text-stone-600"
+            htmlFor="exclusiveToCommunities"
+          >
+            Exclusive to Communities
+          </label>
+          <CommunitySelect
+            name="exclusiveToCommunities"
+            id="exclusiveToCommunities"
+            title=""
+            onChange={(e) => {
+              const newValue = e as { value: string; label: string }[];
+              setFormState((prevState) => ({
+                ...prevState,
+                exclusiveToCommunities: newValue.map(
+                  (community) => community.value
+                ),
+              }));
+              setExclusiveToCommunities(newValue);
+            }}
+            value={exclusiveToCommunities}
+          />
+        </FormItemWrapper>
+        <FormItemWrapper>
+          <label
+            className="text-sm font-light lowercase text-stone-600"
+            htmlFor="helpfulToCommunities"
+          >
+            Helpful to Communities
+          </label>
+          <CommunitySelect
+            name="helpfulToCommunities"
+            id="helpfulToCommunities"
+            title=""
+            onChange={(e) => {
+              const newValue = e as { value: string; label: string }[];
+              setFormState((prevState) => ({
+                ...prevState,
+                helpfulToCommunities: newValue.map(
+                  (community) => community.value
+                ),
+              }));
+              setHelpfulToCommunities(newValue);
+            }}
+            value={helpfulToCommunities}
+          />
+        </FormItemWrapper>
+        <button className=" col-span-full mt-4 w-full rounded bg-rose-500 p-2 text-white">
+          Submit
+        </button>
+      </form>
+    </>
+  );
+}
+
+export function UpdateProgramModal({ program, buttonClassName }: { program: UpdateProgramProps, buttonClassName?: string }) {
+
+  const [isOpen, setIsOpen] = React.useState(false);
+  const isAdmin = useUserStore((state) => state.admin);
+
+  if(!isAdmin) return null;
+
+  return (
+    <>
+    <button className={twMerge("bg-rose-500 text-white rounded p-2", buttonClassName)} onClick={() => setIsOpen(true)}>Edit</button>
+    <ReactModal 
+      isOpen={isOpen}
+      onRequestClose={() => setIsOpen(false)}
+      className="bg-white rounded p-4 min-w-[400px] min-h-[400px]"
+      overlayClassName="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center"
+    >
+      <UpdateProgramForm program={program} onUpdate={() => setIsOpen(false)} />
+    </ReactModal>
+    </>
+  )
+
+}
+
 
 function CreateProgramForm({ org, setSearchName }: { org: DefaultsFromOrganization, setSearchName: (name: string) => void }) {
   const router = useRouter( )
@@ -91,7 +393,6 @@ function CreateProgramForm({ org, setSearchName }: { org: DefaultsFromOrganizati
     const { name, description, orgId, category } = formState;
     if (!orgId) return alert("Please select an organization");
     if (!name) return alert("Please enter a name");
-    if (!description) return alert("Please enter a description");
     if (!category) return alert("Please select a category");
 
     const exluciveToCommunitiesIds = exclusiveToCommunities.map(
@@ -235,6 +536,22 @@ function CreateProgramForm({ org, setSearchName }: { org: DefaultsFromOrganizati
           id="website"
           onChange={handleChange}
           value={formState.url || ""}
+        />
+      </FormItemWrapper>
+      <FormItemWrapper>
+        <label
+          className="text-sm font-light lowercase text-stone-600"
+          htmlFor="phone"
+        >
+          phone
+        </label>
+        <input
+          type="text"
+          name="phone"
+          className="text-bold rounded border border-stone-200 p-2 text-xl"
+          id="phone"
+          onChange={handleChange}
+          value={formState.phone || ""}
         />
       </FormItemWrapper>
       <FormItemWrapper>
