@@ -24,7 +24,7 @@ const server = z.object({
   GOOGLE_CLIENT_SECRET: z.string(),
 
   REDIS_HOST: z.string().min(1),
-  REDIS_PORT: z.number().min(1),
+  REDIS_PORT: z.string().min(1),
   REDIS_PASSWORD: z.string().min(1),
 });
 
