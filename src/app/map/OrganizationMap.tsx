@@ -257,7 +257,7 @@ function BusRoutes({ busRoutes }: { busRoutes: BusRoute[] }) {
 
   const [visibleRoutes, setVisibleRoutes] = React.useState<string[]>(routeNames)
 
-  const [isMinimized, setIsMinimized] = React.useState(true)
+  const [isMinimized, setIsMinimized] = React.useState(false)
 
   function addVisibleRoute(routeId: string) {
     setVisibleRoutes([...visibleRoutes, routeId])
