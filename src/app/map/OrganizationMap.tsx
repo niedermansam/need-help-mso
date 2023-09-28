@@ -330,7 +330,7 @@ function BusRoutes({ busRoutes }: { busRoutes: BusRoute[] }) {
                 (busRoute) => busRoute.name === route
               )?.color;
               return (
-                <div className="flex w-full items-center justify-between gap-1">
+                <div className="flex w-full items-center justify-between gap-1" key={`${route}`}>
                   <input
                     type="checkbox"
                     key={route}

@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import React from 'react'
 import { jitter } from './utils';
 import { BusRoute } from '../api/bus-routes/route';
+import { env } from 'process';
 const OrganizationMap = dynamic(() => import("./OrganizationMapPage"), {
   loading: () => <p>loading...</p>,
   ssr: false,
@@ -66,7 +67,7 @@ async function Page() {
       return {...location, latitude: jitter(location.latitude), longitude: jitter(location.longitude)}
     })
 
-    const busRoutesJson = await fetch('http://localhost:3000/api/bus-routes', {
+    const busRoutesJson = await fetch(env.NEXT_PUBLIC_SITE_URL + '/api/bus-routes', {
       next: {
         revalidate: 0
       }
