@@ -3,6 +3,9 @@ module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      transitionProperty: {
+        'height': 'height'
+      },
       keyframes: {
         "pulse-sm": {
           "75%, 100%": {

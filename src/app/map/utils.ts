@@ -128,3 +128,19 @@ export const filterLocationsByString = (
   }
   return false;
 };
+
+export function createGoogleMapsLink({
+  from,
+  to
+}: {
+  from: {
+    latitude: number;
+    longitude: number;
+  };
+  to: {
+    latitude: number;
+    longitude: number;
+  };
+}) {
+  return `https://www.google.com/maps/dir/${from.latitude},${from.longitude}/@${to.latitude},${to.longitude}`;
+}

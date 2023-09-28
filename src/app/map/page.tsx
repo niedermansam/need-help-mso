@@ -2,7 +2,8 @@ import { prisma } from '@/server/db'
 import dynamic from 'next/dynamic';
 import React from 'react'
 import { jitter } from './utils';
-const OrganizationMap = dynamic(() => import("./OrganizationMap"), {
+import { BusRoute } from '../api/bus-routes/route';
+const OrganizationMap = dynamic(() => import("./OrganizationMapPage"), {
   loading: () => <p>loading...</p>,
   ssr: false,
 });
@@ -65,9 +66,16 @@ async function Page() {
       return {...location, latitude: jitter(location.latitude), longitude: jitter(location.longitude)}
     })
 
+    const busRoutesJson = await fetch('http://localhost:3000/api/bus-routes', {
+      next: {
+        revalidate: 0
+      }
+    })
+    const busRoutes = await busRoutesJson.json() as BusRoute[]
+
 
   return (
-    <OrganizationMap locations={locations} />
+    <OrganizationMap locations={locations} busRoutes={busRoutes} />
   )
 }
 

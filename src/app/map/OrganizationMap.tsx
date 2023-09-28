@@ -4,21 +4,84 @@ import {
   TileLayer,
   Marker,
   MapContainer,
-  useMapEvents,
   Tooltip,
+  Polyline,
+  Popup,
+  useMapEvents,
 } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css"; // Re-uses images from ~leaflet package
 import type { LocationData } from "./page";
-import Link from "next/link";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as _L from "leaflet";
-import "leaflet-defaulticon-compatibility";
-import { isOrgInView,  sortLocationsByDistanceFromCenter } from "./utils";
 import { orgIsFilteredByString } from "../search/utils";
-import { FavoriteOrgButton } from "../_components/DisplayCard/client";
+import { BusRoute } from "../api/bus-routes/route";
+import { PaginatedList } from "./OrganizationMapPage";
+import { isOrgInView, sortLocationsByDistanceFromCenter } from "./utils";
+import { twMerge } from "tailwind-merge";
 
-function ZoomHandler({
+export function OrganizationMap({
+  locations,
+  search,
+  busRoutes,
+}: {
+  locations: LocationData;
+  search: string;
+  busRoutes: BusRoute[];
+}) {
+  const [displayedMapLocations, setDisplayedMapLocations] =
+    React.useState(locations);
+
+  React.useEffect(() => {
+    if (!search) {
+      setDisplayedMapLocations(locations);
+      return;
+    }
+    const filteredLocations = locations.filter((location) => {
+      if (!location.org) return false;
+      return orgIsFilteredByString(location.org, search);
+    });
+
+    setDisplayedMapLocations(filteredLocations);
+  }, [search, locations]);
+
+  return (
+    <div className="grid grid-cols-2 xl:grid-cols-3">
+      <PaginatedList
+        className="order-last col-span-2 py-4 xl:order-first xl:col-span-1 xl:px-4"
+        allLocations={displayedMapLocations}
+      />
+      <div className="col-span-2 ">
+        <MapContainer
+          center={[46.873, -114]}
+          zoom={13}
+          style={{
+            height: 500,
+            width: "100%",
+          }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <OrganizationMarkers locations={displayedMapLocations} />
+
+          <BusRoutes busRoutes={busRoutes} />
+
+          <ZoomHandler
+            locations={locations}
+            setLocations={setDisplayedMapLocations}
+            search={search}
+          />
+        </MapContainer>
+        <p className="text-center text-xs font-light md:text-sm xl:text-base">
+          Enter a search phrase above, or zoom/scroll the map to filter
+          organizations in the list <span className="xl:hidden">below.</span>
+          <span className="hidden  xl:inline">to the left.</span> Locations
+          closer to the center of the map will appear in the list first.
+        </p>
+      </div>
+    </div>
+  );
+}
+export function ZoomHandler({
   locations,
   setLocations,
   search,
@@ -42,7 +105,7 @@ function ZoomHandler({
       };
 
       const newLocations = locations.filter((location) => {
-        if(!location.org) return false;
+        if (!location.org) return false;
         const isFiltered = orgIsFilteredByString(location.org, search);
         if (!isFiltered) return false;
         const { latitude, longitude } = location;
@@ -90,7 +153,7 @@ function ZoomHandler({
       const center = map.getCenter();
 
       const newLocations = locations.filter((location) => {
-        if(!location.org) return false;
+        if (!location.org) return false;
         const isFiltered = orgIsFilteredByString(location.org, search);
         if (!isFiltered) return false;
         const { latitude, longitude } = location;
@@ -129,208 +192,168 @@ function ZoomHandler({
   return null;
 }
 
-function PaginatedList({
-  allLocations,
-  className,
-  ...props
-}: {
-  allLocations: LocationData;
-  className?: string;
-  props?: React.ComponentProps<"div">;
-}) {
-  const resultsPerPage = 5;
-  const [page, setPage] = React.useState(1);
-  const maxPage = Math.ceil(allLocations.length / resultsPerPage);
-
-  const start = (page - 1) * resultsPerPage;
-  const end = page * resultsPerPage;
-
-  const [locationList, setLocationList] = React.useState(
-    allLocations.slice(start, end)
-  );
-
-  React.useEffect(() => {
-    const start = (page - 1) * resultsPerPage;
-    const end = page * resultsPerPage;
-    setLocationList(allLocations.slice(start, end));
-  }, [page, allLocations]);
-
-  React.useEffect(() => {
-    setPage(1);
-  }, [allLocations]);
-
+function OrganizationMarker({ location }: { location: LocationData[0] }) {
+  const { latitude, longitude, org } = location;
+  if (!latitude || !longitude) return null;
+  if (!org) return null;
+  if (!org.name) return null;
   return (
-    <div {...props} className={className}>
-      {locationList.map((location) => {
-        const { org } = location;
-        if (!org) return null;
-        return (
-          <div
-            key={org.id}
-            className="mb-2 rounded-md border border-gray-300 bg-white p-2"
-          >
-            <div className="flex">
-            <FavoriteOrgButton orgId={org.id} />
-            <Link href={`/org/${org.id}`}>
-              <h2 className="text-lg font-semibold hover:text-rose-600">
-                {org.name}
-              </h2>
-            </Link>
-            </div>
-            <p>{org.description}</p>
+    <>
+      <Marker position={[latitude, longitude]}>
+        <Tooltip className="block max-w-sm">
+          <div className="flex max-w-xs flex-wrap ">
+            <h2>{org.name}</h2>
+            {location.address &&
+              location.city &&
+              location.state &&
+              location.zip && (
+                <p>
+                  {location.address}, {location.city}, {location.state}{" "}
+                  {location.zip}
+                </p>
+              )}
           </div>
+        </Tooltip>
+      </Marker>
+    </>
+  );
+}
+
+function OrganizationMarkers({ locations }: { locations: LocationData }) {
+  return (
+    <>
+      {locations.map((location) => {
+        return (
+          <OrganizationMarker
+            location={location}
+            key={`${location.latitude || ""}, ${
+              location.longitude || ""
+            } , ${Math.random()}`}
+          />
         );
       })}
-      <div className="flex justify-center">
-        <button
-          className="m-2 rounded-md bg-gray-200 p-2"
-          onClick={() => setPage(page - 1)}
-          disabled={page === 1}
-        >
-          Prev
-        </button>
-        <span className="m-2 p-2">
-          Page {page} of {maxPage}
-        </span>
-        <button
-          className="m-2 rounded-md bg-gray-200 p-2"
-          onClick={() => setPage(page + 1)}
-          disabled={page === maxPage}
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    </>
   );
 }
 
+function BusRoutes({ busRoutes }: { busRoutes: BusRoute[] }) {
 
-function OrganizationMap({
-  locations,
-  search,
-}: {
-  locations: LocationData;
-  search: string;
-}) {
-  const [displayedMapLocations, setDisplayedMapLocations] =
-    React.useState(locations);
+  const routeNames =[...new Set( busRoutes.map((route) => route.name))].sort(
+    (a,b) => {
+      //get the number from the end of the string
+      const aNumber = Number(a.match(/\d+$/)?.[0])
+      const bNumber = Number(b.match(/\d+$/)?.[0])
 
-  React.useEffect(() => {
-    if (!search) {
-      setDisplayedMapLocations(locations);
-      return;
+      //if the number is the same, sort by the name
+      if(aNumber === bNumber) {
+        return a.localeCompare(b)
+      }
+
+      //otherwise sort by the number  
+      return aNumber - bNumber
+
     }
-    const filteredLocations = locations.filter((location) => {
-      if(!location.org) return false;
-      return orgIsFilteredByString(location.org, search)
-     } );
+  )
 
-    setDisplayedMapLocations(filteredLocations);
-  }, [search, locations]);
+  const [visibleRoutes, setVisibleRoutes] = React.useState<string[]>(routeNames)
 
-  return (
-    <div className="grid grid-cols-2 xl:grid-cols-3">
-      <PaginatedList
-        className="order-last col-span-2 py-4 xl:order-first xl:col-span-1 xl:px-4"
-        allLocations={displayedMapLocations}
-      />
-      <div className="col-span-2 ">
-        <MapContainer
-          center={[46.873, -114]}
-          zoom={13}
-          style={{
-            height: 500,
-            width: "100%",
-          }}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {displayedMapLocations.map((location) => {
-            const { latitude, longitude, org } = location;
-            if (!latitude || !longitude) return null;
-            if (!org) return null;
-            if (!org.name) return null;
-            return (
-              <Marker
-                key={`${latitude}, ${longitude}, ${org.name} ${Math.random()}`}
-                position={[latitude, longitude]}
-              >
-                <Tooltip className="block max-w-sm">
-                  <div className="flex max-w-xs flex-wrap ">
-                    <h2>{org.name}</h2>
-                    {location.address &&
-                      location.city &&
-                      location.state &&
-                      location.zip && (
-                        <p>
-                          {location.address}, {location.city}, {location.state}{" "}
-                          {location.zip}
-                        </p>
-                      )}
-                  </div>
-                </Tooltip>
-              </Marker>
-            );
-          })}
-          <ZoomHandler
-            locations={locations}
-            setLocations={setDisplayedMapLocations}
-            search={search}
-          />
-        </MapContainer>
-        <p className="text-center text-xs font-light md:text-sm xl:text-base">
-          Enter a search phrase above, or zoom/scroll the map to filter
-          organizations in the list <span className="xl:hidden">below.</span>
-          <span className="hidden  xl:inline">to the left.</span> Locations
-          closer to the center of the map will appear in the list first.
-        </p>
-      </div>
-    </div>
-  );
-}
+  const [isMinimized, setIsMinimized] = React.useState(true)
 
-function MapSearchBar({
-  search,
-  setSearch,
-}: {
-  search: string;
-  setSearch: (search: string) => void;
-}) {
-  const onEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    console.log(e.type);
-    if (e.key === "Enter") {
-      e.preventDefault();
-      e.currentTarget.blur();
+  function addVisibleRoute(routeId: string) {
+    setVisibleRoutes([...visibleRoutes, routeId])
+  }
+
+  function removeVisibleRoute(routeId: string) {
+    setVisibleRoutes(visibleRoutes.filter((id) => id !== routeId))
+  }
+
+  function toggleVisibleRoute(routeId: string) {
+    if(visibleRoutes.includes(routeId)) {
+      removeVisibleRoute(routeId)
+    } else {
+      addVisibleRoute(routeId)
     }
-  };
+  }
 
   return (
-    <div className="flex items-center pb-2">
-      <label className="mr-2 text-lg font-light">Search:</label>
-      <input
-        className="w-full rounded-md border border-gray-300 p-2"
-        type="text"
-        value={search}
-        placeholder="Enter a keyword like 'food' or 'shelter'"
-        onChange={(e) => setSearch(e.target.value)}
-        onKeyDown={onEnter}
-      />
-    </div>
-  );
-}
+    <>
+      {visibleRoutes.map((name) => {
+        const route = busRoutes.find((route) => route.name === name);
+        if (!route) return null;
+        return (
+          <Polyline
+            key={route.name + Math.random().toString()}
+            positions={route.path as _L.LatLngExpression[]}
+            pathOptions={{ color: route.color }}
+          >
+            <Popup className="block max-w-sm">
+              <div className="flex max-w-xs flex-wrap ">
+                <h2>{route.name}</h2>
+              </div>
+            </Popup>
+          </Polyline>
+        );
+      })}
+      <div
+        className={
+          "absolute  bottom-[17px] right-0 z-[10000] w-fit rounded-tl border border-stone-200 bg-white p-1"
+        }
+      >
+        <div className="flex items-center">
+          <label className="mb-1 font-bold">Bus Routes</label>{" "}
+          <button
+            className="rounded-full w-4 h-4 border border-stone-200 bg-stone-100 flex items-center justify-center align-top pb-0.5"
+            onClick={() => setIsMinimized(!isMinimized)}
+          >
+            {isMinimized ? "+" : "-"}
+          </button>
+        </div>
+        <form
+          className={"flex flex-col"}
+        >
+          <button
+            className="rounded border border-stone-200 bg-stone-100 "
+            onClick={() => setVisibleRoutes([])}
+          >
+            Hide All
+          </button>
+          <button
+            className="my-1 rounded border border-stone-200 bg-stone-100"
+            onClick={() => setVisibleRoutes(routeNames)}
+          >
+            Show All
+          </button>
 
-export default function OrganizationMapSection({
-  locations,
-}: {
-  locations: LocationData;
-}) {
-  const [search, setSearch] = React.useState("");
-  return (
-    <div>
-      <MapSearchBar search={search} setSearch={setSearch} />
-      <OrganizationMap locations={locations} search={search} />
-    </div>
+          <div className={twMerge(' animate-height', isMinimized ? "h-0 overflow-hidden" : "h-fit", )}>
+            {routeNames.map((route) => {
+              const color = busRoutes.find(
+                (busRoute) => busRoute.name === route
+              )?.color;
+              return (
+                <div className="flex w-full items-center justify-between gap-1">
+                  <input
+                    type="checkbox"
+                    key={route}
+                    id={route}
+                    name={route}
+                    onChange={() => toggleVisibleRoute(route)}
+                    checked={visibleRoutes.includes(route)}
+                  />
+                  <label htmlFor={route}>{route} </label>
+                  <span
+                    style={{
+                      color: color,
+                    }}
+                    className="text-lg"
+                  >
+                    &#9679;
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </form>
+      </div>
+    </>
   );
 }
