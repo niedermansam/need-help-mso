@@ -40,7 +40,7 @@ function UpdateProgramForm({
 }) {
   const [formState, setFormState] = React.useState<UpdateProgramProps>(program);
 
-  console.log(program.helpfulToCommunities)
+    console.log(program.helpfulToCommunities);
 
   const updateProgram = api.program.update.useMutation({
     onSuccess: () => {
@@ -75,6 +75,8 @@ function UpdateProgramForm({
         ...prevState,
         category: value,
       }));
+
+      if(name === "helpfulToCommunities") return;
 
     setFormState((prevState) => ({
       ...prevState,
@@ -287,7 +289,7 @@ function UpdateProgramForm({
               setFormState((prevState) => ({
                 ...prevState,
                 helpfulToCommunities: newValue.map(
-                  (community) => community.value
+                  (community) => community.label
                 ),
               }));
               setHelpfulToCommunities(newValue);
@@ -315,6 +317,8 @@ export function UpdateProgramModal({
   const isAdmin = useUserStore((state) => state.admin);
 
   if (!isAdmin) return null;
+    console.log(program.helpfulToCommunities);
+
 
   return (
     <>
@@ -596,7 +600,7 @@ function CreateProgramForm({
             setFormState((prevState) => ({
               ...prevState,
               exclusiveToCommunities: newValue.map(
-                (community) => community.value
+                (community) => community.label
               ),
             }));
             setExclusiveToCommunities(newValue);
@@ -620,7 +624,7 @@ function CreateProgramForm({
             setFormState((prevState) => ({
               ...prevState,
               helpfulToCommunities: newValue.map(
-                (community) => community.value
+                (community) => community.label
               ),
             }));
             setHelpfulToCommunities(newValue);
