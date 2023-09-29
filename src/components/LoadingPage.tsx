@@ -1,7 +1,6 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { LoadingAnimation } from ".";
 import NavBar from "../app/_components/Nav";
-import { BackToSafetyButtons } from "../pages/old_404";
 import { useState, useEffect } from "react";
 
 export default function LoadingPage() {
@@ -33,12 +32,6 @@ export default function LoadingPage() {
             <h3 className="text-lg text-stone-600">
               You can go back or home if you want.
             </h3>
-          )}
-          {showBackSection && (
-            <BackToSafetyButtons
-              router={router}
-              className="mt-3 flex justify-center"
-            />
           )}
         </div>
       </div>
