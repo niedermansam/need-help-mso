@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import type { OrganizationSearchListProps } from "./page";
+import type { OrganizationSearchListProps, OrganizationSearchProps } from "./page";
 import { OrganizationCard } from "../_components/DisplayCard/server";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -57,8 +57,10 @@ export const PageButtons = ({
 
 export const SearchResults = ({
   searchOptions,
+  searchTerm,
 }: {
   searchOptions: OrganizationSearchListProps;
+  searchTerm: string;
 }) => {
   const pageLength = 10;
   const [page, setPage] = useState(1);
@@ -73,12 +75,71 @@ export const SearchResults = ({
   return (
     <>
       {pageOptions.map((org) => (
-        <OrganizationCard org={org} key={org.id} showDescription={true} />
+        <OrganizationCard org={org} key={org.id} showDescription={true} search={searchTerm} />
       ))}
       <PageButtons setPage={setPage} page={page} maxPage={maxPage} />
     </>
   );
 };
+
+
+const filterOrganization = (org: OrganizationSearchProps, searchTerm: string) => {
+  const nameMatch = org.name
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase());
+  const descriptionMatch = org.description
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase());
+
+  const tagMatch = org.tags.some((tag) =>
+    tag.tag.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const categoryMatch = org.categories.some((category) =>
+    category.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const programMatch = org.programs.some((program) => {
+    const nameMatch = program.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const descriptionMatch = program.description && program.description
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const tagMatch = program.tags.some((tag) =>
+      tag.tag.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const categoryMatch = program.category
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    return nameMatch || descriptionMatch || tagMatch || categoryMatch ;
+  });
+
+  return nameMatch || descriptionMatch || tagMatch || categoryMatch || programMatch;
+}
+
+export const programHasSearchTerm = (program: OrganizationSearchProps["programs"][0], searchTerm: string | undefined) => {
+  if (!searchTerm) {
+    return false;
+  }
+  const nameMatch = program.name
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase());
+  const descriptionMatch = program.description && program.description
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase());
+
+  const tagMatch = program.tags.some((tag) =>
+    tag.tag.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const categoryMatch = program.category
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase());
+
+  return nameMatch || descriptionMatch || tagMatch || categoryMatch;
+}
+
 
 export const SearchComponent = ({
   searchOptions,
@@ -103,21 +164,7 @@ export const SearchComponent = ({
 
     setDisplayOrgs(
       searchOptions.filter((org) => {
-        const nameMatch = org.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        const descriptionMatch = org.description
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-
-        const tagMatch = org.tags.some((tag) =>
-          tag.tag.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        const categoryMatch = org.categories.some((category) =>
-          category.category.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-
-        return nameMatch || descriptionMatch || tagMatch || categoryMatch;
+        return filterOrganization(org, searchTerm);
       })
     );
   }, [searchTerm, searchOptions, router]);
@@ -129,7 +176,7 @@ export const SearchComponent = ({
         searchInput={searchTerm}
         setSearchInput={setSearchTerm}
       />
-      <SearchResults searchOptions={displayOrgs} />
+      <SearchResults searchOptions={displayOrgs} searchTerm={searchTerm} />
     </div>
   );
 };

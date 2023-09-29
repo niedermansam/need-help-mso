@@ -17,6 +17,8 @@ import {
 import { UpdateProgramModal } from "@/app/admin/org/[id]/programs/ProgramForm";
 import { useState } from "react";
 import ReactModal from "react-modal";
+import { twMerge } from "tailwind-merge";
+import { programHasSearchTerm } from "@/app/search/SearchComponent";
 
 export type ContactInfo = {
   phone: string | null;
@@ -221,14 +223,15 @@ const CategoryTagSection = ({
 export function OrganizationCard({
   org,
   showDescription,
+  search,
 }: {
   org: OrgCardProps;
-
   showDescription?: boolean;
+  search?: string;
 }) {
   const orgId = org.id;
 
-  const [showPrograms, setShowPrograms] = useState(false);
+  const [showPrograms, setShowPrograms] = useState(true);
 
   return (
     <CardWrapper>
@@ -277,7 +280,7 @@ export function OrganizationCard({
       {showPrograms && (
         <div className="col-span-full flex w-full flex-wrap gap-2 p-2">
           {org.programs.map((program) => {
-            return <ProgramModal key={program.id} program={program} />;
+            return <ProgramModal key={program.id} program={program} search={search} />;
           })}
         </div>
       )}
@@ -287,26 +290,28 @@ export function OrganizationCard({
 
 export function ProgramModal({
   program,
+  search,
 }: {
   program: Pick<Program, 'name' | 'category' | 'description' | 'phone' | 'url' | 'id' | 'organizationId'>& {
     exclusiveToCommunities: { name: string }[];
   } & { tags: {
   tag: string}[] };
+  search?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="w-fit rounded border border-stone-200 bg-stone-50 px-2 py-1 text-sm"
+        className={twMerge("w-fit rounded border  px-2 py-1 text-sm hover:bg-rose-300 hover:text-stone-800 ", programHasSearchTerm(program, search) ? "bg-rose-500 hover:text-white  hover:bg-rose-700 text-white" : "border-stone-200 text-stone-500" )}
       >
         {program.name}
       </button>
       <ReactModal
         isOpen={isOpen}
         onRequestClose={() => setIsOpen(false)}
-        className="block  w-[60%] flex-col rounded bg-white p-4 shadow-lg"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+        className="block  w-[60%] flex-col rounded bg-white p-4 shadow-lg z-[10001] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[10000] fixed inset-0"
       >
         <h2 className="text-2xl font-bold">{program.name}</h2>
         {program.phone && (<p>{program.phone}</p>)}
