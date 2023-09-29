@@ -27,7 +27,7 @@ const CategoryLink = ({
         divClassName
       )}
     >
-      {category}
+      <h2 className="text-center w-fit max-w-[70%]">{category}</h2>
       <Link href={`orgs/${slug}/map`} className="font-light text-sm flex flex-col  gap-1 text-stone-500 hover:text-rose-500">
         <FontAwesomeIcon className={twMerge("w-6 -my-2", iconClassName)} icon={faMapLocationDot} />
 
