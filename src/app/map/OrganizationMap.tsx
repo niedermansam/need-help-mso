@@ -10,9 +10,9 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import type { LocationData } from "./page";
-import * as _L from "leaflet";
+import type * as _L from "leaflet";
 import { orgIsFilteredByString } from "../search/utils";
-import { BusRoute } from "../api/bus-routes/route";
+import type { BusRoute } from "../api/bus-routes/route";
 import { PaginatedList } from "./OrganizationMapPage";
 import { isOrgInView, sortLocationsByDistanceFromCenter } from "./utils";
 import { twMerge } from "tailwind-merge";

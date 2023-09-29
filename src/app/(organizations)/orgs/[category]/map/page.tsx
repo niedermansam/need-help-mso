@@ -1,16 +1,16 @@
 import { prisma } from '@/server/db'
 import dynamic from 'next/dynamic';
 import React from 'react'
-import { jitter } from './utils';
-import { BusRoute, createBusRoute } from '../api/bus-routes/route';
 import { env } from 'process';
 import { MountainLineRoutes } from '@/data/MountainLineRoutes';
-const OrganizationMap = dynamic(() => import("./OrganizationMapPage"), {
+import { jitter } from '@/app/map/utils';
+import { createBusRoute } from '@/app/api/bus-routes/route';
+const OrganizationMap = dynamic(() => import("@/app/map/OrganizationMapPage"), {
   loading: () => <p>loading...</p>,
   ssr: false,
 });
 
-const getLocationData = async () => {
+const getLocationData = async (category: string) => {
   const locations = await prisma.location.findMany({
     where: {
       NOT: {
@@ -19,7 +19,14 @@ const getLocationData = async () => {
       },
       orgId: {
         not: null,
-      }
+      },
+      org: {
+        categories: {
+          some: {
+            category: category,
+          },
+        },
+      },
     },
     select: {
       id: true,
@@ -41,6 +48,9 @@ const getLocationData = async () => {
           phone: true,
           email: true,
           programs: {
+            where: {
+              category: category,
+            },
             select: {
               name: true,
               description: true,
@@ -62,10 +72,18 @@ const getLocationData = async () => {
 
 export type LocationData = Awaited<ReturnType<typeof getLocationData>>;
 
-async function Page() {
+async function Page({params} : {params: {category: string}}) {
 
+    const categoryName = await prisma.category.findUnique({
+      where: {
+        slug: params.category,
+      },
+      select: {
+        category: true,
+      },
+    });
     
-    let locations = await getLocationData()
+    let locations = await getLocationData(params.category)
 
     locations = locations.map((location) => {
       if( !location.latitude || !location.longitude) return location
@@ -79,10 +97,7 @@ async function Page() {
 
 
   return (
-    <OrganizationMap locations={locations} busRoutes={busRoutes} category={{
-      name: "All Organizations",
-      slug: "all",
-    }} />
+    <OrganizationMap locations={locations} busRoutes={busRoutes} category={{name: categoryName?.category || '', slug: params.category}} />
   )
 }
 

@@ -1,6 +1,9 @@
 import { BackButton } from "@/app/_components/BackButton";
 import { SearchComponent } from "@/app/search/SearchComponent";
 import { prisma } from "@/server/db";
+import { faMapLocationDot } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 import React from "react";
 
 export default async function OrganizationByCategoryPage({
@@ -49,9 +52,9 @@ export default async function OrganizationByCategoryPage({
 
   return (
     <div>
-      <h1 className="mb-6 text-4xl font-bold text-stone-700">
-        <BackButton /> {category.category}
-      </h1>
+      <h1 className="mb-6 text-4xl font-bold text-stone-700 flex items-center gap-2">
+        <BackButton /> {category.category} <Link href={`/orgs/${category.slug}/map`}><FontAwesomeIcon className="w-6 -my-2 text-rose-400 hover:text-rose-500" icon={faMapLocationDot} />
+      </Link></h1>
       <SearchComponent searchOptions={category.allOrganizations} />
     </div>
   );

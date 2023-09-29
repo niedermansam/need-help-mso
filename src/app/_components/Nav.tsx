@@ -92,22 +92,22 @@ export default function NavBar() {
           <NavLink
             href="/about"
             label="About"
-            isActive={/\/about/.test(pathname)}
+            isActive={/^\/about/.test(pathname)}
           />
           <NavLink
             href="/orgs"
             label="Organizations"
-            isActive={/\/org/.test(pathname)}
+            isActive={/^\/org/.test(pathname)}
           />
           <NavLink
             href="/map"
             label="Map"
-            isActive={/\/map/.test(pathname)}
+            isActive={/^\/map/.test(pathname)}
           />
           <NavLink
             href="/contact"
             label="Contact"
-            isActive={/\/contact/.test(pathname)}
+            isActive={/^\/contact/.test(pathname)}
           />
 
           {loggedIn && (

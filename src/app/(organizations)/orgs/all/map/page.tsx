@@ -1,11 +1,11 @@
 import { prisma } from '@/server/db'
 import dynamic from 'next/dynamic';
 import React from 'react'
-import { jitter } from './utils';
-import { BusRoute, createBusRoute } from '../api/bus-routes/route';
 import { env } from 'process';
 import { MountainLineRoutes } from '@/data/MountainLineRoutes';
-const OrganizationMap = dynamic(() => import("./OrganizationMapPage"), {
+import { jitter } from '@/app/map/utils';
+import { createBusRoute } from '@/app/api/bus-routes/route';
+const OrganizationMap = dynamic(() => import("@/app/map/OrganizationMapPage"), {
   loading: () => <p>loading...</p>,
   ssr: false,
 });
@@ -19,7 +19,7 @@ const getLocationData = async () => {
       },
       orgId: {
         not: null,
-      }
+      },
     },
     select: {
       id: true,
@@ -62,7 +62,7 @@ const getLocationData = async () => {
 
 export type LocationData = Awaited<ReturnType<typeof getLocationData>>;
 
-async function Page() {
+async function Page({params} : {params: {category: string}}) {
 
     
     let locations = await getLocationData()
@@ -79,10 +79,7 @@ async function Page() {
 
 
   return (
-    <OrganizationMap locations={locations} busRoutes={busRoutes} category={{
-      name: "All Organizations",
-      slug: "all",
-    }} />
+    <OrganizationMap locations={locations} busRoutes={busRoutes} category={{name: 'All Organizations', slug: params.category}} />
   )
 }
 
