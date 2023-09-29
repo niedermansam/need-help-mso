@@ -135,7 +135,7 @@ export default function OrganizationMapSection({
   category
 }: {
   locations: LocationData;
-  busRoutes: BusRoute[];
+  busRoutes?: BusRoute[] | undefined;
   category: 
   {
     name: string;

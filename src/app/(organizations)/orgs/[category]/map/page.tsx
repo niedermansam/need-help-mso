@@ -58,6 +58,7 @@ const getLocationData = async (category: string) => {
               category: true,
               tags: true,
               exclusiveToCommunities: true,
+              helpfulToCommunities: true,
               phone: true,
               url: true,
               organizationId: true,

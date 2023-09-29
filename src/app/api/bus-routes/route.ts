@@ -4,9 +4,9 @@ import { BUS_ROUTE_COLORS } from "@/utils/constants";
 import { NextResponse } from "next/server";
 
 type MountainLineRoute =  typeof MountainLineRoutes.features[number];
-type RouteName = MountainLineRoute["properties"]["ROUTE"];
+export type BusRouteNumber = MountainLineRoute["properties"]["ROUTE"];
 
-type RouteColor = typeof BUS_ROUTE_COLORS[RouteName];
+type RouteColor = typeof BUS_ROUTE_COLORS[BusRouteNumber];
 
 type RouteAccent = `accent-[${RouteColor}]`
 
@@ -21,17 +21,16 @@ export function createBusRoute(route: (typeof MountainLineRoutes.features)[numbe
     dir: route.properties.DIR,
     number: route.properties.ROUTE,
     color: color,
-    accentColor: `accent-[${color}]]` as RouteAccent,
     path: route.geometry.coordinates[0]?.map((coord) => {
       const [lng, lat] = coord;
       return [lat, lng];
-    }),
+    }) as [number, number][],
   };
 }
 
 type AccentColor = `accent-[${string}]`;
 
-export type BusRoute = NonNullable<ReturnType<typeof createBusRoute>>;
+export type BusRoute = ReturnType<typeof createBusRoute>;
 
 const routes = MountainLineRoutes.features.map(createBusRoute);
 

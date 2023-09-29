@@ -12,7 +12,7 @@ import {
 import type { LocationData } from "./page";
 import type * as _L from "leaflet";
 import { orgIsFilteredByString } from "../search/utils";
-import type { BusRoute } from "../api/bus-routes/route";
+import type { BusRoute, BusRouteNumber } from "../api/bus-routes/route";
 import { PaginatedList } from "./OrganizationMapPage";
 import { isOrgInView, sortLocationsByDistanceFromCenter } from "./utils";
 import { twJoin, twMerge } from "tailwind-merge";
@@ -31,7 +31,7 @@ export function OrganizationMap({
 }: {
   locations: LocationData;
   search: string;
-  busRoutes: BusRoute[];
+  busRoutes?: BusRoute[] | undefined;
 }) {
   const [displayedMapLocations, setDisplayedMapLocations] =
     React.useState(locations);
@@ -245,40 +245,38 @@ function OrganizationMarkers({ locations }: { locations: LocationData }) {
   );
 }
 
-function BusRoutes({ busRoutes }: { busRoutes: BusRoute[] }) {
+function BusRoutes({ busRoutes }: { busRoutes?: BusRoute[] }) {
 
-  const filteredBusRoutes = busRoutes.filter(route => route && route.number)
 
-  const routeNames =[...new Set( busRoutes.filter(route => 
-    {
-      if(!route) return false
-      return route?.name !== undefined
-      
-    }).map((route) => {
+  const filteredBusRoutes = busRoutes?.filter(route => route && route.number)
+
+  const routeNames = filteredBusRoutes ? [...new Set( filteredBusRoutes.map((route) => {
+    if(!route) return null
     return route.number
   }))].sort(
     (a,b) => {
-      
+      if(!a || !b) return 0
 
       //otherwise sort by the number  
       return a - b
 
     }
-  )
+  ) : []
 
-  const [visibleRoutes, setVisibleRoutes] = React.useState<BusRoute['number'][]>(routeNames)
+  const [visibleRoutes, setVisibleRoutes] = React.useState<(BusRouteNumber| null)[]>(routeNames)
 
   const [isMinimized, setIsMinimized] = React.useState(false)
+  if (!busRoutes) return null;
 
-  function addVisibleRoute(routeId: BusRoute["number"]) {
+  function addVisibleRoute(routeId: BusRouteNumber | null) {
     setVisibleRoutes([...visibleRoutes, routeId]);
   }
 
-  function removeVisibleRoute(routeId: BusRoute["number"]) {
+  function removeVisibleRoute(routeId: BusRouteNumber | null) {
     setVisibleRoutes(visibleRoutes.filter((id) => id !== routeId));
   }
 
-  function toggleVisibleRoute(routeId: BusRoute["number"]) {
+  function toggleVisibleRoute(routeId: BusRouteNumber | null) {
     if (visibleRoutes.includes(routeId)) {
       removeVisibleRoute(routeId);
     } else {
@@ -345,21 +343,18 @@ function BusRoutes({ busRoutes }: { busRoutes: BusRoute[] }) {
                 (busRoute) => busRoute?.number === route
               )?.color;
 
-              const accentColor = busRoutes.find(
-                (busRoute) => busRoute?.number === route
-              )?.accentColor;
               return (
-                <div className="flex w-full items-center justify-between gap-1" key={`${route}`}>
+                <div className="flex w-full items-center justify-between gap-1" key={`${route || ''}`}>
                   <input
                     type="checkbox"
-                    className={ BUS_ROUTE_COLOR_ACCENTS[route]}
+                    className={route && BUS_ROUTE_COLOR_ACCENTS[route] || undefined}
                     key={route}
-                    id={route.toString()}
-                    name={route.toString()}
+                    id={route && route.toString() || ''}
+                    name={route && route.toString() || ''}
                     onChange={() => toggleVisibleRoute(route)}
                     checked={visibleRoutes.includes(route)}
                   />
-                  <label htmlFor={route.toString()}>Route {route} </label>
+                  <label htmlFor={route?.toString()}>Route {route} </label>
                   <span
                     style={{
                       color: color,
