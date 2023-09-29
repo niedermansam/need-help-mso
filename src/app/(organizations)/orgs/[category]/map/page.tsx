@@ -23,7 +23,7 @@ const getLocationData = async (category: string) => {
       org: {
         categories: {
           some: {
-            category: category,
+            slug: category,
           },
         },
       },
