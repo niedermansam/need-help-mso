@@ -121,7 +121,7 @@ export function ProgramCard({
         >
           More Info
         </Link>
-        <UpdateProgramModal program={{...program, orgId, tags: program.tags.map(x => x.tag)}} />
+        <UpdateProgramModal program={{...program,  tags: program.tags.map(x => x.tag)}} />
       </div>
     </CardWrapper>
   );
