@@ -5,7 +5,7 @@ import { fetchAllOrgs } from "../_components/organization/utils/fetchAllOrgs";
 export type OrganizationSearchListProps = 
   Awaited<ReturnType<typeof fetchAllOrgs>>
 
-  export type OrganizationSearchProps = Pick<OrganizationSearchListProps[number], "categories" | "tags" | "category" | "description" | "name">
+  export type OrganizationSearchProps = Pick<OrganizationSearchListProps[number], "categories" | "tags" | "category" | "description" | "name" | "programs" >
 async function Page() {
   const orgs = await fetchAllOrgs();
 

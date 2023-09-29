@@ -302,6 +302,7 @@ function UpdateProgramForm({
 
 export function UpdateProgramModal({ program, buttonClassName }: { program: UpdateProgramProps, buttonClassName?: string }) {
 
+  const router = useRouter( )
   const [isOpen, setIsOpen] = React.useState(false);
   const isAdmin = useUserStore((state) => state.admin);
 
@@ -313,10 +314,12 @@ export function UpdateProgramModal({ program, buttonClassName }: { program: Upda
     <ReactModal 
       isOpen={isOpen}
       onRequestClose={() => setIsOpen(false)}
-      className="bg-white rounded p-4 min-w-[400px] min-h-[400px]"
+      className="bg-white rounded p-4 min-w-[50%] min-h-[500px]"
       overlayClassName="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center"
     >
-      <UpdateProgramForm program={program} onUpdate={() => setIsOpen(false)} />
+      <UpdateProgramForm program={program} onUpdate={() => {
+        setIsOpen(false)
+        router.refresh()}} />
     </ReactModal>
     </>
   )

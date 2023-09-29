@@ -5,6 +5,12 @@ export const fetchAllOrgs = async () => {
     include: {
       tags: { select: { tag: true } },
       categories: true,
+      programs: {
+        include: {
+          tags: true,
+          exclusiveToCommunities: true,
+        },
+      },
     },
   });
 

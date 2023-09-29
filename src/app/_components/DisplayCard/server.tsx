@@ -1,3 +1,4 @@
+"use client";
 import { TagList } from "@/components/Tags";
 import type { OrgProps } from "@/pages/old_org";
 import { getRawPhoneNumber, prettyUrl } from "@/utils";
@@ -15,6 +16,8 @@ import {
   ProgramDetailsModal,
 } from "./client";
 import { UpdateProgramModal } from "@/app/admin/org/[id]/programs/ProgramForm";
+import { useState } from "react";
+import ReactModal from "react-modal";
 
 export type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
 
@@ -135,6 +138,12 @@ export type OrgCardProps = Pick<
   "id" | "name" | "phone" | "email" | "website" | "category" | "description"
 > & {
   tags: { tag: string }[];
+} & {
+  programs: (Program & {
+    exclusiveToCommunities: { name: string }[];
+  } & {
+    tags: Tag[];
+  })[];
 };
 
 const DesktopContactInfo = ({
@@ -210,16 +219,13 @@ export function OrganizationCard({
   org,
   showDescription,
 }: {
-  org: 
-  Pick<
-    Organization,
-    "id" | "name" | "phone" | "email" | "website" | "category" | "description"
-    > & {
-      tags: { tag: string }[];
-    };
+  org: OrgCardProps;
+
   showDescription?: boolean;
 }) {
   const orgId = org.id;
+
+  const [showPrograms, setShowPrograms] = useState(false);
 
   return (
     <CardWrapper>
@@ -258,14 +264,79 @@ export function OrganizationCard({
       </div>
       <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
         <FavoriteOrgButton orgId={orgId} />
-        <Link
+        <button
           className="mr-2 flex w-1/2 justify-center justify-self-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md sm:w-2/3 md:w-32"
-          href={`/org/${org.id}`}
+          onClick={() => setShowPrograms(!showPrograms)}
         >
-          More Info
-        </Link>
+          {showPrograms ? "hide" : "Programs"}
+        </button>
       </div>
+      {showPrograms && (
+        <div className="col-span-full flex w-full flex-wrap gap-2 p-2">
+          {org.programs.map((program) => {
+            return <ProgramModal key={program.id} program={program} />;
+          })}
+        </div>
+      )}
     </CardWrapper>
+  );
+}
+
+export function ProgramModal({
+  program,
+}: {
+  program: Program & {
+    exclusiveToCommunities: { name: string }[];
+  } & { tags: Tag[] };
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <button
+        onClick={() => setIsOpen(true)}
+        className="w-fit rounded border border-stone-200 bg-stone-50 px-2 py-1 text-sm"
+      >
+        {program.name}
+      </button>
+      <ReactModal
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+        className="block  w-[60%] flex-col rounded bg-white p-4 shadow-lg"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+      >
+        <h2 className="text-2xl font-bold">{program.name}</h2>
+        {program.phone && (<p>{program.phone}</p>)}
+
+        <CategoryTag
+          category={program.category}
+          tags={program.tags.map((tag) => tag.tag)}
+        />
+
+        {program.exclusiveToCommunities.length > 0 && (
+          <p>
+            Exclusive to{" "}
+            {program.exclusiveToCommunities.map((x) => x.name).join(", ")}
+          </p>
+        )}
+        <p className="text-sm font-light">{program.description}</p>
+        {program.url && (
+          <Link 
+            href={program.url}
+            className="text-rose-500 hover:text-rose-600"
+            target="_blank"
+          >
+            Visit Site
+          </Link>
+        )
+        }
+          <button
+            onClick={() => setIsOpen(false)}
+            className="rounded border border-stone-200 bg-stone-50 px-2 py-1 text-sm"
+          >
+            Close
+          </button>
+      </ReactModal>
+    </>
   );
 }
 
@@ -288,8 +359,11 @@ type ProgramCardDisplayOptions = {
 };
 
 export function truncate(str: string, n: number) {
+  if (str.length <= n) return str;
   const trimmed = str.slice(0, n + 1);
-  return trimmed.slice(0, Math.min(trimmed.length, trimmed.lastIndexOf(" ")));
+  return (
+    trimmed.slice(0, Math.min(trimmed.length, trimmed.lastIndexOf(" "))) + "..."
+  );
 }
 
 export const CategoryTag = ({
@@ -335,7 +409,6 @@ export function ProgramCard({
 
   const orgId = program.organizationId;
 
-
   return (
     <div className="my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white px-4 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-4 md:pb-2">
       <div className="flex w-full flex-wrap items-start justify-start text-start md:col-span-4 lg:col-span-3 lg:justify-start lg:text-left">
@@ -349,7 +422,17 @@ export function ProgramCard({
         <div className="flex">
           {/* <EditProgramButton programId={programId} orgId={orgId} /> */}
           <h2 className=" truncate text-2xl font-bold tracking-tight text-stone-600  md:text-xl">
-            {program.url ? <Link className="text-rose-500 hover:text-rose-600 " target="_blank" href={program.url}>{programName} &rarr;</Link> : programName}
+            {program.url ? (
+              <Link
+                className="text-rose-500 hover:text-rose-600 "
+                target="_blank"
+                href={program.url}
+              >
+                {programName} &rarr;
+              </Link>
+            ) : (
+              programName
+            )}
           </h2>
         </div>
       </div>
@@ -358,11 +441,17 @@ export function ProgramCard({
         tags={program.tags.map((tag) => tag.tag)}
       />
       <div className="col-span-full ">
-        {program.description ? truncate(program.description || '', 250) + "..." : null}
-        <div className="flex justify-between mt-2">
-        {program.description && <ProgramDetailsModal buttonClassName="w-1/3" program={program} />}
-        <UpdateProgramModal buttonClassName="w-1/3" program={{...program, orgId, tags: program.tags.map(x=>x.tag)}} />
-      </div></div>
+        {program.description ? truncate(program.description || "", 250) : null}
+        <div className="mt-2 flex justify-between">
+          {program.description && (
+            <ProgramDetailsModal buttonClassName="w-1/3" program={program} />
+          )}
+          <UpdateProgramModal
+            buttonClassName="w-1/3"
+            program={{ ...program, tags: program.tags.map((x) => x.tag) }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

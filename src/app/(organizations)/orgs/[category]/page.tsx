@@ -8,13 +8,34 @@ export default async function OrganizationByCategoryPage({
 }: {
   params: { category: string };
 }) {
+
+  const categoryName = await prisma.category.findUnique({
+    where: {
+      slug: params.category,
+    },
+    select: {
+      category: true,
+    },
+  });
+
   const category = await prisma.category.findUnique({
     where: { slug: params.category },
     include: {
-      organizations: {
+      allOrganizations: {
         include: {
           tags: true,
           categories: true,
+          programs: {
+            where: {
+              category: {
+                equals: categoryName?.category,
+              }
+            },
+            include: {
+              tags: true,
+              exclusiveToCommunities: true,
+            },
+          },
         },
       },
     },
@@ -31,7 +52,7 @@ export default async function OrganizationByCategoryPage({
       <h1 className="mb-6 text-4xl font-bold text-stone-700">
         <BackButton /> {category.category}
       </h1>
-      <SearchComponent searchOptions={category.organizations} />
+      <SearchComponent searchOptions={category.allOrganizations} />
     </div>
   );
 }
