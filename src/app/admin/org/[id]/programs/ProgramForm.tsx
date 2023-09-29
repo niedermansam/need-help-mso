@@ -25,41 +25,44 @@ type DefaultsFromOrganization = {
   phone: string | null;
   email: string | null;
   website: string | null;
-
-
 };
 
-type UpdateProgramProps = UnwrapTRPCMutation<typeof api.program.update.useMutation>
+type UpdateProgramProps = UnwrapTRPCMutation<
+  typeof api.program.update.useMutation
+>;
 
 function UpdateProgramForm({
-  program, onUpdate }: { program: UpdateProgramProps , onUpdate?: () => void}) {
-
+  program,
+  onUpdate,
+}: {
+  program: UpdateProgramProps;
+  onUpdate?: () => void;
+}) {
   const [formState, setFormState] = React.useState<UpdateProgramProps>(program);
 
+  console.log(program.helpfulToCommunities)
 
   const updateProgram = api.program.update.useMutation({
     onSuccess: () => {
       onUpdate?.();
     },
-  }); 
-
+  });
 
   const [exclusiveToCommunities, setExclusiveToCommunities] = React.useState<
     { value: string; label: string }[]
-  >(program.exclusiveTo?.map(x => ({ value: x, label: x})) || []);
+  >(program.exclusiveToCommunities?.map((x) => ({ value: x, label: x })) || []);
   const [helpfulToCommunities, setHelpfulToCommunities] = React.useState<
     { value: string; label: string }[]
-  >(program.helpfulTo?.map(x => ({ value: x, label: x})) || []);
+  >(program.helpfulToCommunities?.map((x) => ({ value: x, label: x })) || []);
 
   const [selectedTags, setSelectedTags] = React.useState<
     { value: string; label: string }[]
-  >(program.tags?.map(x => ({ value: x, label: x})) || []);
+  >(program.tags?.map((x) => ({ value: x, label: x })) || []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-
 
     if (name === "website")
       return setFormState((prevState) => ({
@@ -99,7 +102,7 @@ function UpdateProgramForm({
       name,
       description,
       category,
-      exclusiveTo: exluciveToCommunitiesIds,
+      exclusiveToCommunities: exluciveToCommunitiesIds,
       helpfulTo: helpfulToCommunitiesIds,
       tags,
     });
@@ -300,35 +303,56 @@ function UpdateProgramForm({
   );
 }
 
-export function UpdateProgramModal({ program, buttonClassName }: { program: UpdateProgramProps, buttonClassName?: string }) {
-
-  const router = useRouter( )
+export function UpdateProgramModal({
+  program,
+  buttonClassName,
+}: {
+  program: UpdateProgramProps;
+  buttonClassName?: string;
+}) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
   const isAdmin = useUserStore((state) => state.admin);
 
-  if(!isAdmin) return null;
+  if (!isAdmin) return null;
 
   return (
     <>
-    <button className={twMerge("bg-rose-500 text-white rounded p-2", buttonClassName)} onClick={() => setIsOpen(true)}>Edit</button>
-    <ReactModal 
-      isOpen={isOpen}
-      onRequestClose={() => setIsOpen(false)}
-      className="bg-white rounded p-4 min-w-[50%] min-h-[500px]"
-      overlayClassName="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center"
-    >
-      <UpdateProgramForm program={program} onUpdate={() => {
-        setIsOpen(false)
-        router.refresh()}} />
-    </ReactModal>
+      <button
+        className={twMerge(
+          "rounded bg-rose-500 p-2 text-white",
+          buttonClassName
+        )}
+        onClick={() => setIsOpen(true)}
+      >
+        Edit
+      </button>
+      <ReactModal
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+        className="min-h-[500px] min-w-[50%] rounded bg-white p-4"
+        overlayClassName="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center"
+      >
+        <UpdateProgramForm
+          program={program}
+          onUpdate={() => {
+            setIsOpen(false);
+            router.refresh();
+          }}
+        />
+      </ReactModal>
     </>
-  )
-
+  );
 }
 
-
-function CreateProgramForm({ org, setSearchName }: { org: DefaultsFromOrganization, setSearchName: (name: string) => void }) {
-  const router = useRouter( )
+function CreateProgramForm({
+  org,
+  setSearchName,
+}: {
+  org: DefaultsFromOrganization;
+  setSearchName: (name: string) => void;
+}) {
+  const router = useRouter();
   const { id: orgId, category: orgCategory } = org;
   const createProgram = api.program.create.useMutation({
     onSuccess: () => {
@@ -345,7 +369,7 @@ function CreateProgramForm({ org, setSearchName }: { org: DefaultsFromOrganizati
       setExclusiveToCommunities([]);
       setHelpfulToCommunities([]);
       setSelectedTags([]);
-      router.refresh()
+      router.refresh();
     },
   });
   type ProgramFormProps = Partial<Parameters<typeof createProgram.mutate>[0]>;
@@ -371,7 +395,6 @@ function CreateProgramForm({ org, setSearchName }: { org: DefaultsFromOrganizati
     const { name, value } = e.target;
 
     if (name === "name") setSearchName(value);
-
 
     if (name === "website")
       return setFormState((prevState) => ({
@@ -612,9 +635,14 @@ function CreateProgramForm({ org, setSearchName }: { org: DefaultsFromOrganizati
   );
 }
 
-function ProgramList({ programs, searchName }: { programs: ProgramCardInformation[], searchName: string }) {
-
-  const filteredPrograms = programs//.filter( (program) => program.name.toLowerCase().includes(searchName.toLowerCase()) );
+function ProgramList({
+  programs,
+  searchName,
+}: {
+  programs: ProgramCardInformation[];
+  searchName: string;
+}) {
+  const filteredPrograms = programs; //.filter( (program) => program.name.toLowerCase().includes(searchName.toLowerCase()) );
 
   const [page, setPage] = React.useState(1);
 
@@ -627,21 +655,24 @@ function ProgramList({ programs, searchName }: { programs: ProgramCardInformatio
 
   const paginatedPrograms = filteredPrograms.slice(start, end);
 
-  if(!paginatedPrograms.length) return (
-    <div className="flex flex-col justify-center items-center h-full">
-      <h2 className="text-6xl font-bold text-stone-500">No Programs Found</h2>
-      <p className="text-2xl text-stone-700">Add a new program using the form on this page.</p>
-    </div>
-  )
+  if (!paginatedPrograms.length)
+    return (
+      <div className="flex h-full flex-col items-center justify-center">
+        <h2 className="text-6xl font-bold text-stone-500">No Programs Found</h2>
+        <p className="text-2xl text-stone-700">
+          Add a new program using the form on this page.
+        </p>
+      </div>
+    );
 
   return (
     <>
       {paginatedPrograms.map((program) => (
         <ProgramCard key={program.id} program={program} />
       ))}
-      <div className="flex justify-center gap-4 items-center">
+      <div className="flex items-center justify-center gap-4">
         <button
-          className="bg-stone-500 text-white rounded p-2"
+          className="rounded bg-stone-500 p-2 text-white"
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
           disabled={page === 1}
         >
@@ -651,14 +682,13 @@ function ProgramList({ programs, searchName }: { programs: ProgramCardInformatio
           Page {page} of {maxPage}
         </span>
         <button
-          className="bg-stone-500 text-white rounded p-2"
+          className="rounded bg-stone-500 p-2 text-white"
           onClick={() => setPage((prev) => Math.min(prev + 1, maxPage))}
           disabled={page === maxPage}
         >
           Next
         </button>
       </div>
-
     </>
   );
 }
@@ -668,14 +698,15 @@ function AdminProgramSection({
 }: {
   org: DefaultsFromOrganization & { programs: ProgramCardInformation[] };
 }) {
-
   const [searchName, setSearchName] = React.useState("");
   return (
     <div className="flex gap-4">
       <div className="w-1/3">
-      <CreateProgramForm org={org} setSearchName={setSearchName} /></div>
+        <CreateProgramForm org={org} setSearchName={setSearchName} />
+      </div>
       <div className="w-2/3">
-      <ProgramList programs={org.programs} searchName={searchName} /></div>
+        <ProgramList programs={org.programs} searchName={searchName} />
+      </div>
     </div>
   );
 }

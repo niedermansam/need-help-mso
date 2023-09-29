@@ -21,7 +21,8 @@ async function getOrganizationResources(id: string) {
         include: {
             tags: true,
             organization: true,
-
+            exclusiveToCommunities: true,
+            helpfulToCommunities: true,
         }
       },
       category: true,

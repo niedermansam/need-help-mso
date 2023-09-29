@@ -239,7 +239,8 @@ export const programRouter = router({
         url: z.string().nullish(),
         tags: z.array(z.string()).optional(),
         helpfulTo: z.array(z.string()).optional(),
-        exclusiveTo: z.array(z.string()).optional(),
+        exclusiveToCommunities: z.array(z.string()).optional(),
+        helpfulToCommunities: z.array(z.string()).optional(),
         barriersToEntry: z.enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"]).nullish(),
         barriersToEntryDetails: z.string().nullish(),
 
@@ -261,7 +262,7 @@ export const programRouter = router({
         tags,
         helpfulTo,
         phone,
-        exclusiveTo,
+        exclusiveToCommunities: exclusiveTo,
         free,
         helpingOrganizations,
       } = input;
@@ -319,81 +320,78 @@ export const programRouter = router({
               : [],
           },
 
-
           free: free || undefined,
         },
       });
 
       // update org with new tags
 
-        await ctx.prisma.program.update({
-          where: {
-            id: input.id,
+      await ctx.prisma.program.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          tags: {
+            disconnect: oldProgram.tags.filter((tag) => {
+              if (!input.tags) return true;
+              return !input.tags.find((tag2) => tag2 === tag.tag);
+            }),
           },
-          data: {
-            tags: {
-              disconnect: oldProgram.tags.filter((tag) => {
-                if (!input.tags) return true;
-                return !input.tags.find((tag2) => tag2 === tag.tag);
-              }),
-            },
-          },
-        });
+        },
+      });
 
       // get exclusiveToCommunities that were removed from old program
-      
-        await ctx.prisma.program.update({
-          where: {
-            id: input.id,
+
+      await ctx.prisma.program.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          exclusiveToCommunities: {
+            disconnect: oldProgram.exclusiveToCommunities.filter(
+              (community) => {
+                if (!input.exclusiveToCommunities) return true;
+                return !input.exclusiveToCommunities.find(
+                  (community2) => community2 === community.id
+                );
+              }
+            ),
+            connectOrCreate: input.exclusiveToCommunities
+              ? input.exclusiveToCommunities.map((community) => ({
+                  where: { name: community },
+                  create: {
+                    name: community,
+                  },
+                }))
+              : undefined,
           },
-          data: {
-            exclusiveToCommunities: {
-              disconnect: oldProgram.exclusiveToCommunities.filter(
-                (community) => {
-                  if (!input.exclusiveTo) return true;
-                  return !input.exclusiveTo.find(
-                    (community2) => community2 === community.id
-                  );
-                }
-              ),
-              connectOrCreate: input.exclusiveTo
-                ? input.exclusiveTo.map((community) => ({
-                    where: { name: community},
-                    create: {
-                      name: community,
-                    },
-                  }))
-                : undefined,
-            },
-          },
-        });
+        },
+      });
 
       // get helpfulToCommunities that were removed from old program
-        await ctx.prisma.program.update({
-          where: {
-            id: input.id,
+      await ctx.prisma.program.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          helpfulToCommunities: {
+            disconnect: oldProgram.helpfulToCommunities.filter((community) => {
+              if (!input.helpfulTo) return true;
+              return !input.helpfulTo.find(
+                (community2) => community2 === community.id
+              );
+            }),
+            connectOrCreate: input.helpfulTo
+              ? input.helpfulTo.map((community) => ({
+                  where: { name: community },
+                  create: {
+                    name: community,
+                  },
+                }))
+              : undefined,
           },
-          data: {
-            helpfulToCommunities: {
-              disconnect: oldProgram.helpfulToCommunities.filter(
-                (community) => {
-                  if (!input.helpfulTo) return true;
-                  return !input.helpfulTo.find(
-                    (community2) => community2 === community.id
-                  );
-                }
-              ),
-              connectOrCreate: input.helpfulTo
-                ? input.helpfulTo.map((community) => ({
-                    where: { name: community },
-                    create: {
-                      name: community,
-                    },
-                  }))
-                : undefined,
-            },
-          },
-        });
+        },
+      });
       return oldProgram;
     }),
 

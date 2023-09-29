@@ -146,6 +146,7 @@ export type OrgCardProps = Pick<
 } & {
   programs: (Program & {
     exclusiveToCommunities: { name: string }[];
+    helpfulToCommunities: { name: string }[];
   } & {
     tags: Tag[];
   })[];
@@ -294,6 +295,7 @@ export function ProgramModal({
 }: {
   program: Pick<Program, 'name' | 'category' | 'description' | 'phone' | 'url' | 'id' | 'organizationId'>& {
     exclusiveToCommunities: { name: string }[];
+    helpfulToCommunities: { name: string }[];
   } & { tags: {
   tag: string}[] };
   search?: string;
@@ -360,6 +362,8 @@ export type ProgramCardInformation = Pick<
     website: string | null;
   };
   tags: Pick<Tag, "tag">[];
+  exclusiveToCommunities: { name: string }[];
+  helpfulToCommunities: { name: string }[];
 };
 
 type ProgramCardDisplayOptions = {
@@ -457,7 +461,7 @@ export function ProgramCard({
           )}
           <UpdateProgramModal
             buttonClassName="w-1/3"
-            program={{ ...program, tags: program.tags.map((x) => x.tag) }}
+            program={{ ...program, helpfulToCommunities: program.helpfulToCommunities.map(x=>x.name), exclusiveToCommunities: program.exclusiveToCommunities.map(x => x.name), tags: program.tags.map((x) => x.tag) }}
           />
         </div>
       </div>
