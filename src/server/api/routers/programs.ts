@@ -226,6 +226,20 @@ export const programRouter = router({
           free: free,
         },
       });
+
+      await ctx.prisma.organization.update({
+        where: {
+          id: orgId,
+        },
+        data: {
+          categories: {
+            connect: {
+              category: category,
+            },
+          },
+        },
+      });
+
       return newProgram;
     }),
   update: adminProcedure
@@ -275,6 +289,11 @@ export const programRouter = router({
           tags: true,
           exclusiveToCommunities: true,
           helpfulToCommunities: true,
+          organization: {
+            select: {
+              id: true,
+            }
+          }
         },
         data: {
           name: name || undefined,
@@ -323,6 +342,21 @@ export const programRouter = router({
           free: free || undefined,
         },
       });
+
+     if(category) await ctx.prisma.organization.update({
+        where: {
+          id: oldProgram.organization.id,
+        },
+        data: {
+          categories: {
+            connect: 
+            {
+                category: category
+            }
+          }
+        }
+
+        })
 
       // update org with new tags
 
