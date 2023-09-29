@@ -16,6 +16,7 @@ async function Page() {
         include: {
           tags: true,
           exclusiveToCommunities: true,
+          helpfulToCommunities: true,
         }
       },
       exclusiveToCommunities: true,
