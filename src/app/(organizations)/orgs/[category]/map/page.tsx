@@ -102,4 +102,21 @@ async function Page({params} : {params: {category: string}}) {
   )
 }
 
+
+export async function generateStaticParams() {
+
+  const slugsJson = await prisma.category.findMany({
+    select: {
+      slug: true,
+    },
+  });
+
+  const slugs = slugsJson.map((x) => x.slug);
+
+  return slugs.map((slug) => {
+    return { category: slug };
+  });
+}
+
+
 export default Page
