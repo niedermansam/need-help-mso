@@ -149,6 +149,17 @@ export const userRouter = router({
           organizations: {
             include: {
               tags: true,
+              programs: {
+                include: {
+                  tags: true,
+                  exclusiveToCommunities: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
