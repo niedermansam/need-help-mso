@@ -10,6 +10,12 @@ export default async function Page({ params }: { params: { id: string } }) {
       organizations: {
         include: {
           tags: true,
+          programs: {
+            include: {
+              tags: true,
+              exclusiveToCommunities: true,
+            },
+          },
         },
       },
     },
