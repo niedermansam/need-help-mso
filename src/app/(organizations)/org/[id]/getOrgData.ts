@@ -10,6 +10,8 @@ export async function getOrgData(id:string) {
           include: {
             tags: true,
             categoryMeta: true,
+            helpfulToCommunities: true,
+            exclusiveToCommunities: true,
           },
         },
         exclusiveToCommunities: true,
