@@ -11,6 +11,12 @@ async function OrganizationPage() {
     include: {
       tags: { select: { tag: true } },
       categories: true,
+      programs: {
+        include: {
+          tags: true,
+          exclusiveToCommunities: true,
+        },
+      },
     },
   });
   return (
