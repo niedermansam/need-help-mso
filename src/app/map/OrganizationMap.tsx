@@ -47,6 +47,7 @@ export function OrganizationMap({
       <PaginatedList
         className="order-last col-span-2 py-4 xl:order-first xl:col-span-1 xl:px-4"
         allLocations={displayedMapLocations}
+        search={search}
       />
       <div className="col-span-2 ">
         <MapContainer

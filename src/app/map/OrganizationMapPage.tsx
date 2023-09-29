@@ -9,15 +9,18 @@ import "leaflet-defaulticon-compatibility";
 import { FavoriteOrgButton } from "../_components/DisplayCard/client";
 import { BusRoute } from "../api/bus-routes/route";
 import { OrganizationMap } from "./OrganizationMap";
+import { ProgramModal } from "../_components/DisplayCard/server";
 
 export function PaginatedList({
   allLocations,
   className,
+  search,
   ...props
 }: {
   allLocations: LocationData;
   className?: string;
   props?: React.ComponentProps<"div">;
+  search: string;
 }) {
   const resultsPerPage = 5;
   const [page, setPage] = React.useState(1);
@@ -58,7 +61,14 @@ export function PaginatedList({
                 </h2>
               </Link>
             </div>
-            <p>{org.description}</p>
+            <div className="flex gap-2 flex-wrap"> 
+            {org.programs.length > 0 && ( 
+              org.programs.map((program) => (
+                <ProgramModal program={program} key={program.id} search={search} />
+              ))
+
+      )}
+              </div>
           </div>
         );
       })}
@@ -124,7 +134,6 @@ export default function OrganizationMapSection({
 }) {
   const [search, setSearch] = React.useState("");
 
-  console.log(busRoutes);
   return (
     <div>
       <MapSearchBar search={search} setSearch={setSearch} />
