@@ -47,6 +47,7 @@ const getLocationData = async () => {
               id: true,
               category: true,
               tags: true,
+              exclusiveToCommunities: true,
             },
           },
         },

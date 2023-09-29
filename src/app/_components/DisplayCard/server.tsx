@@ -285,9 +285,10 @@ export function OrganizationCard({
 export function ProgramModal({
   program,
 }: {
-  program: Program & {
+  program: Pick<Program, 'name' | 'category' | 'description' | 'phone' | 'url' | 'id' | 'organizationId'>& {
     exclusiveToCommunities: { name: string }[];
-  } & { tags: Tag[] };
+  } & { tags: {
+  tag: string}[] };
 }) {
   const [isOpen, setIsOpen] = useState(false);
   return (
