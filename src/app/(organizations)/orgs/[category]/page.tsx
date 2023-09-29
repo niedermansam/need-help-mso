@@ -37,6 +37,7 @@ export default async function OrganizationByCategoryPage({
             include: {
               tags: true,
               exclusiveToCommunities: true,
+              helpfulToCommunities: true,
             },
           },
         },

@@ -15,6 +15,7 @@ async function OrganizationPage() {
         include: {
           tags: true,
           exclusiveToCommunities: true,
+          helpfulToCommunities: true,
         },
       },
     },

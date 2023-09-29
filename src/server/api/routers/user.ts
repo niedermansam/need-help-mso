@@ -158,6 +158,12 @@ export const userRouter = router({
                       name: true,
                     },
                   },
+                    helpfulToCommunities: {
+                      select: {
+                        id: true,
+                        name: true,
+                      },
+                    },
                 },
               },
             },

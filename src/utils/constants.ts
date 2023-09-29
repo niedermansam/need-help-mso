@@ -9,7 +9,7 @@ export const SITE_DESCRIPTION = "A directory of resources for Missoula, Montana.
 
 const ROUTE_1_COLOR = "#F44336";
 const ROUTE_2_COLOR = "#FF9800";
-const ROUTE_3_COLOR = "#FFEB3B";
+const ROUTE_3_COLOR = "#5b369b";
 const ROUTE_4_COLOR = "#4CAF50";
 const ROUTE_5_COLOR = "#2196F3";
 const ROUTE_6_COLOR = "#9C27B0";

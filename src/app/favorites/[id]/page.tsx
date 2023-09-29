@@ -14,6 +14,7 @@ export default async function Page({ params }: { params: { id: string } }) {
             include: {
               tags: true,
               exclusiveToCommunities: true,
+              helpfulToCommunities: true,
             },
           },
         },

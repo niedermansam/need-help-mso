@@ -309,13 +309,6 @@ export const programRouter = router({
                 },
               }
             : undefined,
-          helpingOrganizations:
-            (helpingOrganizations && {
-              connect: helpingOrganizations.map((org) => ({
-                id: org,
-              })),
-            }) ||
-            undefined,
 
           tags: {
             connectOrCreate: tags

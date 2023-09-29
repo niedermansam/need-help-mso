@@ -9,6 +9,7 @@ export const fetchAllOrgs = async () => {
         include: {
           tags: true,
           exclusiveToCommunities: true,
+          helpfulToCommunities: true,
         },
       },
     },
