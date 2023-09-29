@@ -204,7 +204,7 @@ export const programRouter = router({
           exclusiveToCommunities: exclusiveToCommunities
             ? {
                 connectOrCreate: exclusiveToCommunities.map((community) => ({
-                  where: { id: community },
+                  where: { name: community },
                   create: {
                     name: community,
                   },
@@ -215,7 +215,7 @@ export const programRouter = router({
           helpfulToCommunities: helpfulToCommunities
             ? {
                 connectOrCreate: helpfulToCommunities.map((community) => ({
-                  where: { id: community },
+                  where: { name: community },
                   create: {
                     name: community,
                   },
@@ -260,7 +260,7 @@ export const programRouter = router({
         category,
         url,
         tags,
-        helpfulTo,
+        helpfulToCommunities,
         phone,
         exclusiveToCommunities: exclusiveTo,
         free,
@@ -310,8 +310,8 @@ export const programRouter = router({
           },
           url: url,
           helpfulToCommunities: {
-            connectOrCreate: helpfulTo
-              ? helpfulTo.map((community) => ({
+            connectOrCreate: helpfulToCommunities
+              ? helpfulToCommunities.map((community) => ({
                   where: { name: community },
                   create: {
                     name: community,

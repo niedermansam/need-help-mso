@@ -421,6 +421,8 @@ export function ProgramCard({
   const orgName = program.organization.name;
 
   const orgId = program.organizationId;
+    console.log(program.helpfulToCommunities);
+
 
   return (
     <div className="my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white px-4 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-4 md:pb-2">
