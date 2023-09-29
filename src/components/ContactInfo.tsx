@@ -6,11 +6,14 @@ import {
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { OrgProps } from "../pages/old_org/[id]";
 import ReactModal from "react-modal";
 import { useState } from "react";
 
-export type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
+export type ContactInfo = {
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+}
 
 export function ContactInfo({
   phone,

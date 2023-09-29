@@ -1,6 +1,5 @@
 "use client";
 import { TagList } from "@/components/Tags";
-import type { OrgProps } from "@/pages/old_org";
 import { getRawPhoneNumber, prettyUrl } from "@/utils";
 import {
   faEnvelope,
@@ -19,7 +18,11 @@ import { UpdateProgramModal } from "@/app/admin/org/[id]/programs/ProgramForm";
 import { useState } from "react";
 import ReactModal from "react-modal";
 
-export type ContactInfo = Pick<OrgProps, "phone" | "email" | "website">;
+export type ContactInfo = {
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+}
 
 const FA_ICON_SIZE = { minWidth: 18, width: 18, height: 18 } as const;
 
