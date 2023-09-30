@@ -426,13 +426,13 @@ function CreateProgramForm({
     if (!category) return alert("Please select a category");
 
     const exluciveToCommunitiesIds = exclusiveToCommunities.map(
-      (community) => community.value
+      (community) => community.label
     );
     const helpfulToCommunitiesIds = helpfulToCommunities.map(
-      (community) => community.value
+      (community) => community.label
     );
 
-    const tags = selectedTags.map((tag) => tag.value);
+    const tags = selectedTags.map((tag) => tag.label);
 
     createProgram.mutate({
       ...formState,
