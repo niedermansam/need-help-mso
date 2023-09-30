@@ -261,22 +261,12 @@ export function OrganizationCard({
       />
 
       <div className="flex h-fit flex-col p-3 xs:row-span-2 xs:mt-4 md:col-span-6 md:row-span-1 md:mt-0 md:p-1 lg:col-span-5">
-        {showDescription ? (
           <p className="text-sm font-light tracking-wide text-stone-600">
             {org.description}
           </p>
-        ) : (
-          <CategoryTagSection category={org.category} tags={org.tags} />
-        )}
       </div>
       <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
         <FavoriteOrgButton orgId={orgId} />
-        <button
-          className="mr-2 flex w-1/2 justify-center justify-self-center rounded border border-rose-500 bg-rose-500 py-1.5 font-bold text-white shadow-md sm:w-2/3 md:w-32"
-          onClick={() => setShowPrograms(!showPrograms)}
-        >
-          {showPrograms ? "hide" : "Programs"}
-        </button>
       </div>
       {showPrograms && (
         <div className="col-span-full flex w-full flex-wrap gap-2 p-2">
