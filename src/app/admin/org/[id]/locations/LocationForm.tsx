@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { OrganizationFormProps } from "../page";
+import type { OrganizationFormProps } from "../page";
 import { FormItemWrapper } from "@/app/_components/FormItemWrapper";
 import { twMerge } from "tailwind-merge";
 import { api } from "@/utils/api";
@@ -63,7 +63,7 @@ function UpdateLocationForm({
   }
 
   return (
-    <form className="flex items-center justify-center gap-1">
+    <form className="flex items-center justify-center gap-1" onSubmit={handleSubmit}>
       <FormItemWrapper>
         <label htmlFor="name">Name</label>
         <input
