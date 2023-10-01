@@ -3,16 +3,15 @@ import JumpToOrgSelect from "@/components/organization/JumpToOrgSelect";
 import { prisma } from "@/server/db";
 import { type NextPage } from "next";
 import Link from "next/link";
-import ReactSelect from "react-select";
 
 const CallToAction: React.FC = () => {
   return (
     <div className="m-4 mt-4 flex w-full flex-col justify-around md:flex-row">
       <Link
         className="my-2 rounded-lg bg-rose-600 px-4 py-2 font-bold text-white shadow-lg transition-all  hover:bg-rose-700 hover:shadow-xl focus:bg-rose-700 focus:shadow-xl"
-        href="/orgs"
+        href="/orgs/all"
       >
-        Explore by Category
+        All Organizations
       </Link>
       <Link
         className="my-2 rounded-lg bg-rose-600 px-4 py-2 font-bold text-white shadow-lg transition-all  hover:bg-rose-700 hover:shadow-xl focus:bg-rose-700 focus:shadow-xl"
