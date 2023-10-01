@@ -4,6 +4,7 @@ import React from "react";
 import { getOrgData } from "./getOrgData";
 import ProgramSection from "./ProgramSection";
 import { EditOrgButton } from "@/components/DisplayCard/client";
+import { prisma } from "@/server/db";
 
 export const revalidate = 60 * 60 * 6;
 
@@ -43,5 +44,16 @@ async function Page({ params }: { params: { id: string } }) {
     </div>
   );
 }
+
+export async function generateStaticParams() {
+  const orgs = await prisma.organization.findMany({
+    select: {
+      id: true,
+    },
+  });
+
+  return  orgs.map((org) => {return {id: org.id}})
+  
+  }
 
 export default Page;

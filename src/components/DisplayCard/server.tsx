@@ -381,7 +381,6 @@ export function ProgramCard({
   const orgName = program.organization.name;
 
   const orgId = program.organizationId;
-    console.log(program.helpfulToCommunities);
 
 
   return (
@@ -394,12 +393,12 @@ export function ProgramCard({
             </h3>
           </Link>
         )}
-        <div className="flex">
+        <div className="flex flex-col">
           {/* <EditProgramButton programId={programId} orgId={orgId} /> */}
           <h2 className=" truncate text-2xl font-bold tracking-tight text-stone-600  md:text-xl">
             {program.url ? (
               <Link
-                className="text-rose-500 hover:text-rose-600 "
+                className="text-stone-500 hover:text-cyan-700 "
                 target="_blank"
                 href={program.url}
               >
@@ -409,6 +408,7 @@ export function ProgramCard({
               programName
             )}
           </h2>
+          {program.exclusiveToCommunities.length >0 && <p className="text-sm font-light text-stone-600">Exclusive to {program.exclusiveToCommunities.map(x => x.name).join(', ')}</p>}
         </div>
       </div>
       <CategoryTag
