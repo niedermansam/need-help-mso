@@ -1,4 +1,4 @@
-import { OrganizationCard } from "@/app/_components/DisplayCard/server";
+import { OrganizationCard } from "@/components/DisplayCard/server";
 import React from "react";
 import { FavoritesHeader } from "../page";
 import { prisma } from "@/server/db";

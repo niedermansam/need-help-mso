@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getRawPhoneNumber, prettyUrl } from "../utils";
+import { getRawPhoneNumber, prettyUrl } from "../../utils";
 import {
   faEnvelope,
   faGlobe,

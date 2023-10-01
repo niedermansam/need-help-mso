@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import type { OrganizationFormProps } from "../page";
-import { FormItemWrapper } from "@/app/_components/FormItemWrapper";
+import { FormItemWrapper } from "@/components/FormItemWrapper";
 import { twMerge } from "tailwind-merge";
 import { api } from "@/utils/api";
 

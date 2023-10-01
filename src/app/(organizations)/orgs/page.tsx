@@ -2,7 +2,7 @@
 import React, { type HTMLAttributes } from "react";
 import { prisma } from "@/server/db";
 import Link from "next/link";
-import { NewOrgButton } from "@/app/_components/organization/CreateForm";
+import { NewOrgButton } from "@/components/organization/CreateForm";
 import { twMerge } from "tailwind-merge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMap, faMapLocationDot } from "@fortawesome/free-solid-svg-icons";
@@ -23,14 +23,19 @@ const CategoryLink = ({
   <Link href={`/orgs/${slug}`} className={className}>
     <div
       className={twMerge(
-        `flex h-24 cursor-pointer flex-row gap-2 items-center justify-center rounded bg-white text-2xl font-bold text-stone-600 shadow transition-all hover:scale-105 hover:text-rose-600 hover:shadow-lg`,
+        `flex h-24 cursor-pointer flex-row items-center justify-center gap-2 rounded bg-white text-2xl font-bold text-stone-600 shadow transition-all hover:scale-105 hover:text-rose-600 hover:shadow-lg`,
         divClassName
       )}
     >
-      <h2 className="text-center w-fit max-w-[70%]">{category}</h2>
-      <Link href={`orgs/${slug}/map`} className="font-light text-sm flex flex-col  gap-1 text-stone-500 hover:text-rose-500">
-        <FontAwesomeIcon className={twMerge("w-6 -my-2", iconClassName)} icon={faMapLocationDot} />
-
+      <h2 className="w-fit max-w-[70%] text-center">{category}</h2>
+      <Link
+        href={`orgs/${slug}/map`}
+        className="flex flex-col gap-1 text-sm  font-light text-stone-500 hover:text-rose-500"
+      >
+        <FontAwesomeIcon
+          className={twMerge("-my-2 w-6", iconClassName)}
+          icon={faMapLocationDot}
+        />
       </Link>
     </div>
   </Link>

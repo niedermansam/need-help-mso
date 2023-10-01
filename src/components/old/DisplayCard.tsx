@@ -7,7 +7,7 @@ import { TagList } from "./Tags";
 import type { Organization, Program, Tag } from "@prisma/client";
 import { faStar } from "@fortawesome/free-regular-svg-icons";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
-import { api } from "../utils/api";
+import { api } from "@/utils/api";
 import { useEffect, useState } from "react";
 import { UpdateProgramModal } from "@/app/admin/org/[id]/programs/ProgramForm";
 

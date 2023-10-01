@@ -2,13 +2,13 @@
 import {
   ProgramCard,
   type ProgramCardInformation,
-} from "@/app/_components/DisplayCard/server";
-import { FormItemWrapper } from "@/app/_components/FormItemWrapper";
+} from "@/components/DisplayCard/server";
+import { FormItemWrapper } from "@/components/FormItemWrapper";
 import {
   CategorySelect,
   CommunitySelect,
   TagSelect,
-} from "@/components/Selectors";
+} from "@/components/old/Selectors";
 import { UnwrapTRPCMutation } from "@/types/trpc";
 import { api } from "@/utils/api";
 import { useUserStore } from "@/utils/userStore";
@@ -41,7 +41,7 @@ function UpdateProgramForm({
 }) {
   const [formState, setFormState] = React.useState<UpdateProgramProps>(program);
 
-    console.log(program.helpfulToCommunities);
+  console.log(program.helpfulToCommunities);
 
   const updateProgram = api.program.update.useMutation({
     onSuccess: () => {
@@ -77,7 +77,7 @@ function UpdateProgramForm({
         category: value,
       }));
 
-      if(name === "helpfulToCommunities") return;
+    if (name === "helpfulToCommunities") return;
 
     setFormState((prevState) => ({
       ...prevState,
@@ -303,7 +303,8 @@ function UpdateProgramForm({
         </button>
       </form>
       <div className="pt-4">
-      <DeleteProgramButton programId={program.id} /></div>
+        <DeleteProgramButton programId={program.id} />
+      </div>
     </>
   );
 }
@@ -320,8 +321,7 @@ export function UpdateProgramModal({
   const isAdmin = useUserStore((state) => state.admin);
 
   if (!isAdmin) return null;
-    console.log(program.helpfulToCommunities);
-
+  console.log(program.helpfulToCommunities);
 
   return (
     <>
@@ -718,13 +718,12 @@ function AdminProgramSection({
   );
 }
 
-
 export function DeleteProgramButton({ programId }: { programId: string }) {
-  const router = useRouter()
+  const router = useRouter();
   const deleteProgram = api.program.delete.useMutation({
     onSuccess: () => {
       setIsOpen(false);
-      router.refresh()
+      router.refresh();
     },
   });
   const [isOpen, setIsOpen] = React.useState(false);
@@ -735,7 +734,6 @@ export function DeleteProgramButton({ programId }: { programId: string }) {
     deleteProgram.mutate({ programId: programId, confirmString });
   };
 
-
   const deleteButtonActive = (confirmString: string) =>
     confirmString.toLowerCase().trim() === "confirm";
 
@@ -745,7 +743,8 @@ export function DeleteProgramButton({ programId }: { programId: string }) {
         className="rounded bg-rose-500 p-2 text-white"
         onClick={(e) => {
           e.preventDefault();
-          setIsOpen(true)}}
+          setIsOpen(true);
+        }}
       >
         Delete Program
       </button>
@@ -783,6 +782,5 @@ export function DeleteProgramButton({ programId }: { programId: string }) {
     </>
   );
 }
-
 
 export default AdminProgramSection;

@@ -1,7 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import type { OrganizationSearchListProps, OrganizationSearchProps } from "./page";
-import { OrganizationCard } from "../_components/DisplayCard/server";
+import type {
+  OrganizationSearchListProps,
+  OrganizationSearchProps,
+} from "./page";
+import { OrganizationCard } from "../../components/DisplayCard/server";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export const SearchBar = ({
@@ -75,18 +78,23 @@ export const SearchResults = ({
   return (
     <>
       {pageOptions.map((org) => (
-        <OrganizationCard org={org} key={org.id} showDescription={true} search={searchTerm} />
+        <OrganizationCard
+          org={org}
+          key={org.id}
+          showDescription={true}
+          search={searchTerm}
+        />
       ))}
       <PageButtons setPage={setPage} page={page} maxPage={maxPage} />
     </>
   );
 };
 
-
-const filterOrganization = (org: OrganizationSearchProps, searchTerm: string) => {
-  const nameMatch = org.name
-    .toLowerCase()
-    .includes(searchTerm.toLowerCase());
+const filterOrganization = (
+  org: OrganizationSearchProps,
+  searchTerm: string
+) => {
+  const nameMatch = org.name.toLowerCase().includes(searchTerm.toLowerCase());
   const descriptionMatch = org.description
     .toLowerCase()
     .includes(searchTerm.toLowerCase());
@@ -102,9 +110,9 @@ const filterOrganization = (org: OrganizationSearchProps, searchTerm: string) =>
     const nameMatch = program.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const descriptionMatch = program.description && program.description
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+    const descriptionMatch =
+      program.description &&
+      program.description.toLowerCase().includes(searchTerm.toLowerCase());
 
     const tagMatch = program.tags.some((tag) =>
       tag.tag.toLowerCase().includes(searchTerm.toLowerCase())
@@ -113,22 +121,27 @@ const filterOrganization = (org: OrganizationSearchProps, searchTerm: string) =>
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
 
-    return nameMatch || descriptionMatch || tagMatch || categoryMatch ;
+    return nameMatch || descriptionMatch || tagMatch || categoryMatch;
   });
 
-  return nameMatch || descriptionMatch || tagMatch || categoryMatch || programMatch;
-}
+  return (
+    nameMatch || descriptionMatch || tagMatch || categoryMatch || programMatch
+  );
+};
 
-export const programHasSearchTerm = (program: OrganizationSearchProps["programs"][0], searchTerm: string | undefined) => {
+export const programHasSearchTerm = (
+  program: OrganizationSearchProps["programs"][0],
+  searchTerm: string | undefined
+) => {
   if (!searchTerm) {
     return false;
   }
   const nameMatch = program.name
     .toLowerCase()
     .includes(searchTerm.toLowerCase());
-  const descriptionMatch = program.description && program.description
-    .toLowerCase()
-    .includes(searchTerm.toLowerCase());
+  const descriptionMatch =
+    program.description &&
+    program.description.toLowerCase().includes(searchTerm.toLowerCase());
 
   const tagMatch = program.tags.some((tag) =>
     tag.tag.toLowerCase().includes(searchTerm.toLowerCase())
@@ -138,8 +151,7 @@ export const programHasSearchTerm = (program: OrganizationSearchProps["programs"
     .includes(searchTerm.toLowerCase());
 
   return nameMatch || descriptionMatch || tagMatch || categoryMatch;
-}
-
+};
 
 export const SearchComponent = ({
   searchOptions,

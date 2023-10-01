@@ -1,6 +1,6 @@
 'use client'
 import { useUserStore } from '@/utils/userStore'
-import LoadingPage from '../_components/LoadingPage'
+import LoadingPage from '@/components/LoadingPage'
 import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 

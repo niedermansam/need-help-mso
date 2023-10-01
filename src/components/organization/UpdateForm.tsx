@@ -1,16 +1,16 @@
 "use client";
 
 import React from "react";
-import type { OrganizationFormProps } from "../../admin/org/[id]/page";
+import type { OrganizationFormProps } from "../../app/admin/org/[id]/page";
 import {
   CategorySelect,
   type CategorySelectItem,
   CommunitySelect,
   TagSelect,
   getValidSingleValue,
-} from "@/components/Selectors";
+} from "@/components/old/Selectors";
 import { api } from "@/utils/api";
-import { FormItemWrapper } from "../FormItemWrapper";
+import { FormItemWrapper } from "@/components/FormItemWrapper";
 import Link from "next/link";
 import ReactModal from "react-modal";
 import { twMerge } from "tailwind-merge";
@@ -353,7 +353,8 @@ export function DeleteOrganizationButton({ orgId }: { orgId: string }) {
     deleteOrganization.mutate({ orgId: orgId, confirmString });
   };
 
-  const deleteButtonActive = (confirmString:string )=> confirmString.toLowerCase().trim() === "confirm";
+  const deleteButtonActive = (confirmString: string) =>
+    confirmString.toLowerCase().trim() === "confirm";
 
   return (
     <>
@@ -361,15 +362,20 @@ export function DeleteOrganizationButton({ orgId }: { orgId: string }) {
         className="rounded bg-rose-500 p-2 text-white"
         onClick={(e) => {
           e.preventDefault();
-          setIsOpen(true)}}
+          setIsOpen(true);
+        }}
       >
         Delete Organization
       </button>
-      <ReactModal 
-      className="flex flex-col gap-4 p-4 bg-white rounded
-      absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-      overlayClassName={twMerge("fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50")}
-      isOpen={isOpen} onRequestClose={() => setIsOpen(false)}>
+      <ReactModal
+        className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2
+      transform flex-col gap-4 rounded bg-white p-4"
+        overlayClassName={twMerge(
+          "fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50"
+        )}
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+      >
         <div className="flex flex-col gap-4">
           <p>Are you sure you want to delete this organization?</p>
           <p>This action cannot be undone.</p>
@@ -381,10 +387,12 @@ export function DeleteOrganizationButton({ orgId }: { orgId: string }) {
             className="rounded border border-stone-200 p-2"
           />
           <button
-            className={twMerge("rounded bg-rose-500 p-2 text-white", deleteButtonActive(confirmString) ? "bg-rose-500" : "bg-stone-300")}
+            className={twMerge(
+              "rounded bg-rose-500 p-2 text-white",
+              deleteButtonActive(confirmString) ? "bg-rose-500" : "bg-stone-300"
+            )}
             onClick={handleDelete}
             disabled={!deleteButtonActive(confirmString)}
-
           >
             Delete
           </button>

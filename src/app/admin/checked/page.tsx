@@ -1,4 +1,4 @@
-import { OrganizationCard } from "@/app/_components/DisplayCard/server";
+import { OrganizationCard } from "@/components/DisplayCard/server";
 import { prisma } from "@/server/db";
 import React from "react";
 

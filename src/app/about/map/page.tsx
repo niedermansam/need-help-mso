@@ -1,4 +1,4 @@
-import Scribe from '@/app/_components/Scribe';
+import Scribe from '@/components/Scribe';
 import React from 'react'
 
 function Page() {

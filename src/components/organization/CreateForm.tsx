@@ -1,5 +1,5 @@
 "use client";
-import { FormItemWrapper } from "@/app/_components/FormItemWrapper";
+import { FormItemWrapper } from "@/components/FormItemWrapper";
 import { DEFAULT_LOCATION } from "@/app/admin/org/[id]/locations/LocationForm";
 import {
   CategorySelect,
@@ -7,7 +7,7 @@ import {
   CommunitySelect,
   TagSelect,
   getValidSingleValue,
-} from "@/components/Selectors";
+} from "@/components/old/Selectors";
 import { api } from "@/utils/api";
 import { useUserStore } from "@/utils/userStore";
 import Link from "next/link";

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { encodeTag } from "../utils/manageUrl";
+import { encodeTag } from "@/utils/manageUrl";
 import type { Tag } from "@prisma/client";
 
 interface TagLinkProps extends React.HTMLAttributes<HTMLAnchorElement> {

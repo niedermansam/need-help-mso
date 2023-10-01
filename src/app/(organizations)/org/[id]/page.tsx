@@ -1,14 +1,14 @@
-import { BackButton } from "@/app/_components/BackButton";
-import { ContactInfo } from "@/app/_components/DisplayCard/server";
+import { BackButton } from "@/components/BackButton";
+import { ContactInfo } from "@/components/DisplayCard/server";
 import React from "react";
 import { getOrgData } from "./getOrgData";
 import ProgramSection from "./ProgramSection";
-import { EditOrgButton } from "@/app/_components/DisplayCard/client";
+import { EditOrgButton } from "@/components/DisplayCard/client";
 
 export const revalidate = 60 * 60 * 6;
 
 async function Page({ params }: { params: { id: string } }) {
-  const orgData = await getOrgData(params.id)
+  const orgData = await getOrgData(params.id);
 
   if (!orgData) {
     return {
@@ -20,8 +20,12 @@ async function Page({ params }: { params: { id: string } }) {
     <div>
       <div className="p-2 pt-0">
         <div className="mx-6">
-          <h1 className="mb-4 pt-6 text-3xl font-bold flex items-center gap-2">
-            <BackButton /> {orgData?.name} <span className="text-2xl">  <EditOrgButton orgId={orgData.id}/></span> 
+          <h1 className="mb-4 flex items-center gap-2 pt-6 text-3xl font-bold">
+            <BackButton /> {orgData?.name}{" "}
+            <span className="text-2xl">
+              {" "}
+              <EditOrgButton orgId={orgData.id} />
+            </span>
           </h1>
           <div className="mb-6 flex flex-col">
             <h3 className="font-semibold text-stone-500">Contact Info:</h3>

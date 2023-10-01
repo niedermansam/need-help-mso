@@ -1,10 +1,7 @@
-"use client";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useFavoriteOrgStore, useUserStore } from "@/utils/userStore";
-import { api } from "@/utils/api";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 const NavLink = ({
   href,
@@ -21,8 +18,6 @@ const NavLink = ({
       className={`mr-4 mt-4 block text-rose-200 hover:text-white md:mt-0 md:inline-block ${
         isActive ? "font-bold text-white" : ""
       }`}
-      data-umami-event="nav-link"
-      data-umami-event-page={label}
     >
       {label}
     </Link>
@@ -30,41 +25,15 @@ const NavLink = ({
 };
 
 export default function NavBar() {
-  const pathname = usePathname() || "";
+  const session = useSession();
+  const router = useRouter();
+  const userId = session.data?.user?.id;
   const [isOpen, setIsOpen] = useState(false);
-
-  const { data } = useSession();
-  const setUser = useUserStore((state) => state.setUser);
-
-  useEffect(() => {
-    setUser(data?.user?.name || null, !!data?.user?.name, !!data?.user.admin);
-  }, [data?.user.name, data?.user.admin, setUser]);
-
-  const loggedIn = useUserStore((state) => state.loggedIn);
-
-  const setFavoriteOrgs = useFavoriteOrgStore((state) => state.setFavoriteOrgs);
-  const setFavoriteListId = useFavoriteOrgStore(
-    (state) => state.setFavoriteListId
-  );
-
-  const { data: favorites } = api.user.getCurrentFavoritesList.useQuery(undefined ,{
-    enabled: loggedIn,
-  });
-
-  useEffect(() => {
-    setFavoriteOrgs(favorites?.organizations || []);
-    setFavoriteListId(favorites?.id);
-  }, [
-    favorites?.organizations,
-    setFavoriteOrgs,
-    favorites?.id,
-    setFavoriteListId,
-  ]);
-
+  console.log(router);
   return (
-    <nav className="sticky z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
+    <nav className="fixed z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
       <div className="mr-6 flex flex-shrink-0 items-center text-white">
-        <Link data-umami-event="nav-link" data-umami-event-name="Home" href="/" className="text-xl font-semibold tracking-tight">
+        <Link href="/" className="text-xl font-semibold tracking-tight">
           Need Help Missoula
         </Link>
       </div>
@@ -92,29 +61,28 @@ export default function NavBar() {
           <NavLink
             href="/about"
             label="About"
-            isActive={/^\/about/.test(pathname)}
+            isActive={/\/about/.test(router.pathname)}
           />
           <NavLink
-            href="/orgs"
+            href="/program"
+            label="Programs"
+            isActive={/\/program/.test(router.pathname)}
+          />
+          <NavLink
+            href="/org"
             label="Organizations"
-            isActive={/^\/org/.test(pathname)}
+            isActive={/\/org/.test(router.pathname)}
           />
           <NavLink
-            href="/map"
-            label="Map"
-            isActive={/^\/map/.test(pathname)}
+            href="/community"
+            label="Communities"
+            isActive={/\/community/.test(router.pathname)}
           />
-          <NavLink
-            href="/contact"
-            label="Contact"
-            isActive={/^\/contact/.test(pathname)}
-          />
-
-          {loggedIn && (
+          {userId && (
             <NavLink
               href="/favorites"
               label="Favorites"
-              isActive={/\/list/.test(pathname)}
+              isActive={/\/list/.test(router.pathname)}
             />
           )}
         </div>
@@ -128,12 +96,12 @@ export default function NavBar() {
             )
           }
           <button
-            onClick={loggedIn ? () => void signOut() : () => void signIn()}
-            className={`mt-4 inline-block rounded border border-white px-4 py-2 text-sm leading-none text-white hover:border-transparent hover:bg-white hover:text-indigo-800 md:mt-0`}
-            data-umami-event={loggedIn ? "sign-out" : "sign-in"}
-
+            onClick={userId ? () => void signOut() : () => void signIn()}
+            className={`${
+              userId ? "umami--click--sign-out" : "umami--click-sign-in"
+            } mt-4 inline-block rounded border border-white px-4 py-2 text-sm leading-none text-white hover:border-transparent hover:bg-white hover:text-indigo-800 md:mt-0`}
           >
-            {loggedIn ? "Sign Out" : "Sign In"}
+            {userId ? "Sign Out" : "Sign In"}
           </button>
         </div>
       </div>

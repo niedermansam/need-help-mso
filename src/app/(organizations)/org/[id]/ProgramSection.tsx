@@ -1,7 +1,7 @@
 "use client";
 import React, { type Dispatch, type SetStateAction } from "react";
 import type { ProgramData } from "./getOrgData";
-import { ProgramCard } from "@/app/_components/DisplayCard/server";
+import { ProgramCard } from "@/components/DisplayCard/server";
 import { twMerge } from "tailwind-merge";
 // import { useSearchParams, useRouter } from 'next/navigation'
 
@@ -135,9 +135,9 @@ const CategoryButton = ({
   <button
     key={category}
     className={twMerge(
-      `mb-2 mr-2 rounded-md border border-rose-200 bg-rose-50 px-4 py-2 font-medium hover:text-bold hover:bg-rose-400 hover:text-white text-rose-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2`,
+      `hover:text-bold mb-2 mr-2 rounded-md border border-rose-200 bg-rose-50 px-4 py-2 font-medium text-rose-500 shadow-sm hover:bg-rose-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2`,
       currentCategory === category &&
-        `bg-rose-600 hover:bg-rose-700 focus:ring-rose-500 text-white`
+        `bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-500`
     )}
     onClick={() => handleCategoryChange(category)}
   >

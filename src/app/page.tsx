@@ -51,10 +51,10 @@ const Description = () => {
   return (
     <div className="ml-8 flex max-w-full  items-center px-6 text-stone-900 lg:w-[40%] ">
       <p className=" text-xl font-light leading-8">
-        We are a hub for organizations and groups that help
-        people who need a hand. Need Help Missoula is a friendly user interface where social workers, case managers, and
-        other professionals can find programs for their clients. Consider supporting
-        our efforts on Patreon.
+        We are a hub for organizations and groups that help people who need a
+        hand. Need Help Missoula is a friendly user interface where social
+        workers, case managers, and other professionals can find programs for
+        their clients. Consider supporting our efforts on Patreon.
       </p>
     </div>
   );
@@ -62,11 +62,17 @@ const Description = () => {
 
 const Home: NextPage = () => {
   return (
-    <div className="flex items-center justify-center bg-stone-50 md:p-20">
-      <div className="flex max-w-6xl  flex-wrap justify-center rounded-xl border border-stone-200 bg-white  pb-10 pt-20 shadow-xl md:px-6">
+    <div className="flex flex-col items-center justify-center bg-stone-50 md:p-10">
+      <div className="flex max-w-6xl  flex-wrap justify-center rounded-xl border border-stone-200 bg-white  pb-10 pt-10 shadow-xl md:px-6">
         <Title />
         <Description />
         <CallToAction />
+      </div>
+      <div className="w-full pl-20 pt-6 text-lg text-stone-500">
+        <p>Already know what you&apos;re looking for?</p>
+        <h2 className="text-3xl font-bold text-stone-600">
+          Go To An Organization
+        </h2>
       </div>
     </div>
   );

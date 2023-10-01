@@ -1,4 +1,4 @@
-import { OrganizationCard } from "@/app/_components/DisplayCard/server";
+import { OrganizationCard } from "@/components/DisplayCard/server";
 import { prisma } from "@/server/db";
 import React from "react";
 
@@ -11,17 +11,15 @@ async function Page() {
     },
     include: {
       tags: true,
-      programs: 
-      {
+      programs: {
         include: {
           tags: true,
           exclusiveToCommunities: true,
           helpfulToCommunities: true,
-        }
+        },
       },
       exclusiveToCommunities: true,
     },
-  
   });
   return (
     <div>

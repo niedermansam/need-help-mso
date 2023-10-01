@@ -1,5 +1,5 @@
 "use client";
-import { OrganizationCard } from "@/app/_components/DisplayCard/server";
+import { OrganizationCard } from "@/components/DisplayCard/server";
 import { trpc } from "@/app/providers";
 import { LoadingAnimation } from "@/components";
 import { api } from "@/utils/api";
@@ -74,8 +74,7 @@ export function DeleteListButton({
 
 export function FavoritesActionButtons({ listId }: { listId: number }) {
   const favoriteStore = useFavoriteOrgStore((state) => state.setFavoriteListId);
-  const router = useRouter()
-
+  const router = useRouter();
 
   const createList = api.user.createFavoriteList.useMutation({
     onSuccess: (data) => {
@@ -199,13 +198,19 @@ type ContactProps = {
   website?: string | null;
 };
 
-const PlainTextContactModal = ({ contact }: { contact?: ContactProps[] | null }) => {
+const PlainTextContactModal = ({
+  contact,
+}: {
+  contact?: ContactProps[] | null;
+}) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  if(!contact) return undefined;
+  if (!contact) return undefined;
   const contactsString = contact.map((contact) => {
-    const { name,  phone, website } = contact;
-    
-    return  `Name: ${name || "N/A"}\nPhone: ${phone || "N/A"}\nWebsite: ${website || "N/A"}\n\n`;
+    const { name, phone, website } = contact;
+
+    return `Name: ${name || "N/A"}\nPhone: ${phone || "N/A"}\nWebsite: ${
+      website || "N/A"
+    }\n\n`;
   });
 
   const customStyles = {
@@ -226,44 +231,55 @@ const PlainTextContactModal = ({ contact }: { contact?: ContactProps[] | null })
       <button
         onClick={() => setIsOpen(true)}
         data-umami-event="plain-text-contact-modal"
-        className="rounded bg-rose-500 px-2 py-1 text-white text-sm"
+        className="rounded bg-rose-500 px-2 py-1 text-sm text-white"
       >
         View Contacts as Plain Text
       </button>
 
-    <ReactModal style={customStyles} isOpen={isOpen}  onRequestClose={() => setIsOpen(false)} >
-      <textarea className="w-full h-full">{contactsString.join("")}</textarea>;
-    </ReactModal>
+      <ReactModal
+        style={customStyles}
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+      >
+        <textarea className="h-full w-full">{contactsString.join("")}</textarea>
+        ;
+      </ReactModal>
     </>
   );
 };
 
-
 type OrganizationProps = Parameters<typeof OrganizationCard>[0]["org"];
 
-function FavoritesList({organizations}: {organizations: OrganizationProps[]}) {
-
-  if(!organizations.length) return (
-    <div className="flex h-[40vh] flex-col items-center justify-center text-center">
-      <p className="text-3xl font-bold text-stone-500">
-        No organizations in this list, yet.
-      </p>
-      <p className="text-stone-500">
-        Click the star next to an organization to change that.
-      </p>
-      <div className="flex gap-1 pt-2">
-        <Link
-          href="/orgs/all"
-          className="rounded bg-rose-500 px-2 py-1 text-white"
-        >
-          Browse Organizations
-        </Link>
-        <Link className="rounded bg-rose-500 px-2 py-1 text-white" href="/map">
-          View Map
-        </Link>
+function FavoritesList({
+  organizations,
+}: {
+  organizations: OrganizationProps[];
+}) {
+  if (!organizations.length)
+    return (
+      <div className="flex h-[40vh] flex-col items-center justify-center text-center">
+        <p className="text-3xl font-bold text-stone-500">
+          No organizations in this list, yet.
+        </p>
+        <p className="text-stone-500">
+          Click the star next to an organization to change that.
+        </p>
+        <div className="flex gap-1 pt-2">
+          <Link
+            href="/orgs/all"
+            className="rounded bg-rose-500 px-2 py-1 text-white"
+          >
+            Browse Organizations
+          </Link>
+          <Link
+            className="rounded bg-rose-500 px-2 py-1 text-white"
+            href="/map"
+          >
+            View Map
+          </Link>
+        </div>
       </div>
-    </div>
-  );
+    );
 
   return (
     <div>
@@ -315,7 +331,7 @@ function Page() {
   });
 
   const afterDelete = () => {
-    router.refresh()
+    router.refresh();
   };
 
   return (
@@ -330,7 +346,9 @@ function Page() {
           {" "}
           <LoadingAnimation />{" "}
         </div>
-      ) :  <FavoritesList organizations={favoriteList?.organizations || []} />}
+      ) : (
+        <FavoritesList organizations={favoriteList?.organizations || []} />
+      )}
       <h2 className="text-2xl font-bold text-stone-600">Your other lists:</h2>
       <p className="mb-2 text-sm">Click to view and edit</p>
       {userLists?.map((list) => {

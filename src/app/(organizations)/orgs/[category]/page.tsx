@@ -1,4 +1,4 @@
-import { BackButton } from "@/app/_components/BackButton";
+import { BackButton } from "@/components/BackButton";
 import { SearchComponent } from "@/app/search/SearchComponent";
 import { prisma } from "@/server/db";
 import { faMapLocationDot } from "@fortawesome/free-solid-svg-icons";
@@ -11,7 +11,6 @@ export default async function OrganizationByCategoryPage({
 }: {
   params: { category: string };
 }) {
-
   const categoryName = await prisma.category.findUnique({
     where: {
       slug: params.category,
@@ -32,7 +31,7 @@ export default async function OrganizationByCategoryPage({
             where: {
               category: {
                 equals: categoryName?.category,
-              }
+              },
             },
             include: {
               tags: true,
@@ -53,9 +52,15 @@ export default async function OrganizationByCategoryPage({
 
   return (
     <div>
-      <h1 className="mb-6 text-4xl font-bold text-stone-700 flex items-center gap-2">
-        <BackButton /> {category.category} <Link href={`/orgs/${category.slug}/map`}><FontAwesomeIcon className="w-6 -my-2 text-rose-400 hover:text-rose-500" icon={faMapLocationDot} />
-      </Link></h1>
+      <h1 className="mb-6 flex items-center gap-2 text-4xl font-bold text-stone-700">
+        <BackButton /> {category.category}{" "}
+        <Link href={`/orgs/${category.slug}/map`}>
+          <FontAwesomeIcon
+            className="-my-2 w-6 text-rose-400 hover:text-rose-500"
+            icon={faMapLocationDot}
+          />
+        </Link>
+      </h1>
       <SearchComponent searchOptions={category.allOrganizations} />
     </div>
   );
@@ -84,8 +89,6 @@ export async function generateStaticParams() {
   });
 
   const slugs = slugsJson.map((x) => x.slug);
-
-
 
   return slugs.map((slug) => {
     return { category: slug };

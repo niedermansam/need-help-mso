@@ -3,7 +3,7 @@ import React from "react";
 // import { SITE_URL } from '@/utils/constants'
 // import type { Organization } from '@prisma/client'
 import { prisma } from "@/server/db";
-import { BackButton } from "@/app/_components/BackButton";
+import { BackButton } from "@/components/BackButton";
 import { SearchComponent } from "@/app/search/SearchComponent";
 
 async function OrganizationPage() {

@@ -6,11 +6,11 @@ import type { LocationData } from "./page";
 import Link from "next/link";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import "leaflet-defaulticon-compatibility";
-import { FavoriteOrgButton } from "../_components/DisplayCard/client";
+import { FavoriteOrgButton } from "../../components/DisplayCard/client";
 import type { BusRoute } from "../api/bus-routes/route";
 import { OrganizationMap } from "./OrganizationMap";
-import { ProgramModal } from "../_components/DisplayCard/server";
-import { BackButton } from "../_components/BackButton";
+import { ProgramModal } from "../../components/DisplayCard/server";
+import { BackButton } from "../../components/BackButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRectangleList } from "@fortawesome/free-solid-svg-icons";
 
@@ -64,14 +64,16 @@ export function PaginatedList({
                 </h2>
               </Link>
             </div>
-            <div className="flex gap-2 flex-wrap"> 
-            {org.programs.length > 0 && ( 
-              org.programs.map((program) => (
-                <ProgramModal program={program} key={program.id} search={search} />
-              ))
-
-      )}
-              </div>
+            <div className="flex flex-wrap gap-2">
+              {org.programs.length > 0 &&
+                org.programs.map((program) => (
+                  <ProgramModal
+                    program={program}
+                    key={program.id}
+                    search={search}
+                  />
+                ))}
+            </div>
           </div>
         );
       })}
@@ -94,7 +96,6 @@ export function PaginatedList({
           Next
         </button>
       </div>
-      
     </div>
   );
 }
@@ -132,22 +133,27 @@ function MapSearchBar({
 export default function OrganizationMapSection({
   locations,
   busRoutes,
-  category
+  category,
 }: {
   locations: LocationData;
   busRoutes?: BusRoute[] | undefined;
-  category: 
-  {
+  category: {
     name: string;
-    slug: string
+    slug: string;
   };
 }) {
   const [search, setSearch] = React.useState("");
 
   return (
     <div>
-      <h1 className="w-full pb-6 text-xl font-bold text-stone-500 sm:text-4xl flex items-center gap-2">
-       <BackButton  /> {category.name} <Link href={`/orgs/${category.slug}`}><FontAwesomeIcon className="w-8  text-rose-400 hover:text-rose-500" icon={faRectangleList} /> </Link>
+      <h1 className="flex w-full items-center gap-2 pb-6 text-xl font-bold text-stone-500 sm:text-4xl">
+        <BackButton /> {category.name}{" "}
+        <Link href={`/orgs/${category.slug}`}>
+          <FontAwesomeIcon
+            className="w-8  text-rose-400 hover:text-rose-500"
+            icon={faRectangleList}
+          />{" "}
+        </Link>
       </h1>
       <MapSearchBar search={search} setSearch={setSearch} />
       <OrganizationMap
