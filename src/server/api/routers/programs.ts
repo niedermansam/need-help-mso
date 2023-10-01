@@ -292,8 +292,8 @@ export const programRouter = router({
           organization: {
             select: {
               id: true,
-            }
-          }
+            },
+          },
         },
         data: {
           name: name || undefined,
@@ -336,20 +336,19 @@ export const programRouter = router({
         },
       });
 
-     if(category) await ctx.prisma.organization.update({
-        where: {
-          id: oldProgram.organization.id,
-        },
-        data: {
-          categories: {
-            connect: 
-            {
-                category: category
-            }
-          }
-        }
-
-        })
+      if (category)
+        await ctx.prisma.organization.update({
+          where: {
+            id: oldProgram.organization.id,
+          },
+          data: {
+            categories: {
+              connect: {
+                category: category,
+              },
+            },
+          },
+        });
 
       // update org with new tags
 
@@ -445,5 +444,28 @@ export const programRouter = router({
         },
       });
       return program;
+    }),
+
+  delete: adminProcedure
+    .input(
+      z.object({
+        programId: z.string(),
+        confirmString: z.string().includes("confirm"),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      if (input.confirmString !== "confirm")
+        throw new Error(
+          "Please confirm that you want to delete this program"
+        );
+      try {
+        return await ctx.prisma.program.delete({
+          where: {
+            id: input.programId,
+          },
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }),
 });

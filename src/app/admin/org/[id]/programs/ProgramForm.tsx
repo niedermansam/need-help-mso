@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import ReactModal from "react-modal";
 import { twMerge } from "tailwind-merge";
+import { set } from "zod";
 
 type DefaultsFromOrganization = {
   id: string;
@@ -301,6 +302,8 @@ function UpdateProgramForm({
           Submit
         </button>
       </form>
+      <div className="pt-4">
+      <DeleteProgramButton programId={program.id} /></div>
     </>
   );
 }
@@ -714,5 +717,72 @@ function AdminProgramSection({
     </div>
   );
 }
+
+
+export function DeleteProgramButton({ programId }: { programId: string }) {
+  const router = useRouter()
+  const deleteProgram = api.program.delete.useMutation({
+    onSuccess: () => {
+      setIsOpen(false);
+      router.refresh()
+    },
+  });
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [confirmString, setConfirmString] = React.useState("");
+  const handleDelete = () => {
+    if (!programId) return;
+
+    deleteProgram.mutate({ programId: programId, confirmString });
+  };
+
+
+  const deleteButtonActive = (confirmString: string) =>
+    confirmString.toLowerCase().trim() === "confirm";
+
+  return (
+    <>
+      <button
+        className="rounded bg-rose-500 p-2 text-white"
+        onClick={(e) => {
+          e.preventDefault();
+          setIsOpen(true)}}
+      >
+        Delete Program
+      </button>
+      <ReactModal
+        className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2
+      transform flex-col gap-4 rounded bg-white p-4"
+        overlayClassName={twMerge(
+          "fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50"
+        )}
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+      >
+        <div className="flex flex-col gap-4">
+          <p>Are you sure you want to delete this program?</p>
+          <p>This action cannot be undone.</p>
+          <p>Type the word &quot;confirm&quot; to continue</p>
+          <input
+            type="text"
+            value={confirmString}
+            onChange={(e) => setConfirmString(e.target.value)}
+            className="rounded border border-stone-200 p-2"
+          />
+          <button
+            className={twMerge(
+              "rounded bg-rose-500 p-2 text-white",
+              deleteButtonActive(confirmString) ? "bg-rose-500" : "bg-stone-300"
+            )}
+            onClick={handleDelete}
+            disabled={!deleteButtonActive(confirmString)}
+          >
+            Delete
+          </button>
+        </div>
+      </ReactModal>
+    </>
+  );
+}
+
 
 export default AdminProgramSection;

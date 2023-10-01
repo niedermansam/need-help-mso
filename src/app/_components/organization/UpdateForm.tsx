@@ -12,7 +12,9 @@ import {
 import { api } from "@/utils/api";
 import { FormItemWrapper } from "../FormItemWrapper";
 import Link from "next/link";
-
+import ReactModal from "react-modal";
+import { twMerge } from "tailwind-merge";
+import { useRouter } from "next/navigation";
 
 export function UpdateOrganizationForm({
   org,
@@ -22,7 +24,8 @@ export function UpdateOrganizationForm({
   const editOrganization = api.organization.update.useMutation();
   const disconnectTag = api.organization.disconnectTag.useMutation();
 
-  const updateAdminVerified = api.organization.updateAdminVerified.useMutation();
+  const updateAdminVerified =
+    api.organization.updateAdminVerified.useMutation();
 
   console.log("locations", org.locations);
 
@@ -306,19 +309,23 @@ export function UpdateOrganizationForm({
         <button className="col-span-1  rounded bg-rose-500 p-2 text-white md:col-span-2">
           Submit
         </button>
-        <Link href={`/admin/org/${org.id}/programs`}>
-          <button className="col-span-1  rounded bg-rose-500 p-2 text-white md:col-span-2">
-            Go to Programs
-          </button>
-        </Link>
+        <DeleteOrganizationButton orgId={org.id} />
         <FormItemWrapper className="flex flex-row">
-          <input type="checkbox" name="adminVerified" onChange={
-            (e) => {
-              setFormData((prev) => ({ ...prev, adminVerified: e.target.checked }));
-              updateAdminVerified.mutate({ orgId: org.id, adminVerified: e.target.checked });
-            }
-          
-          } checked={formData.adminVerified} />
+          <input
+            type="checkbox"
+            name="adminVerified"
+            onChange={(e) => {
+              setFormData((prev) => ({
+                ...prev,
+                adminVerified: e.target.checked,
+              }));
+              updateAdminVerified.mutate({
+                orgId: org.id,
+                adminVerified: e.target.checked,
+              });
+            }}
+            checked={formData.adminVerified}
+          />
           <label
             className="text-sm font-light lowercase text-stone-600"
             htmlFor="adminVerified"
@@ -327,7 +334,62 @@ export function UpdateOrganizationForm({
           </label>
         </FormItemWrapper>
       </form>
+    </>
+  );
+}
 
+export function DeleteOrganizationButton({ orgId }: { orgId: string }) {
+  const router = useRouter();
+  const deleteOrganization = api.organization.delete.useMutation({
+    onSuccess: () => {
+      router.push("/admin/to-check");
+    },
+  });
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [confirmString, setConfirmString] = React.useState("");
+  const handleDelete = () => {
+    if (!orgId) return;
+
+    deleteOrganization.mutate({ orgId: orgId, confirmString });
+  };
+
+  const deleteButtonActive = (confirmString:string )=> confirmString.toLowerCase().trim() === "confirm";
+
+  return (
+    <>
+      <button
+        className="rounded bg-rose-500 p-2 text-white"
+        onClick={(e) => {
+          e.preventDefault();
+          setIsOpen(true)}}
+      >
+        Delete Organization
+      </button>
+      <ReactModal 
+      className="flex flex-col gap-4 p-4 bg-white rounded
+      absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+      overlayClassName={twMerge("fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50")}
+      isOpen={isOpen} onRequestClose={() => setIsOpen(false)}>
+        <div className="flex flex-col gap-4">
+          <p>Are you sure you want to delete this organization?</p>
+          <p>This action cannot be undone.</p>
+          <p>Type the word &quot;confirm&quot; to continue</p>
+          <input
+            type="text"
+            value={confirmString}
+            onChange={(e) => setConfirmString(e.target.value)}
+            className="rounded border border-stone-200 p-2"
+          />
+          <button
+            className={twMerge("rounded bg-rose-500 p-2 text-white", deleteButtonActive(confirmString) ? "bg-rose-500" : "bg-stone-300")}
+            onClick={handleDelete}
+            disabled={!deleteButtonActive(confirmString)}
+
+          >
+            Delete
+          </button>
+        </div>
+      </ReactModal>
     </>
   );
 }

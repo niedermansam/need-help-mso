@@ -490,4 +490,23 @@ export const organizationRouter = router({
         console.log(err)
       }
     }),
+
+    delete: adminProcedure
+    .input(
+      z.object({
+        orgId: z.string(),
+        confirmString: z.string().includes("confirm")
+      })
+    ).mutation(async ({ input, ctx }) => {
+      if(input.confirmString !=="confirm") throw new Error("Please confirm that you want to delete this organization")
+      try {
+        return await ctx.prisma.organization.delete({
+          where: {
+            id: input.orgId
+          }
+        })
+      } catch (err) {
+        console.log(err)
+      }
+    }),
 });
