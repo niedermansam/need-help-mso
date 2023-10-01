@@ -1,5 +1,9 @@
+import { CategorySection } from "@/components/organization/CategorySection";
+import JumpToOrgSelect from "@/components/organization/JumpToOrgSelect";
+import { prisma } from "@/server/db";
 import { type NextPage } from "next";
 import Link from "next/link";
+import ReactSelect from "react-select";
 
 const CallToAction: React.FC = () => {
   return (
@@ -60,7 +64,14 @@ const Description = () => {
   );
 };
 
-const Home: NextPage = () => {
+const Home: NextPage = async () => {
+  const orgs = await prisma.organization.findMany({
+    select: {
+      name: true,
+      id: true,
+    }
+  })
+  const categories = await prisma.category.findMany({});
   return (
     <div className="flex flex-col items-center justify-center bg-stone-50 md:p-10">
       <div className="flex max-w-6xl  flex-wrap justify-center rounded-xl border border-stone-200 bg-white  pb-10 pt-10 shadow-xl md:px-6">
@@ -68,11 +79,12 @@ const Home: NextPage = () => {
         <Description />
         <CallToAction />
       </div>
-      <div className="w-full pl-20 pt-6 text-lg text-stone-500">
-        <p>Already know what you&apos;re looking for?</p>
-        <h2 className="text-3xl font-bold text-stone-600">
-          Go To An Organization
-        </h2>
+      <div className="w-full pt-6 text-stone-500 text-lg font-light">
+        <h2 className="pt-8 text-2xl font-thin">Already know what you&apos;re looking for? Jump to an organization:</h2>
+
+        <JumpToOrgSelect orgs={orgs} />
+        <h2 className="pt-12 text-2xl font-thin">Explore Organizations and Programs by Category:</h2>
+        <CategorySection categoryList={categories} />
       </div>
     </div>
   );

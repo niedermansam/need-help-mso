@@ -1,7 +1,7 @@
 import "../styles/globals.css";
 import NavBar from "@/components/Nav";
-import { Providers } from "./providers";
-import  Script  from "next/script";
+import { Providers } from "../components/providers";
+import Script from "next/script";
 
 export const metadata = {
   title: "Need Help Missoula",

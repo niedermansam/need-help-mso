@@ -9,12 +9,15 @@ import {
   Popup,
   useMapEvents,
 } from "react-leaflet";
-import type { LocationData } from "./page";
+import type { LocationData } from "@/app/map/page";
 import type * as _L from "leaflet";
-import { orgIsFilteredByString } from "../search/utils";
-import type { BusRoute, BusRouteNumber } from "../api/bus-routes/route";
-import { PaginatedList } from "./OrganizationMapPage";
-import { isOrgInView, sortLocationsByDistanceFromCenter } from "./utils";
+import { orgIsFilteredByString } from "@/app/search/utils";
+import type { BusRoute, BusRouteNumber } from "@/app/api/bus-routes/route";
+import { PaginatedMapList } from "./OrganizationMapPage";
+import {
+  isOrgInView,
+  sortLocationsByDistanceFromCenter,
+} from "@/app/map/utils";
 import { twJoin, twMerge } from "tailwind-merge";
 import { BUS_ROUTE_COLOR_ACCENTS } from "@/utils/constants";
 
@@ -22,7 +25,7 @@ const ACCENT_COLORS = {
   1: "accent-rose-500",
   2: "accent-rose-400",
   3: "accent-rose-300",
-}
+};
 
 export function OrganizationMap({
   locations,
@@ -35,7 +38,6 @@ export function OrganizationMap({
 }) {
   const [displayedMapLocations, setDisplayedMapLocations] =
     React.useState(locations);
-
 
   React.useEffect(() => {
     if (!search) {
@@ -52,7 +54,7 @@ export function OrganizationMap({
 
   return (
     <div className="grid grid-cols-2 xl:grid-cols-3">
-      <PaginatedList
+      <PaginatedMapList
         className="order-last col-span-2 py-4 xl:order-first xl:col-span-1 xl:px-4"
         allLocations={displayedMapLocations}
         search={search}
@@ -246,26 +248,28 @@ function OrganizationMarkers({ locations }: { locations: LocationData }) {
 }
 
 function BusRoutes({ busRoutes }: { busRoutes?: BusRoute[] }) {
+  const filteredBusRoutes = busRoutes?.filter((route) => route && route.number);
 
+  const routeNames = filteredBusRoutes
+    ? [
+        ...new Set(
+          filteredBusRoutes.map((route) => {
+            if (!route) return null;
+            return route.number;
+          })
+        ),
+      ].sort((a, b) => {
+        if (!a || !b) return 0;
 
-  const filteredBusRoutes = busRoutes?.filter(route => route && route.number)
+        //otherwise sort by the number
+        return a - b;
+      })
+    : [];
 
-  const routeNames = filteredBusRoutes ? [...new Set( filteredBusRoutes.map((route) => {
-    if(!route) return null
-    return route.number
-  }))].sort(
-    (a,b) => {
-      if(!a || !b) return 0
+  const [visibleRoutes, setVisibleRoutes] =
+    React.useState<(BusRouteNumber | null)[]>(routeNames);
 
-      //otherwise sort by the number  
-      return a - b
-
-    }
-  ) : []
-
-  const [visibleRoutes, setVisibleRoutes] = React.useState<(BusRouteNumber| null)[]>(routeNames)
-
-  const [isMinimized, setIsMinimized] = React.useState(false)
+  const [isMinimized, setIsMinimized] = React.useState(false);
   if (!busRoutes) return null;
 
   function addVisibleRoute(routeId: BusRouteNumber | null) {
@@ -311,20 +315,19 @@ function BusRoutes({ busRoutes }: { busRoutes?: BusRoute[] }) {
         <div className="flex items-center">
           <label className="mb-1 font-bold">Bus Routes</label>{" "}
           <button
-            className="rounded-full w-4 h-4 border border-stone-200 bg-stone-100 flex items-center justify-center align-top pb-0.5"
+            className="flex h-4 w-4 items-center justify-center rounded-full border border-stone-200 bg-stone-100 pb-0.5 align-top"
             onClick={() => setIsMinimized(!isMinimized)}
           >
             {isMinimized ? "+" : "-"}
           </button>
         </div>
-        <form
-          className={"flex flex-col"}
-        >
+        <form className={"flex flex-col"}>
           <button
             className="rounded border border-stone-200 bg-stone-100 "
             onClick={(e) => {
               e.preventDefault();
-              setVisibleRoutes([])}}
+              setVisibleRoutes([]);
+            }}
           >
             Hide All
           </button>
@@ -332,25 +335,36 @@ function BusRoutes({ busRoutes }: { busRoutes?: BusRoute[] }) {
             className="my-1 rounded border border-stone-200 bg-stone-100"
             onClick={(e) => {
               e.preventDefault();
-              setVisibleRoutes(routeNames)}}
+              setVisibleRoutes(routeNames);
+            }}
           >
             Show All
           </button>
 
-          <div className={twMerge(' animate-height', isMinimized ? "h-0 overflow-hidden" : "h-fit", )}>
+          <div
+            className={twMerge(
+              " animate-height",
+              isMinimized ? "h-0 overflow-hidden" : "h-fit"
+            )}
+          >
             {routeNames.map((route) => {
               const color = busRoutes.find(
                 (busRoute) => busRoute?.number === route
               )?.color;
 
               return (
-                <div className="flex w-full items-center justify-between gap-1" key={`${route || ''}`}>
+                <div
+                  className="flex w-full items-center justify-between gap-1"
+                  key={`${route || ""}`}
+                >
                   <input
                     type="checkbox"
-                    className={route && BUS_ROUTE_COLOR_ACCENTS[route] || undefined}
+                    className={
+                      (route && BUS_ROUTE_COLOR_ACCENTS[route]) || undefined
+                    }
                     key={route}
-                    id={route && route.toString() || ''}
-                    name={route && route.toString() || ''}
+                    id={(route && route.toString()) || ""}
+                    name={(route && route.toString()) || ""}
                     onChange={() => toggleVisibleRoute(route)}
                     checked={visibleRoutes.includes(route)}
                   />

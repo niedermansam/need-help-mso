@@ -2,19 +2,19 @@
 import React from "react";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css"; // Re-uses images from ~leaflet package
-import type { LocationData } from "./page";
+import type { LocationData } from "../../app/map/page";
 import Link from "next/link";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import "leaflet-defaulticon-compatibility";
-import { FavoriteOrgButton } from "../../components/DisplayCard/client";
-import type { BusRoute } from "../api/bus-routes/route";
+import { FavoriteOrgButton } from "../DisplayCard/client";
+import type { BusRoute } from "../../app/api/bus-routes/route";
 import { OrganizationMap } from "./OrganizationMap";
-import { ProgramModal } from "../../components/DisplayCard/server";
-import { BackButton } from "../../components/BackButton";
+import { ProgramModal } from "../DisplayCard/server";
+import { BackButton } from "../BackButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRectangleList } from "@fortawesome/free-solid-svg-icons";
 
-export function PaginatedList({
+export function PaginatedMapList({
   allLocations,
   className,
   search,
