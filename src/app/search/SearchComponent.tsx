@@ -81,7 +81,6 @@ export const SearchResults = ({
         <OrganizationCard
           org={org}
           key={org.id}
-          showDescription={true}
           search={searchTerm}
         />
       ))}

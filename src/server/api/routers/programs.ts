@@ -276,9 +276,7 @@ export const programRouter = router({
         tags,
         helpfulToCommunities,
         phone,
-        exclusiveToCommunities: exclusiveTo,
         free,
-        helpingOrganizations,
       } = input;
 
       const oldProgram = await ctx.prisma.program.update({

@@ -1,5 +1,4 @@
 "use client";
-import { TagList } from "@/components/old/Tags";
 import { getRawPhoneNumber, prettyUrl } from "@/utils";
 import {
   faEnvelope,
@@ -195,44 +194,16 @@ const ContactIconSection = ({
     </div>
   );
 };
-const CategoryTagSection = ({
-  category,
-  tags,
-}: {
-  category: string;
-  tags: { tag: string }[];
-}) => {
-  return (
-    <>
-      <p className=" my-2 w-full px-4 text-base md:mt-0 lg:mt-0">
-        <span className="mr-1 w-full text-center font-light"> Category: </span>
-        <Link
-          href={`/cat/${category}`}
-          className="font-bold text-stone-500 hover:text-rose-500"
-        >
-          {category}
-        </Link>
-      </p>
-      <div className="flex max-h-[48px] px-4">
-        <p className="mb-0.5 mr-2 w-16 font-light"> Tags: </p>
-        <TagList className="overflow-y-auto" tags={tags} />
-      </div>
-    </>
-  );
-};
 
 export function OrganizationCard({
   org,
-  showDescription,
   search,
 }: {
   org: OrgCardProps;
-  showDescription?: boolean;
   search?: string;
 }) {
   const orgId = org.id;
 
-  const [showPrograms, setShowPrograms] = useState(true);
 
   return (
     <CardWrapper>
@@ -268,7 +239,7 @@ export function OrganizationCard({
       <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
         <FavoriteOrgButton orgId={orgId} />
       </div>
-      {showPrograms && (
+      {org.programs.length >=1 && (
         <div className="col-span-full flex w-full flex-wrap gap-2 p-2">
           {org.programs.map((program) => {
             return <ProgramModal key={program.id} program={program} search={search} />;
@@ -402,8 +373,7 @@ export function ProgramCard({
   program: ProgramCardInformation;
   options?: ProgramCardDisplayOptions;
 }) {
-  const { showDescription, showOrgName } = options ?? {
-    showDescription: false,
+  const { showOrgName } = options ?? {
     showOrgName: false,
   };
 

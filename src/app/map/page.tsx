@@ -2,8 +2,7 @@ import { prisma } from "@/server/db";
 import dynamic from "next/dynamic";
 import React from "react";
 import { jitter } from "./utils";
-import { BusRoute, createBusRoute } from "../api/bus-routes/route";
-import { env } from "process";
+import {  createBusRoute } from "../api/bus-routes/route";
 import { MountainLineRoutes } from "@/data/MountainLineRoutes";
 const OrganizationMap = dynamic(
   () => import("../../components/map/OrganizationMapPage"),

@@ -1,7 +1,6 @@
 import { prisma } from "@/server/db";
 import dynamic from "next/dynamic";
 import React from "react";
-import { env } from "process";
 import { MountainLineRoutes } from "@/data/MountainLineRoutes";
 import { jitter } from "@/app/map/utils";
 import { createBusRoute } from "@/app/api/bus-routes/route";

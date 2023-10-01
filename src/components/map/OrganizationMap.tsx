@@ -18,14 +18,10 @@ import {
   isOrgInView,
   sortLocationsByDistanceFromCenter,
 } from "@/app/map/utils";
-import { twJoin, twMerge } from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 import { BUS_ROUTE_COLOR_ACCENTS } from "@/utils/constants";
 
-const ACCENT_COLORS = {
-  1: "accent-rose-500",
-  2: "accent-rose-400",
-  3: "accent-rose-300",
-};
+
 
 export function OrganizationMap({
   locations,

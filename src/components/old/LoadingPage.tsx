@@ -1,10 +1,8 @@
-import { useRouter } from "next/navigation";
 import { LoadingAnimation } from ".";
 import NavBar from "@/components/Nav";
 import { useState, useEffect } from "react";
 
 export default function LoadingPage() {
-  const router = useRouter();
 
   const [showBackSection, setShowBackSection] = useState(false);
 

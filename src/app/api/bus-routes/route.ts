@@ -6,9 +6,8 @@ import { NextResponse } from "next/server";
 type MountainLineRoute =  typeof MountainLineRoutes.features[number];
 export type BusRouteNumber = MountainLineRoute["properties"]["ROUTE"];
 
-type RouteColor = typeof BUS_ROUTE_COLORS[BusRouteNumber];
+// type RouteColor = typeof BUS_ROUTE_COLORS[BusRouteNumber];
 
-type RouteAccent = `accent-[${RouteColor}]`
 
 export function createBusRoute(route: (typeof MountainLineRoutes.features)[number]) {
   // if (route.properties.DIR === "IB") return;
@@ -28,7 +27,6 @@ export function createBusRoute(route: (typeof MountainLineRoutes.features)[numbe
   };
 }
 
-type AccentColor = `accent-[${string}]`;
 
 export type BusRoute = ReturnType<typeof createBusRoute>;
 

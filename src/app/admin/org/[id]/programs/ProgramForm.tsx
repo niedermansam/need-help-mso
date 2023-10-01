@@ -9,15 +9,13 @@ import {
   CommunitySelect,
   TagSelect,
 } from "@/components/old/Selectors";
-import { UnwrapTRPCMutation } from "@/types/trpc";
+import type { UnwrapTRPCMutation } from "@/types/trpc";
 import { api } from "@/utils/api";
 import { useUserStore } from "@/utils/userStore";
-import { UseTRPCMutationOptions } from "@trpc/react-query/shared";
 import { useRouter } from "next/navigation";
 import React from "react";
 import ReactModal from "react-modal";
 import { twMerge } from "tailwind-merge";
-import { set } from "zod";
 
 type DefaultsFromOrganization = {
   id: string;
@@ -354,10 +352,8 @@ export function UpdateProgramModal({
 
 function CreateProgramForm({
   org,
-  setSearchName,
 }: {
   org: DefaultsFromOrganization;
-  setSearchName: (name: string) => void;
 }) {
   const router = useRouter();
   const { id: orgId, category: orgCategory } = org;
@@ -401,7 +397,6 @@ function CreateProgramForm({
   ) => {
     const { name, value } = e.target;
 
-    if (name === "name") setSearchName(value);
 
     if (name === "website")
       return setFormState((prevState) => ({
@@ -644,10 +639,8 @@ function CreateProgramForm({
 
 function ProgramList({
   programs,
-  searchName,
 }: {
   programs: ProgramCardInformation[];
-  searchName: string;
 }) {
   const filteredPrograms = programs; //.filter( (program) => program.name.toLowerCase().includes(searchName.toLowerCase()) );
 
@@ -705,14 +698,13 @@ function AdminProgramSection({
 }: {
   org: DefaultsFromOrganization & { programs: ProgramCardInformation[] };
 }) {
-  const [searchName, setSearchName] = React.useState("");
   return (
     <div className="flex gap-4">
       <div className="w-1/3">
-        <CreateProgramForm org={org} setSearchName={setSearchName} />
+        <CreateProgramForm org={org}  />
       </div>
       <div className="w-2/3">
-        <ProgramList programs={org.programs} searchName={searchName} />
+        <ProgramList programs={org.programs}/>
       </div>
     </div>
   );

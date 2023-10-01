@@ -284,7 +284,7 @@ function FavoritesList({
   return (
     <div>
       {organizations.map((org) => (
-        <OrganizationCard org={org} key={org.id} showDescription />
+        <OrganizationCard org={org} key={org.id}  />
       ))}
 
       <PlainTextContactModal contact={organizations} />
