@@ -9,7 +9,7 @@ import "leaflet-defaulticon-compatibility";
 import { FavoriteOrgButton } from "../DisplayCard/client";
 import type { BusRoute } from "../../app/api/bus-routes/route";
 import { OrganizationMap } from "./OrganizationMap";
-import { ProgramModal } from "../DisplayCard/server";
+import { ProgramModal } from "../DisplayCard/client";
 import { BackButton } from "../BackButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRectangleList } from "@fortawesome/free-solid-svg-icons";

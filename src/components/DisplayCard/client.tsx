@@ -12,10 +12,25 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { CategoryTag, type ProgramCardInformation } from "./server";
 import ReactModal from "react-modal";
+import { twMerge, twMerge } from "tailwind-merge";
+import { programHasSearchTerm } from "@/app/search/SearchComponent";
+import { programHasSearchTerm } from "@/app/search/SearchComponent";
+import type { Program } from "@prisma/client";
+import type { Program } from "@prisma/client";
+import Link from "next/link";
+import Link from "next/link";
+import { useState } from "react";
+import { useState } from "react";
+import ReactModal from "react-modal";
+import ReactModal from "react-modal";
 import { twMerge } from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
+import { CategoryTag } from "./server";
+import { programHasSearchTerm } from "@/app/search/SearchComponent";
+import { Program } from "@prisma/client";
 
 export function FavoriteOrgButton({ orgId }: { orgId: string }) {
   const favoriteOrgs = useFavoriteOrgStore((state) => state.favoriteOrgs);
@@ -36,15 +51,17 @@ export function FavoriteOrgButton({ orgId }: { orgId: string }) {
     });
   };
   return (
-   loggedIn && <button
-      className="flex h-8 w-8 items-center justify-center "
-      onClick={handleClick}
-    >
-      <FontAwesomeIcon
-        icon={isFavoriteOrg ? faStarSolid : faStar}
-        className="text-gold-500 h-4 text-amber-400 "
-      />
-    </button>
+    loggedIn && (
+      <button
+        className="flex h-8 w-8 items-center justify-center "
+        onClick={handleClick}
+      >
+        <FontAwesomeIcon
+          icon={isFavoriteOrg ? faStarSolid : faStar}
+          className="text-gold-500 h-4 text-amber-400 "
+        />
+      </button>
+    )
   );
 }
 
@@ -74,15 +91,17 @@ export function FavoriteProgramButton({
     });
   };
   return (
-    loggedIn && <button
-      className="flex h-8 w-8 items-center justify-center "
-      onClick={handleClick}
-    >
-      <FontAwesomeIcon
-        icon={isFavoriteProgram ? faStarSolid : faStar}
-        className="text-gold-500 h-4 text-amber-400 "
-      />
-    </button>
+    loggedIn && (
+      <button
+        className="flex h-8 w-8 items-center justify-center "
+        onClick={handleClick}
+      >
+        <FontAwesomeIcon
+          icon={isFavoriteProgram ? faStarSolid : faStar}
+          className="text-gold-500 h-4 text-amber-400 "
+        />
+      </button>
+    )
   );
 }
 
@@ -120,7 +139,7 @@ const modalStyles = {
     bottom: "auto",
     marginRight: "-50%",
     width: "80%",
-   transform: "translate(-50%, -50%)",
+    transform: "translate(-50%, -50%)",
   },
 };
 
@@ -138,7 +157,10 @@ export function ProgramDetailsModal({
   return (
     <>
       <button
-        className={twMerge("flex w-32 items-center text-sm justify-center rounded bg-stone-200 text-stone-600", buttonClassName)}
+        className={twMerge(
+          "flex w-32 items-center justify-center rounded bg-stone-200 text-sm text-stone-600",
+          buttonClassName
+        )}
         onClick={() => setShowDetails(true)}
       >
         More Details
@@ -176,6 +198,83 @@ export function ProgramDetailsModal({
             Close
           </button>
         </div>
+      </ReactModal>
+    </>
+  );
+}
+export function ProgramModal({
+  program,
+  search,
+}: {
+  program: Pick<
+    Program,
+    | "name"
+    | "category"
+    | "description"
+    | "phone"
+    | "url"
+    | "id"
+    | "organizationId"
+  > & {
+    exclusiveToCommunities: { name: string }[];
+    helpfulToCommunities: { name: string }[];
+  } & {
+    tags: {
+      tag: string;
+    }[];
+  };
+  search?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <button
+        onClick={() => setIsOpen(true)}
+        className={twMerge(
+          "w-fit rounded border  px-2 py-1 text-sm hover:bg-rose-300 hover:text-stone-800 ",
+          programHasSearchTerm(program, search)
+            ? "bg-rose-500 text-white  hover:bg-rose-700 hover:text-white"
+            : "border-stone-200 text-stone-500"
+        )}
+      >
+        {program.name}
+      </button>
+      <ReactModal
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+        className="absolute  left-1/2 top-1/2 z-[10001] block w-[60%] -translate-x-1/2 -translate-y-1/2 transform flex-col rounded bg-white p-4 shadow-lg"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[10000] fixed inset-0"
+      >
+        <h2 className="text-2xl font-bold">{program.name}</h2>
+        {program.phone && <p>{program.phone}</p>}
+
+        <CategoryTag
+          category={program.category}
+          tags={program.tags.map((tag) => tag.tag)}
+        />
+
+        {program.exclusiveToCommunities.length > 0 && (
+          <p>
+            Exclusive to{" "}
+            {program.exclusiveToCommunities.map((x) => x.name).join(", ")}
+          </p>
+        )}
+        <p className="text-sm font-light">{program.description}</p>
+        {program.url && (
+          <Link
+            href={program.url}
+            className="text-rose-500 hover:text-rose-600"
+            target="_blank"
+          >
+            Visit Site
+          </Link>
+        )}
+        <button
+          onClick={() => setIsOpen(false)}
+          className="rounded border border-stone-200 bg-stone-50 px-2 py-1 text-sm"
+        >
+          Close
+        </button>
       </ReactModal>
     </>
   );

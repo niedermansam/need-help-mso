@@ -1,4 +1,3 @@
-"use client";
 import { getRawPhoneNumber, prettyUrl } from "@/utils";
 import {
   faEnvelope,
@@ -14,16 +13,13 @@ import {
   ProgramDetailsModal,
 } from "./client";
 import { UpdateProgramModal } from "@/app/admin/org/[id]/programs/ProgramForm";
-import { useState } from "react";
-import ReactModal from "react-modal";
-import { twMerge } from "tailwind-merge";
-import { programHasSearchTerm } from "@/app/search/SearchComponent";
+import { ProgramModal } from "./client";
 
 export type ContactInfo = {
   phone: string | null;
   email: string | null;
   website: string | null;
-}
+};
 
 const FA_ICON_SIZE = { minWidth: 18, width: 18, height: 18 } as const;
 
@@ -204,7 +200,6 @@ export function OrganizationCard({
 }) {
   const orgId = org.id;
 
-
   return (
     <CardWrapper>
       <div className="flex w-full flex-wrap items-start justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left">
@@ -232,83 +227,27 @@ export function OrganizationCard({
       />
 
       <div className="flex h-fit flex-col p-3 xs:row-span-2 xs:mt-4 md:col-span-6 md:row-span-1 md:mt-0 md:p-1 lg:col-span-5">
-          <p className="text-sm font-light tracking-wide text-stone-600">
-            {org.description}
-          </p>
+        <p className="text-sm font-light tracking-wide text-stone-600">
+          {org.description}
+        </p>
       </div>
       <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
         <FavoriteOrgButton orgId={orgId} />
       </div>
-      {org.programs.length >=1 && (
+      {org.programs.length >= 1 && (
         <div className="col-span-full flex w-full flex-wrap gap-2 p-2">
           {org.programs.map((program) => {
-            return <ProgramModal key={program.id} program={program} search={search} />;
+            return (
+              <ProgramModal
+                key={program.id}
+                program={program}
+                search={search}
+              />
+            );
           })}
         </div>
       )}
     </CardWrapper>
-  );
-}
-
-export function ProgramModal({
-  program,
-  search,
-}: {
-  program: Pick<Program, 'name' | 'category' | 'description' | 'phone' | 'url' | 'id' | 'organizationId'>& {
-    exclusiveToCommunities: { name: string }[];
-    helpfulToCommunities: { name: string }[];
-  } & { tags: {
-  tag: string}[] };
-  search?: string;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  return (
-    <>
-      <button
-        onClick={() => setIsOpen(true)}
-        className={twMerge("w-fit rounded border  px-2 py-1 text-sm hover:bg-rose-300 hover:text-stone-800 ", programHasSearchTerm(program, search) ? "bg-rose-500 hover:text-white  hover:bg-rose-700 text-white" : "border-stone-200 text-stone-500" )}
-      >
-        {program.name}
-      </button>
-      <ReactModal
-        isOpen={isOpen}
-        onRequestClose={() => setIsOpen(false)}
-        className="block  w-[60%] flex-col rounded bg-white p-4 shadow-lg z-[10001] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[10000] fixed inset-0"
-      >
-        <h2 className="text-2xl font-bold">{program.name}</h2>
-        {program.phone && (<p>{program.phone}</p>)}
-
-        <CategoryTag
-          category={program.category}
-          tags={program.tags.map((tag) => tag.tag)}
-        />
-
-        {program.exclusiveToCommunities.length > 0 && (
-          <p>
-            Exclusive to{" "}
-            {program.exclusiveToCommunities.map((x) => x.name).join(", ")}
-          </p>
-        )}
-        <p className="text-sm font-light">{program.description}</p>
-        {program.url && (
-          <Link 
-            href={program.url}
-            className="text-rose-500 hover:text-rose-600"
-            target="_blank"
-          >
-            Visit Site
-          </Link>
-        )
-        }
-          <button
-            onClick={() => setIsOpen(false)}
-            className="rounded border border-stone-200 bg-stone-50 px-2 py-1 text-sm"
-          >
-            Close
-          </button>
-      </ReactModal>
-    </>
   );
 }
 
@@ -382,7 +321,6 @@ export function ProgramCard({
 
   const orgId = program.organizationId;
 
-
   return (
     <div className="my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white px-4 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-4 md:pb-2">
       <div className="flex w-full flex-wrap items-start justify-start text-start md:col-span-4 lg:col-span-3 lg:justify-start lg:text-left">
@@ -408,7 +346,12 @@ export function ProgramCard({
               programName
             )}
           </h2>
-          {program.exclusiveToCommunities.length >0 && <p className="text-sm font-light text-stone-600">Exclusive to {program.exclusiveToCommunities.map(x => x.name).join(', ')}</p>}
+          {program.exclusiveToCommunities.length > 0 && (
+            <p className="text-sm font-light text-stone-600">
+              Exclusive to{" "}
+              {program.exclusiveToCommunities.map((x) => x.name).join(", ")}
+            </p>
+          )}
         </div>
       </div>
       <CategoryTag
@@ -423,7 +366,16 @@ export function ProgramCard({
           )}
           <UpdateProgramModal
             buttonClassName="w-1/3"
-            program={{ ...program, helpfulToCommunities: program.helpfulToCommunities.map(x=>x.name), exclusiveToCommunities: program.exclusiveToCommunities.map(x => x.name), tags: program.tags.map((x) => x.tag) }}
+            program={{
+              ...program,
+              helpfulToCommunities: program.helpfulToCommunities.map(
+                (x) => x.name
+              ),
+              exclusiveToCommunities: program.exclusiveToCommunities.map(
+                (x) => x.name
+              ),
+              tags: program.tags.map((x) => x.tag),
+            }}
           />
         </div>
       </div>
