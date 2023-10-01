@@ -38,7 +38,7 @@ const Title = () => {
         <br /> <span className="tracking-wide text-rose-500">Missoula</span>
       </h1>
       <p className="my-4 w-full text-center tracking-tight">
-        <span className=" text-xl font-bold text-stone-400 md:text-xl lg:text-2xl  ">
+        <span className=" text-lg font-bold text-stone-400 md:text-xl lg:text-2xl  ">
           A digital directory of programs for people
         </span>{" "}
         <br />{" "}
