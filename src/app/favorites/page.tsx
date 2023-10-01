@@ -1,7 +1,7 @@
 "use client";
 import { OrganizationCard } from "@/components/DisplayCard/server";
 import { trpc } from "@/app/providers";
-import { LoadingAnimation } from "@/components";
+import { LoadingAnimation } from "@/components/old";
 import { api } from "@/utils/api";
 import { useFavoriteOrgStore } from "@/utils/userStore";
 import Link from "next/link";
