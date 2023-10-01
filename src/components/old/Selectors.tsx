@@ -1,5 +1,5 @@
 import type { StateManagerProps } from "react-select/dist/declarations/src/useStateManager";
-import { api } from "../utils/api";
+import { api } from "@/utils/api";
 import type { MultiValue, SingleValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import Select from "react-select";

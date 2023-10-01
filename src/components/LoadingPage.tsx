@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { LoadingAnimation } from "@/components/index";
+import { LoadingAnimation } from "@/components/old/index";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 

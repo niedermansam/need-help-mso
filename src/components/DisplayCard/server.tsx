@@ -1,5 +1,5 @@
 "use client";
-import { TagList } from "@/components/Tags";
+import { TagList } from "@/components/old/Tags";
 import { getRawPhoneNumber, prettyUrl } from "@/utils";
 import {
   faEnvelope,
