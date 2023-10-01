@@ -78,11 +78,15 @@ const Home: NextPage = async () => {
         <Description />
         <CallToAction />
       </div>
-      <div className="w-full pt-6 text-stone-500 text-lg font-light">
-        <h2 className="pt-8 text-2xl font-thin">Already know what you&apos;re looking for? Jump to an organization:</h2>
+      <div className="w-full pt-6 sm:text-lg font-light text-stone-500">
+        <h2 className="pb-2 pt-8 text-center text-lg sm:text-2xl font-thin sm:text-left">
+          Already know what you&apos;re looking for? Jump to an organization:
+        </h2>
 
         <JumpToOrgSelect orgs={orgs} />
-        <h2 className="pt-12 text-2xl font-thin">Explore Organizations and Programs by Category:</h2>
+        <h2 className="pt-12 text-lg text-center sm:text-2xl font-thin sm:text-left">
+          Explore Organizations and Programs by Category:
+        </h2>
         <CategorySection categoryList={categories} />
       </div>
     </div>
