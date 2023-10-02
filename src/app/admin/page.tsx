@@ -2,6 +2,8 @@ import { prisma } from "@/server/db";
 import Link from "next/link";
 import React from "react";
 
+export const revalidate =0
+
 async function Page() {
   const users = await prisma.user.findMany({});
   const totalOrgs = await prisma.organization.count();
