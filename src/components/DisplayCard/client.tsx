@@ -15,22 +15,10 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { CategoryTag, type ProgramCardInformation } from "./server";
 import ReactModal from "react-modal";
-import { twMerge, twMerge } from "tailwind-merge";
-import { programHasSearchTerm } from "@/app/search/SearchComponent";
-import { programHasSearchTerm } from "@/app/search/SearchComponent";
-import type { Program } from "@prisma/client";
-import type { Program } from "@prisma/client";
-import Link from "next/link";
-import Link from "next/link";
-import { useState } from "react";
-import { useState } from "react";
-import ReactModal from "react-modal";
-import ReactModal from "react-modal";
 import { twMerge } from "tailwind-merge";
-import { twMerge } from "tailwind-merge";
-import { CategoryTag } from "./server";
 import { programHasSearchTerm } from "@/app/search/SearchComponent";
 import { Program } from "@prisma/client";
+
 
 export function FavoriteOrgButton({ orgId }: { orgId: string }) {
   const favoriteOrgs = useFavoriteOrgStore((state) => state.favoriteOrgs);
