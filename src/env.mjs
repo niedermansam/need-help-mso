@@ -26,6 +26,8 @@ const server = z.object({
   REDIS_HOST: z.string().min(1),
   REDIS_PORT: z.string().min(1),
   REDIS_PASSWORD: z.string().min(1),
+
+  VERCEL_DEPLOY_HOOK: z.string().url(),
 });
 
 /**
@@ -57,7 +59,9 @@ const processEnv = {
   REDIS_PASSWORD: process.env.REDIS_PASSWORD,
 
 
+
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+  VERCEL_DEPLOY_HOOK: process.env.VERCEL_DEPLOY_HOOK,
 };
 
 // Don't touch the part below

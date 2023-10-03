@@ -1,9 +1,10 @@
-import { router, publicProcedure } from "./trpc";
+import { router, publicProcedure, superAdminProcedure } from "./trpc";
 import { organizationRouter } from "./routers/organization";
 import { programRouter } from "./routers/programs";
 import { tagRouter } from "./routers/tag";
 import { communityRouter } from "./routers/community";
 import { userRouter } from "./routers/user";
+import { env } from "@/env.mjs";
 
 /**
  * This is the primary router for your server.
@@ -21,6 +22,17 @@ export const appRouter = router({
     const categories = await ctx.prisma.category.findMany();
     return categories;
   }),
+
+  rebuildApp: superAdminProcedure.mutation(async ({ ctx }) => {
+    const res = await fetch(
+      env.VERCEL_DEPLOY_HOOK, {
+      method: 'POST',
+      }
+    );
+    return res;
+  }
+  )
+
 });
 
 // export type definition of API

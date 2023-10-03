@@ -1,6 +1,7 @@
 import { prisma } from "@/server/db";
 import Link from "next/link";
 import React from "react";
+import RedeployButton from "./RedeployButton";
 
 export const revalidate =0
 
@@ -17,6 +18,7 @@ async function Page() {
   const totalPrograms = await prisma.program.count();
   return (
     <div>
+      <RedeployButton />
       <p> {totalOrgs} organizations</p>
       <p> {verifiedOrgs} verified organizations</p>
       <p> {totalPrograms} programs</p>
