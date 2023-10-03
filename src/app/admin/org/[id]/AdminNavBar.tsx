@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { twMerge } from "tailwind-merge";
+import { UrlObject } from "url";
 
 export function NavigateNextPrevious({
   nextOrgId,
@@ -25,7 +26,7 @@ function AdminNavLink({
   children,
   className,
 }: {
-  href: string;
+  href: string | UrlObject;
   pathname: string | null;
   children: React.ReactNode;
   className?: string;
@@ -37,6 +38,7 @@ function AdminNavLink({
         pathname === href ? "pr-4  font-bold" : "pr-4 hover:text-rose-600",
         className
       )}
+      replace
     >
       {children}
     </Link>

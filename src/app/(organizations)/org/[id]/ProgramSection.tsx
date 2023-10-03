@@ -3,13 +3,162 @@ import React, { type Dispatch, type SetStateAction } from "react";
 import type { ProgramData } from "./getOrgData";
 import { ProgramCard } from "@/components/DisplayCard/server";
 import { twMerge } from "tailwind-merge";
+import { usePathname, useSearchParams } from "next/navigation";
+import Link from "next/link";
 // import { useSearchParams, useRouter } from 'next/navigation'
+
+const FirstPageButton = () => {
+  const currentPage = parseInt(useSearchParams().get("page") || "") || 0;
+  const category = useSearchParams().get("category");
+  const pathname = usePathname();
+
+  return (
+    <Link
+      href={{
+        pathname,
+        query: category && { category },
+      }}
+      className={twMerge(
+        `mb-2 mr-2 rounded-md bg-stone-400 px-2 py-2 text-sm font-medium text-stone-600 shadow-sm `,
+        currentPage !== 0 &&
+          `bg-stone-300 hover:bg-rose-600 hover:text-white focus:ring-rose-500`
+      )}
+      aria-disabled={currentPage === 0}
+      replace
+      scroll={false}
+    >
+      &laquo;
+    </Link>
+  );
+};
+
+const LastPageButton = ({ lastPage }: { lastPage: number }) => {
+  const currentPage = parseInt(useSearchParams().get("page") || "") || 0;
+  const category = useSearchParams().get("category");
+  const pathname = usePathname();
+
+  const query: Partial<Record<"page" | "category", string | number>> = {
+    page: lastPage,
+  };
+  if (category) query.category = category;
+
+  return (
+    <Link
+      href={{
+        pathname,
+        query,
+      }}
+      className={twMerge(
+        `mb-2 mr-2 rounded-md bg-stone-400 px-2 py-2 text-sm font-medium text-stone-600 shadow-sm `,
+        currentPage !== lastPage &&
+          `bg-stone-300 hover:bg-rose-600 hover:text-white focus:ring-rose-500`
+      )}
+      aria-disabled={currentPage === lastPage}
+      replace
+      scroll={false}
+    >
+      &raquo;
+    </Link>
+  );
+};
+
+const NextPageButton = ({ lastPage }: { lastPage: number }) => {
+  const currentPage = parseInt(useSearchParams().get("page") || "") || 0;
+  const category = useSearchParams().get("category");
+  const pathname = usePathname();
+
+  const query: Partial<Record<"page" | "category", string | number>> = {
+    page: lastPage,
+  };
+  if (category) query.category = category;
+
+  return (
+    <Link
+      className={twMerge(
+        `mb-2 mr-2 rounded-md bg-stone-400 px-2 py-2 text-sm font-medium text-stone-600 shadow-sm `,
+        currentPage !== lastPage &&
+          `bg-stone-300 hover:bg-rose-600 hover:text-white focus:ring-rose-500`
+      )}
+      href={{
+        pathname,
+        query,
+      }}
+      replace
+      scroll={false}
+      aria-disabled={currentPage === lastPage}
+    >
+      &rsaquo;
+    </Link>
+  );
+};
+
+const NumberedPageButton = ({
+  pageNumber,
+}: {
+  pageNumber: number;
+}) => {
+  const currentPage = parseInt(useSearchParams().get("page") || "") || 0;
+  const category = useSearchParams().get("category");
+  const pathname = usePathname();
+
+  const query: Partial<Record<"page" | "category", string | number>> = {
+    page: pageNumber,
+  };
+  if (category) query.category = category;
+
+  return (
+    <Link
+      className={twMerge(
+        `mb-2 mr-2 rounded-md bg-stone-400 px-2 py-2 text-sm font-medium text-stone-600 shadow-sm `,
+        currentPage !== pageNumber &&
+          `bg-stone-300 hover:bg-rose-600 hover:text-white focus:ring-rose-500`
+      )}
+      href={{
+        pathname,
+        query,
+      }}
+      aria-disabled={currentPage === pageNumber}
+      replace
+      scroll={false}
+    >
+      {pageNumber}
+    </Link>
+  );
+}
+
+const PreviousPageButton = () => {
+  const currentPage = parseInt(useSearchParams().get("page") || "") || 0;
+  const category = useSearchParams().get("category");
+  const pathname = usePathname();
+
+  const query: Partial<Record<"page" | "category", string | number>> = {
+    page: currentPage - 1,
+  };
+  if (category) query.category = category;
+
+  return (
+    <Link
+      className={twMerge(
+        `mb-2 mr-2 rounded-md bg-stone-400 px-2 py-2 text-sm font-medium text-stone-600 shadow-sm `,
+        currentPage !== 0 &&
+          `bg-stone-300 hover:bg-rose-600 hover:text-white focus:ring-rose-500`
+      )}
+      href={{
+        pathname,
+        query,
+      }}
+      aria-disabled={currentPage === 0}
+      replace
+      scroll={false}
+    >
+      &lsaquo;
+    </Link>
+  );
+}
 
 function PaginatedProgramList({
   programs,
   organization,
-  currentPage,
-  setCurrentPage,
 }: {
   programs: ProgramData;
   organization: {
@@ -19,9 +168,8 @@ function PaginatedProgramList({
     email: string | null;
     website: string | null;
   };
-  currentPage: number;
-  setCurrentPage: Dispatch<SetStateAction<number>>;
 }) {
+  const currentPage = parseInt(useSearchParams().get("page") || "") || 0;
   const programsPerPage = 5;
 
   const indexOfLastProgram = (currentPage + 1) * programsPerPage;
@@ -32,7 +180,7 @@ function PaginatedProgramList({
   );
 
   const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(programs.length / programsPerPage); i++) {
+  for (let i = 1; i < Math.ceil(programs.length / programsPerPage); i++) {
     pageNumbers.push(i);
   }
 
@@ -50,72 +198,15 @@ function PaginatedProgramList({
       </div>
       {pageNumbers.length >= 2 && (
         <div className="mb-4 flex flex-row flex-wrap">
-          {pageNumbers.length >= 3 && (
-            <button
-              className={twMerge(
-                `mb-2 mr-2 rounded-md bg-stone-400 px-2 py-2 text-sm font-medium text-stone-600 shadow-sm `,
-                currentPage !== 0 &&
-                  `bg-stone-300 hover:bg-rose-600 hover:text-white focus:ring-rose-500`
-              )}
-              onClick={() => setCurrentPage(0)}
-              aria-disabled={currentPage === 0}
-              disabled={currentPage === 0}
-            >
-              &laquo;
-            </button>
-          )}
-          <button
-            className={twMerge(
-              `mb-2 mr-4 rounded-md bg-stone-400 px-2 py-2 text-sm font-medium text-stone-600 shadow-sm `,
-              currentPage !== 0 &&
-                `bg-stone-300 hover:bg-rose-600 hover:text-white focus:ring-rose-500`
-            )}
-            onClick={() => setCurrentPage(currentPage - 1)}
-            aria-disabled={currentPage === 0}
-            disabled={currentPage === 0}
-          >
-            &lsaquo;
-          </button>
+          {pageNumbers.length >= 3 && <FirstPageButton />}
+          <PreviousPageButton />
 
-          {pageNumbers.map((pageNumber) => (
-            <button
-              key={pageNumber}
-              className={twMerge(
-                `mb-2 mr-2 rounded-md bg-stone-300 px-4 py-2 font-medium text-stone-600 shadow-sm hover:bg-rose-300 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 `,
-                currentPage === pageNumber - 1 &&
-                  `bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-500`
-              )}
-              onClick={() => setCurrentPage(pageNumber - 1)}
-            >
-              {pageNumber}
-            </button>
+          {pageNumbers.map((pageNumber) => ( <NumberedPageButton pageNumber={pageNumber} key={pageNumber} />
           ))}
 
-          <button
-            className={twMerge(
-              `mb-2 ml-4 mr-2 rounded-md bg-stone-400 px-2 py-2 text-sm font-medium text-stone-600 shadow-sm `,
-              currentPage !== pageNumbers.length - 1 &&
-                `bg-stone-300 hover:bg-rose-600 hover:text-white focus:ring-rose-500`
-            )}
-            onClick={() => setCurrentPage(currentPage + 1)}
-            aria-disabled={currentPage === pageNumbers.length - 1}
-            disabled={currentPage === pageNumbers.length - 1}
-          >
-            &rsaquo;
-          </button>
+          <NextPageButton lastPage={pageNumbers.length - 1} />
           {pageNumbers.length >= 3 && (
-            <button
-              className={twMerge(
-                `mb-2 mr-2 rounded-md bg-stone-400 px-2 py-2 text-sm font-medium text-stone-600 shadow-sm `,
-                currentPage !== pageNumbers.length - 1 &&
-                  `bg-stone-300 hover:bg-rose-600 hover:text-white focus:ring-rose-500`
-              )}
-              onClick={() => setCurrentPage(pageNumbers.length - 1)}
-              aria-disabled={currentPage === pageNumbers.length - 1}
-              disabled={currentPage === pageNumbers.length - 1}
-            >
-              &raquo;
-            </button>
+            <LastPageButton lastPage={pageNumbers.length - 1} />
           )}
         </div>
       )}
@@ -125,25 +216,59 @@ function PaginatedProgramList({
 
 const CategoryButton = ({
   category,
-  currentCategory,
-  handleCategoryChange,
 }: {
-  category: string;
-  currentCategory: string | null;
-  handleCategoryChange: (category: string) => void;
-}) => (
-  <button
-    key={category}
-    className={twMerge(
-      `hover:text-bold mb-2 mr-2 rounded-md border border-rose-200 bg-rose-50 px-4 py-2 font-medium text-rose-500 shadow-sm hover:bg-rose-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2`,
-      currentCategory === category &&
-        `bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-500`
-    )}
-    onClick={() => handleCategoryChange(category)}
-  >
-    {category}
-  </button>
-);
+  category:
+    | {
+        category: string;
+        slug: string;
+      }
+    | undefined;
+}) => {
+  const pathname = usePathname();
+
+  const currentCategory = useSearchParams().get("category");
+
+  const url = new URL(pathname, window.location.origin);
+
+  if (category?.slug) url.searchParams.set("category", category.slug);
+
+  if (!category) {
+    // Handle All Programs Button
+    return (
+      <Link
+        className={twMerge(
+          `hover:text-bold mb-2 mr-2 rounded-md border border-rose-200 bg-rose-50 px-4 py-2 font-medium text-rose-500 shadow-sm hover:bg-rose-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2`,
+          currentCategory === null &&
+            `bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-500`
+        )}
+        href={{
+          pathname: url.pathname,
+        }}
+        replace
+      >
+        All Programs
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      key={category.slug}
+      className={twMerge(
+        `hover:text-bold mb-2 mr-2 rounded-md border border-rose-200 bg-rose-50 px-4 py-2 font-medium text-rose-500 shadow-sm hover:bg-rose-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2`,
+        currentCategory === category.slug &&
+          `bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-500`
+      )}
+      href={{
+        pathname: url.pathname,
+        query: { category: category.slug },
+      }}
+      replace
+    >
+      {category.category}
+    </Link>
+  );
+};
 
 function ProgramSection({
   programs,
@@ -164,20 +289,21 @@ function ProgramSection({
   //const category = searchParams?.get('category')
   //const page = parseInt( searchParams?.get('page') || '0')
 
-  const categories = programs.map((program) => program.category);
+  const categoryMap = new Map<string, Record<"category" | "slug", string>>();
+
+  programs.forEach((program) => {
+    categoryMap.set(program.categoryMeta.slug, {
+      category: program.category,
+      slug: program.categoryMeta.slug,
+    });
+  });
+
+  const categories = programs.map((program) => program.categoryMeta.slug);
 
   const uniqueCategories = [...new Set(categories)];
 
-  const [currentCategory, setCurrentCategory] = React.useState<string | null>(
-    "All Categories"
-  );
+  const currentCategory = useSearchParams().get("category");
 
-  const [currentPage, setCurrentPage] = React.useState(0);
-
-  const handleCategoryChange = (category: string) => {
-    setCurrentCategory(category);
-    setCurrentPage(0);
-  };
 
   return (
     <div>
@@ -188,31 +314,27 @@ function ProgramSection({
           </h2>
           {uniqueCategories.length > 1 && (
             <div className="mb-4 flex flex-row flex-wrap">
-              <CategoryButton
-                category="All Categories"
-                currentCategory={currentCategory}
-                handleCategoryChange={handleCategoryChange}
-              />
+              <CategoryButton category={undefined} />
 
               {uniqueCategories.map((category) => (
                 <CategoryButton
                   key={category}
-                  category={category}
-                  currentCategory={currentCategory}
-                  handleCategoryChange={handleCategoryChange}
+                  category={categoryMap.get(category)}
                 />
               ))}
             </div>
           )}
           <PaginatedProgramList
-            programs={programs.filter(
-              (program) =>
-                program.category === currentCategory ||
-                currentCategory === "All Categories"
-            )}
+            programs={
+              !currentCategory
+                ? programs
+                : programs.filter(
+                    (program) =>
+                      program.categoryMeta.slug === currentCategory ||
+                      currentCategory === "All Categories"
+                  )
+            }
             organization={organization}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
           />
         </div>
       )}
