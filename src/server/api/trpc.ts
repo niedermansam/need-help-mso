@@ -112,3 +112,19 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
 });
 
 export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
+
+const enforceUserIsSuperAdmin = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user || ctx.session.user.role !== "SUPERADMIN") {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+}
+);
+
+
+export const superAdminProcedure = t.procedure.use(enforceUserIsSuperAdmin);

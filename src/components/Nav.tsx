@@ -37,8 +37,8 @@ export default function NavBar() {
   const setUser = useUserStore((state) => state.setUser);
 
   useEffect(() => {
-    setUser(data?.user?.name || null, !!data?.user?.name, !!data?.user.admin);
-  }, [data?.user.name, data?.user.admin, setUser]);
+    setUser(data?.user?.name || null, !!data?.user?.name, !!data?.user.admin, data?.user.role || "USER");
+  }, [data?.user.name, data?.user.admin, data?.user.role , setUser]);
 
   const loggedIn = useUserStore((state) => state.loggedIn);
 

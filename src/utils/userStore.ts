@@ -1,18 +1,22 @@
 import { create } from "zustand";
 
+type UserRole = "USER" | "ADMIN" | "SUPERADMIN" | "VOLUNTEER";
+
 type UserStore = {
   userId: string | null;
   loggedIn: boolean;
   admin: boolean | null; 
-  setUser: (userId: string | null, loggedIn: boolean, admin: boolean) => void;
+  role: UserRole | null;
+  setUser: (userId: string | null, loggedIn: boolean, admin: boolean, role: UserRole ) => void;
 };
 
 export const useUserStore = create<UserStore>((set) => ({
   userId: null,
   loggedIn: false,
   admin: null,
-  setUser: (userId: string | null, loggedIn: boolean, admin: boolean) =>
-    set({ userId, loggedIn, admin }),
+  role: null,
+  setUser: (userId: string | null, loggedIn: boolean, admin: boolean, role: "USER" | "ADMIN" | "SUPERADMIN" | "VOLUNTEER") =>
+    set({ userId, loggedIn, admin, role }),
 }));
 
 type FavoriteOrgsStore = {
