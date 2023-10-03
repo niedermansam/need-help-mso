@@ -102,7 +102,7 @@ const NumberedPageButton = ({
   const pathname = usePathname();
 
   const query: Partial<Record<"page" | "category", string | number>> = {
-    page: pageNumber,
+    page: pageNumber -1,
   };
   if (category) query.category = category;
 
@@ -110,9 +110,13 @@ const NumberedPageButton = ({
     <Link
       className={twMerge(
         `mb-2 mr-2 rounded-md bg-stone-400 px-2 py-2 text-sm font-medium text-stone-600 shadow-sm `,
-        currentPage !== pageNumber &&
+        currentPage === pageNumber -1 &&
+          `bg-rose-300 text-rose-800 font-bold`,
+        currentPage !== pageNumber -1 &&
           `bg-stone-300 hover:bg-rose-600 hover:text-white focus:ring-rose-500`
-      )}
+      )
+        
+    }
       href={{
         pathname,
         query,
@@ -180,7 +184,7 @@ function PaginatedProgramList({
   );
 
   const pageNumbers = [];
-  for (let i = 1; i < Math.ceil(programs.length / programsPerPage); i++) {
+  for (let i = 1; i <= Math.ceil(programs.length / programsPerPage); i++) {
     pageNumbers.push(i);
   }
 
