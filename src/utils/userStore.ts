@@ -1,6 +1,19 @@
+import type { User } from "@prisma/client";
 import { create } from "zustand";
 
-type UserRole = "USER" | "ADMIN" | "SUPERADMIN" | "VOLUNTEER";
+export const AdminRoles:Record<User['role'], number> = {
+  USER: 0,
+  VOLUNTEER: 1,
+  ADMIN: 2,
+  SUPERADMIN: 3,
+}
+
+export const userHasPermission = (userRole: User['role'] | undefined | null, requiredRole: User['role']) => {
+  if(!userRole) return false
+  return AdminRoles[userRole] >= AdminRoles[requiredRole]
+}
+
+type UserRole = User['role']
 
 type UserStore = {
   userId: string | null;
@@ -15,7 +28,8 @@ export const useUserStore = create<UserStore>((set) => ({
   loggedIn: false,
   admin: null,
   role: null,
-  setUser: (userId: string | null, loggedIn: boolean, admin: boolean, role: "USER" | "ADMIN" | "SUPERADMIN" | "VOLUNTEER") =>
+  setUser: (userId: string | null, loggedIn: boolean, admin: boolean, role: 
+    UserRole) =>
     set({ userId, loggedIn, admin, role }),
 }));
 

@@ -23,7 +23,7 @@ export const appRouter = router({
     return categories;
   }),
 
-  rebuildApp: superAdminProcedure.mutation(async ({ ctx }) => {
+  rebuildApp: superAdminProcedure.mutation(async () => {
     const res = await fetch(
       env.VERCEL_DEPLOY_HOOK, {
       method: 'POST',

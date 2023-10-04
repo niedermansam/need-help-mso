@@ -8,6 +8,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "../env.mjs";
 import { prisma } from "./db";
+import type { User as PrismaUser } from "@prisma/client";
 
 /**
  * Module augmentation for `next-auth` types.
@@ -22,18 +23,18 @@ declare module "next-auth" {
       id: string;
       // ...other properties
       admin: boolean;
-      role: "USER" | "ADMIN" | "SUPERADMIN";
+      role: PrismaUser["role"];
       currentListId: number | undefined;
     } & DefaultSession["user"];
   }
 
   interface User {
-  //   // ...other properties
-  //   // role: UserRole;
+    //   // ...other properties
+    //   // role: UserRole;
     admin: boolean;
-    role: "USER" | "ADMIN" | "SUPERADMIN";
+    role:  PrismaUser["role"];
     currentListId: number | undefined;
- }
+  }
 }
 
 /**
@@ -47,9 +48,9 @@ export const authOptions: NextAuthOptions = {
     session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
-        session.user.admin = user.admin // <-- put other properties on the session here
-        session.user.currentListId = user.currentListId
-        session.user.role = user.role
+        session.user.admin = user.admin; // <-- put other properties on the session here
+        session.user.currentListId = user.currentListId;
+        session.user.role = user.role;
       }
       return session;
     },

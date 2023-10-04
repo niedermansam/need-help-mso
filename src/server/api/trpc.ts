@@ -12,6 +12,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 import { authOptions } from "../auth";
 import { prisma } from "../db";
+import { userHasPermission } from "@/utils/userStore";
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request
@@ -100,13 +101,14 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
 
 const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user || !ctx.session.user.admin) {
+  const user = ctx.session?.user;
+  if (userHasPermission(user?.role, 'ADMIN')) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
     ctx: {
       // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
+      session: { ...ctx.session, user: user },
     },
   });
 });
@@ -114,13 +116,17 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
 export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
 
 const enforceUserIsSuperAdmin = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user || ctx.session.user.role !== "SUPERADMIN") {
+
+  const user = ctx.session?.user;
+
+
+  if (userHasPermission(user?.role, 'SUPERADMIN')) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
     ctx: {
       // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
+      session: { ...ctx.session, user: user },
     },
   });
 }
