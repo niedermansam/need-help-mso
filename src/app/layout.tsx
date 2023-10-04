@@ -5,7 +5,25 @@ import Script from "next/script";
 
 export const metadata = {
   title: "Need Help Missoula",
-  //description: "Desc",
+  description:
+    "A directory of resources for people who need a hand in Missoula, and Western Montana",
+
+  openGraph: {
+    title: "Need Help Missoula",
+    description:
+      "A directory of resources for people who need a hand in Missoula, and Western Montana.",
+    url: "https://www.needhelpmissoula.org/",
+    siteName: "needhelpmissoula.org",
+    images: [
+      {
+        url: "/img/logo.png",
+        width: 202,
+        height: 192,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
