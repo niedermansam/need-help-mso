@@ -5,7 +5,7 @@ import {
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { Organization, Program, Tag } from "@prisma/client";
+import type { Community, Organization, Program, Tag } from "@prisma/client";
 import Link from "next/link";
 import {
   EditOrgButton,
@@ -133,18 +133,27 @@ export function ContactIcons({
   );
 }
 
-export type OrgCardProps = Pick<
-  Organization,
-  "id" | "name" | "phone" | "email" | "website" | "category" | "description"
-> & {
-  tags: { tag: string }[];
+type ProgramBaseProps = Pick<Program, "name" | "description" | "url" | "organizationId" | "phone" | "category" | "id"> 
+
+type TagProps = Pick<Tag, 
+"tag">;
+
+
+type CommunityProps = Pick<Community, "name">;
+
+type OrganizationProps = Pick<Organization, "name" | "phone" | "email" | "website" | "category" | "description" |'id'>;
+
+export type ProgramProps = ProgramBaseProps & {
+  exclusiveToCommunities: CommunityProps[];
+  helpfulToCommunities: CommunityProps[];
 } & {
-  programs: (Program & {
-    exclusiveToCommunities: { name: string }[];
-    helpfulToCommunities: { name: string }[];
-  } & {
-    tags: Tag[];
-  })[];
+  tags: TagProps[];
+};
+
+
+
+export type OrgCardProps =  OrganizationProps & {
+  programs: ProgramProps[];
 };
 
 const DesktopContactInfo = ({

@@ -89,7 +89,7 @@ export const SearchResults = ({
   );
 };
 
-const filterOrganization = (
+export const filterOrganization = (
   org: OrganizationSearchProps,
   searchTerm: string
 ) => {

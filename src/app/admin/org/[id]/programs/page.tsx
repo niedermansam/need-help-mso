@@ -1,6 +1,7 @@
 import { prisma } from "@/server/db";
 import React from "react";
 import AdminProgramSection from "./ProgramForm";
+import { ORGANIZATION_SELECT } from "@/components/organization/utils/fetchAllOrgs";
 
 export const dynamic = "force-dynamic";
 
@@ -10,23 +11,21 @@ async function getOrganizationResources(id: string) {
       id: id,
     },
     select: {
-      id: true,
-
-      name: true,
-      phone: true,
-      email: true,
-      website: true,
-      programs: 
-      {
-        include: {
-            tags: true,
-            organization: true,
-            exclusiveToCommunities: true,
-            helpfulToCommunities: true,
-        }
+      ...ORGANIZATION_SELECT,
+      programs: {
+        select: {
+          ...ORGANIZATION_SELECT.programs.select,
+          organization: {
+            select: {
+              id: true,
+              name: true,
+              website: true,
+              phone: true,
+              email: true,
+            },
+          },
+        },
       },
-      category: true,
-      categoryMeta: true,
     },
   });
   return orgData;
@@ -47,8 +46,7 @@ async function Page({
     };
   return (
     <div>
-
-        <AdminProgramSection org={orgData} />
+      <AdminProgramSection org={orgData} />
     </div>
   );
 }

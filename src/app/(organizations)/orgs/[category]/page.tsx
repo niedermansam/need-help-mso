@@ -5,6 +5,7 @@ import { faMapLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import React from "react";
+import { ORGANIZATION_SELECT } from "@/components/organization/utils/fetchAllOrgs";
 
 export default async function OrganizationByCategoryPage({
   params,
@@ -24,22 +25,7 @@ export default async function OrganizationByCategoryPage({
     where: { slug: params.category },
     include: {
       allOrganizations: {
-        include: {
-          tags: true,
-          categories: true,
-          programs: {
-            where: {
-              category: {
-                equals: categoryName?.category,
-              },
-            },
-            include: {
-              tags: true,
-              exclusiveToCommunities: true,
-              helpfulToCommunities: true,
-            },
-          },
-        },
+        select: ORGANIZATION_SELECT
       },
     },
   });

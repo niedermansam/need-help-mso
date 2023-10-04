@@ -4,6 +4,7 @@ import {
   useFavoriteOrgStore,
   useFavoriteProgramStore,
   useUserStore,
+  userHasPermission,
 } from "@/utils/userStore";
 import { faStar } from "@fortawesome/free-regular-svg-icons";
 import {
@@ -94,9 +95,11 @@ export function FavoriteProgramButton({
 }
 
 function EditButton({ href }: { href: string }) {
-  const admin = useUserStore((state) => state.admin);
+  const  userRole = useUserStore((state) => state.role);
 
-  return admin ? (
+  const hasPermission = userHasPermission(userRole, "ADMIN");
+
+  return hasPermission ? (
     <Link href={href} className="mr-1">
       <FontAwesomeIcon
         className="text-stone-500 hover:text-rose-500"

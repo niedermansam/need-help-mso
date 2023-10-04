@@ -2,24 +2,12 @@
 import React from "react";
 // import { SITE_URL } from '@/utils/constants'
 // import type { Organization } from '@prisma/client'
-import { prisma } from "@/server/db";
 import { BackButton } from "@/components/BackButton";
 import { SearchComponent } from "@/app/search/SearchComponent";
+import { fetchAllOrgs } from "@/components/organization/utils/fetchAllOrgs";
 
 async function OrganizationPage() {
-  const orgs = await prisma.organization.findMany({
-    include: {
-      tags: { select: { tag: true } },
-      categories: true,
-      programs: {
-        include: {
-          tags: true,
-          exclusiveToCommunities: true,
-          helpfulToCommunities: true,
-        },
-      },
-    },
-  });
+  const orgs = await fetchAllOrgs();
   return (
     <div>
       <h1 className="text-4xl font-bold text-stone-700">

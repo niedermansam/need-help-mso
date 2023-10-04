@@ -1,4 +1,5 @@
 import { OrganizationCard } from "@/components/DisplayCard/server";
+import { ORGANIZATION_SELECT, PROGRAM_SELECT } from "@/components/organization/utils/fetchAllOrgs";
 import { prisma } from "@/server/db";
 import React from "react";
 
@@ -9,17 +10,7 @@ async function Page() {
     where: {
       adminVerified: false,
     },
-    include: {
-      tags: true,
-      programs: {
-        include: {
-          tags: true,
-          exclusiveToCommunities: true,
-          helpfulToCommunities: true,
-        },
-      },
-      exclusiveToCommunities: true,
-    },
+    select: ORGANIZATION_SELECT,
   });
   return (
     <div>

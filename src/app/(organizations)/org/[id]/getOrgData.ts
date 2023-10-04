@@ -1,3 +1,4 @@
+import { ORGANIZATION_SELECT } from "@/components/organization/utils/fetchAllOrgs";
 import { prisma } from "@/server/db";
 
 export async function getOrgData(id:string) {
@@ -5,20 +6,7 @@ export async function getOrgData(id:string) {
       where: {
         id: id,
       },
-      include: {
-        programs: {
-          include: {
-            tags: true,
-            categoryMeta: true,
-            helpfulToCommunities: true,
-            exclusiveToCommunities: true,
-          },
-        },
-        exclusiveToCommunities: true,
-        helpfulToCommunities: true,
-        tags: true,
-        categoryMeta: true,
-      },
+      select: ORGANIZATION_SELECT,
     });
 }
 export type OrgData = Awaited<ReturnType<typeof getOrgData>>;

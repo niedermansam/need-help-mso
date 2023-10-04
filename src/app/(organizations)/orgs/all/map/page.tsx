@@ -4,6 +4,7 @@ import React from "react";
 import { MountainLineRoutes } from "@/data/MountainLineRoutes";
 import { jitter } from "@/app/map/utils";
 import { createBusRoute } from "@/app/api/bus-routes/route";
+import { ORGANIZATION_SELECT } from "@/components/organization/utils/fetchAllOrgs";
 const OrganizationMap = dynamic(
   () => import("@/components/map/OrganizationMapPage"),
   {
@@ -32,30 +33,7 @@ const getLocationData = async () => {
       state: true,
       zip: true,
       org: {
-        select: {
-          name: true,
-          id: true,
-          description: true,
-          category: true,
-          categories: true,
-          tags: true,
-          website: true,
-          phone: true,
-          email: true,
-          programs: {
-            select: {
-              name: true,
-              description: true,
-              id: true,
-              category: true,
-              tags: true,
-              exclusiveToCommunities: true,
-              phone: true,
-              url: true,
-              organizationId: true,
-            },
-          },
-        },
+        select: ORGANIZATION_SELECT,
       },
     },
   });
