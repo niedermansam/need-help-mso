@@ -2,6 +2,20 @@ import React, { type HTMLAttributes } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 
+export const MapLink = ({
+  slug,
+  className,
+}: {
+  slug: string;
+  className?: HTMLAttributes<HTMLDivElement>["className"];
+}) => (
+  <Link href={`/orgs/${slug}/map`} className={className}>
+    <div className="flex gap-1 text-sm items-center border px-2 py-1 rounded font-semibold text-stone-500 hover:text-white hover:bg-rose-500 hover:border-rose-500">
+      View&nbsp;Map
+    </div>
+  </Link>
+);
+
 const CategoryLink = ({
   category,
   slug,
@@ -23,12 +37,7 @@ const CategoryLink = ({
       )}
     >
       <h2 className="w-fit text-center">{category}</h2>
-      <Link
-        href={`orgs/${slug}/map`}
-        className={twMerge("flex gap-1 text-sm items-center border px-2 py-1 rounded font-semibold text-stone-500 hover:text-white hover:bg-rose-500 hover:border-rose-500", mapLinkClassName)}
-      >
-         View&nbsp;Map
-      </Link>
+      <MapLink slug={slug} className={mapLinkClassName} />
     </div>
   </Link>
 );

@@ -5,14 +5,15 @@ import React from "react";
 import { BackButton } from "@/components/BackButton";
 import { SearchComponent } from "@/app/search/SearchComponent";
 import { fetchAllOrgs } from "@/components/organization/utils/fetchAllOrgs";
+import { MapLink } from "@/components/organization/CategorySection";
 
 async function OrganizationPage() {
   const orgs = await fetchAllOrgs();
   return (
     <div>
-      <h1 className="text-4xl font-bold text-stone-700">
+      <h1 className="text-4xl font-bold text-stone-700 flex items-center  gap-2">
         {" "}
-        <BackButton /> All Organizations
+        <BackButton /> All Organizations <MapLink slug={'all'} />
       </h1>
       <SearchComponent searchOptions={orgs} />
     </div>

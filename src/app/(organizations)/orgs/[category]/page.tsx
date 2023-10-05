@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import React from "react";
 import { ORGANIZATION_SELECT } from "@/components/organization/utils/fetchAllOrgs";
+import { MapLink } from "@/components/organization/CategorySection";
 
 export default async function OrganizationByCategoryPage({
   params,
@@ -40,12 +41,7 @@ export default async function OrganizationByCategoryPage({
     <div>
       <h1 className="mb-6 flex items-center gap-2 text-4xl font-bold text-stone-700">
         <BackButton /> {category.category}{" "}
-        <Link href={`/orgs/${category.slug}/map`}>
-          <FontAwesomeIcon
-            className="-my-2 w-6 text-rose-400 hover:text-rose-500"
-            icon={faMapLocationDot}
-          />
-        </Link>
+        <MapLink slug={category.slug} />
       </h1>
       <SearchComponent searchOptions={category.allOrganizations} />
     </div>
