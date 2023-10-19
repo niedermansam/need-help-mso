@@ -6,33 +6,49 @@ import { signIn } from 'next-auth/react'
 
 function Layout({children}: {children: React.ReactNode}) {
 
-    const admin = useUserStore(state => state.admin)
+    // const admin = useUserStore(state => state.admin)
     const role = useUserStore(state => state.role)
     const loggedIn = useUserStore(state => state.loggedIn)
+    const loading = useUserStore(state => state.loading)
+
+
+
+
+    if(!loggedIn) return <LoadingPage />
+
 
 
     const hasPermission = userHasPermission(role, "VOLUNTEER")
 
-
-    if (admin === null) {
-        return <LoadingPage />
-    }
-
-
-    if (!hasPermission) {
-        return <div className='w-full flex justify-center flex-col items-center'>
-            <h1 className='text-4xl font-bold pt-16 text-stone-600 text-center'>You are not authorized<br/> to view this page.</h1>
-            {loggedIn && <Link href="/"><button className='bg-rose-600 text-white rounded px-4 py-2 mt-4 max-w-md'>Go Home</button></Link>}
-            {!loggedIn && <button className='bg-rose-600 text-white rounded px-4 py-2 mt-4 max-w-md' onClick={() => void signIn()}>Login</button>}  
-        </div>
-    }
-
-
-  return (
-    <>
-        {children}
-    </>
-  )
+    return (
+      <>
+        {hasPermission ? (
+          <div>{children}</div>
+        ) : (
+          <div className="flex w-full flex-col items-center justify-center">
+            <h2 className="pt-16 text-center text-4xl font-bold text-stone-600">
+              You are not authorized
+              <br /> to view this page.
+            </h2>
+            {loggedIn && (
+              <Link href="/">
+                <button className="mt-4 max-w-md rounded bg-rose-600 px-4 py-2 text-white">
+                  Go Home
+                </button>
+              </Link>
+            )}
+            {!loggedIn && (
+              <button
+                className="mt-4 max-w-md rounded bg-rose-600 px-4 py-2 text-white"
+                onClick={() => void signIn()}
+              >
+                Login
+              </button>
+            )}
+          </div>
+        )}
+      </>
+    );
 }
 
 export default Layout

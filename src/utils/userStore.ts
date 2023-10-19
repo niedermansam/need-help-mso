@@ -20,6 +20,7 @@ type UserStore = {
   loggedIn: boolean;
   admin: boolean | null; 
   role: UserRole | null;
+  loading: boolean;
   setUser: (userId: string | null, loggedIn: boolean, admin: boolean, role: UserRole ) => void;
 };
 
@@ -28,9 +29,10 @@ export const useUserStore = create<UserStore>((set) => ({
   loggedIn: false,
   admin: null,
   role: null,
+  loading: true,
   setUser: (userId: string | null, loggedIn: boolean, admin: boolean, role: 
     UserRole) =>
-    set({ userId, loggedIn, admin, role }),
+    set({ userId, loggedIn, admin, role, loading: false }),
 }));
 
 type FavoriteOrgsStore = {
