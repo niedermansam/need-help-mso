@@ -11,7 +11,7 @@ function RedeployButton() {
 
   if (!userHasPermission(userRole, "VOLUNTEER")) return null;
   return (
-    <div className="flex items-center gap-4 rounded p-2 shadow">
+    <div className="flex items-center gap-4 rounded p-2 shadow bg-white/90">
       <button
         onClick={() => redeploy.mutate()}
         className="max-w-md rounded bg-rose-500 px-4 py-2 text-white hover:bg-rose-500"

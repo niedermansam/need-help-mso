@@ -35,6 +35,12 @@ const UsersSection = async () => {
 };
 
 async function Page() {
+  const session = await getServerSession(authOptions);
+
+  const hasPermission = userHasPermission(session?.user.role, "VOLUNTEER");
+
+  if (!hasPermission) return null;
+
   const totalOrgs = await prisma.organization.count();
 
   const verifiedOrgs = await prisma.organization.count({

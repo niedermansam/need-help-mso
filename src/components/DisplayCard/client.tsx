@@ -97,7 +97,7 @@ export function FavoriteProgramButton({
 function EditButton({ href }: { href: string }) {
   const  userRole = useUserStore((state) => state.role);
 
-  const hasPermission = userHasPermission(userRole, "ADMIN");
+  const hasPermission = userHasPermission(userRole, "VOLUNTEER");
 
   return hasPermission ? (
     <Link href={href} className="mr-1">
