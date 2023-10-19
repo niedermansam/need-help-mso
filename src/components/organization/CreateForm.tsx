@@ -9,7 +9,7 @@ import {
   getValidSingleValue,
 } from "@/components/old/Selectors";
 import { api } from "@/utils/api";
-import { useUserStore } from "@/utils/userStore";
+import { useUserStore, userHasPermission } from "@/utils/userStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -395,7 +395,7 @@ export function NewOrgButton({
   className?: string;
   props?: React.ComponentProps<typeof Link>;
 }) {
-  const admin = useUserStore((state) => state.admin);
+  const admin = userHasPermission(useUserStore((state) => state.role), "VOLUNTEER");
 
   return admin ? (
     <Link

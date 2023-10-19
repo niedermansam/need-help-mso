@@ -100,6 +100,24 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
 
+
+const enforceUserIsVolunteer = t.middleware(({ ctx, next }) => {
+  const user = ctx.session?.user;
+  if (userHasPermission(user?.role, "VOLUNTEER")) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: user },
+    },
+  });
+});
+
+export const volunteerProcedure = t.procedure.use(enforceUserIsVolunteer);
+
+
+
 const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
   const user = ctx.session?.user;
   if (userHasPermission(user?.role, 'ADMIN')) {
@@ -114,6 +132,8 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
 });
 
 export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
+
+
 
 const enforceUserIsSuperAdmin = t.middleware(({ ctx, next }) => {
 

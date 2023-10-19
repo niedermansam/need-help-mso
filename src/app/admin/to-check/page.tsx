@@ -5,7 +5,7 @@ import React from "react";
 
 export const revalidate = 0;
 
-async function Page() {
+async function OrgsToCheckPage() {
   const orgs = await prisma.organization.findMany({
     where: {
       adminVerified: false,
@@ -13,12 +13,12 @@ async function Page() {
     select: ORGANIZATION_SELECT,
   });
   return (
-    <div>
+    <>
       {orgs.map((org) => {
         return <OrganizationCard key={org.id} org={org} />;
       })}
-    </div>
+    </>
   );
 }
 
-export default Page;
+export default OrgsToCheckPage;

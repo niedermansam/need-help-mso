@@ -3,7 +3,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useFavoriteOrgStore, useUserStore } from "@/utils/userStore";
+import { useFavoriteOrgStore, useUserStore, userHasPermission } from "@/utils/userStore";
 import { api } from "@/utils/api";
 
 const NavLink = ({
@@ -41,6 +41,7 @@ export default function NavBar() {
   }, [data?.user.name, data?.user.admin, data?.user.role , setUser]);
 
   const loggedIn = useUserStore((state) => state.loggedIn);
+  const role =  useUserStore((state) => state.role);
 
   const setFavoriteOrgs = useFavoriteOrgStore((state) => state.setFavoriteOrgs);
   const setFavoriteListId = useFavoriteOrgStore(
@@ -64,7 +65,12 @@ export default function NavBar() {
   return (
     <nav className="sticky z-50 flex w-full flex-wrap items-center justify-between bg-rose-600 px-6 py-2 drop-shadow-lg">
       <div className="mr-6 flex flex-shrink-0 items-center text-white">
-        <Link data-umami-event="nav-link" data-umami-event-name="Home" href="/" className="text-xl font-semibold tracking-tight">
+        <Link
+          data-umami-event="nav-link"
+          data-umami-event-name="Home"
+          href="/"
+          className="text-xl font-semibold tracking-tight"
+        >
           Need Help Missoula
         </Link>
       </div>
@@ -86,7 +92,7 @@ export default function NavBar() {
       <div
         className={`block w-full flex-grow md:flex md:w-auto md:items-center   ${
           isOpen ? "h-44" : "h-0"
-        } transition-height overflow-hidden duration-200 ease-in-out md:h-auto`}
+        } overflow-hidden transition-height duration-200 ease-in-out md:h-auto`}
       >
         <div className=" md:flex-grow">
           <NavLink
@@ -99,17 +105,12 @@ export default function NavBar() {
             label="Organizations"
             isActive={/^\/org/.test(pathname)}
           />
-          <NavLink
-            href="/map"
-            label="Map"
-            isActive={/^\/map/.test(pathname)}
-          />
+          <NavLink href="/map" label="Map" isActive={/^\/map/.test(pathname)} />
           <NavLink
             href="/contact"
             label="Contact"
             isActive={/^\/contact/.test(pathname)}
           />
-
           {loggedIn && (
             <NavLink
               href="/favorites"
@@ -118,7 +119,7 @@ export default function NavBar() {
             />
           )}
         </div>
-        <div className="flex">
+        <div className="flex items-center">
           {
             // userId // uncomment this
             false && ( // and delete this to show the profile link // if user is logged in, show their name and profile pic in the navbar
@@ -127,11 +128,19 @@ export default function NavBar() {
               </Link>
             )
           }
+
+          {userHasPermission(role, "VOLUNTEER") && (
+            <NavLink
+              href="/admin"
+              label="Admin"
+              isActive={/^\/admin/.test(pathname)}
+            />
+          )}
+
           <button
             onClick={loggedIn ? () => void signOut() : () => void signIn()}
             className={`mt-4 inline-block rounded border border-white px-4 py-2 text-sm leading-none text-white hover:border-transparent hover:bg-white hover:text-indigo-800 md:mt-0`}
             data-umami-event={loggedIn ? "sign-out" : "sign-in"}
-
           >
             {loggedIn ? "Sign Out" : "Sign In"}
           </button>
