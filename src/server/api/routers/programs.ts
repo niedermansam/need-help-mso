@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { adminProcedure, router, publicProcedure } from "../trpc";
+import { adminProcedure, router, publicProcedure, volunteerProcedure } from "../trpc";
 import { getTagsFromPrograms } from "./tag";
 
 const createProgramId = (name: string, orgName: string) => {
@@ -87,7 +87,7 @@ export const programRouter = router({
         console.log(e);
       }
     }),
-  create: adminProcedure
+  create: volunteerProcedure
     .input(
       z.object({
         name: z.string(),
@@ -242,7 +242,7 @@ export const programRouter = router({
 
       return newProgram;
     }),
-  update: adminProcedure
+  update: volunteerProcedure
     .input(
       z.object({
         id: z.string(),
@@ -419,7 +419,7 @@ export const programRouter = router({
       return oldProgram;
     }),
 
-  reassignAdministeringOrg: adminProcedure
+  reassignAdministeringOrg: volunteerProcedure
     .input(
       z.object({
         programId: z.string(),

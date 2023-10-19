@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { adminProcedure, router, publicProcedure } from "../trpc";
+import { volunteerProcedure, router, publicProcedure } from "../trpc";
 import { decodeTag } from "../../../utils/manageUrl";
 import type { Program, Organization, Tag, Category } from "@prisma/client";
 
@@ -25,7 +25,7 @@ export const tagRouter = router({
       console.log(err);
     }
   }),
-  connectCategories: adminProcedure.mutation(async ({ ctx }) => {
+  connectCategories: volunteerProcedure.mutation(async ({ ctx }) => {
     const programs = await ctx.prisma.program.findMany({
       include: { tags: true },
     });
@@ -66,7 +66,7 @@ export const tagRouter = router({
 
     return true;
   }),
-  connectOrganization: adminProcedure
+  connectOrganization: volunteerProcedure
     .input(z.object({ orgId: z.string(), tag: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.tag.upsert({
@@ -90,7 +90,7 @@ export const tagRouter = router({
 
       return true;
     }),
-  disconnectOrganization: adminProcedure
+  disconnectOrganization: volunteerProcedure
     .input(z.object({ orgId: z.string(), tag: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.tag.update({
@@ -109,7 +109,7 @@ export const tagRouter = router({
 
 
 
-  connectProgram: adminProcedure
+  connectProgram: volunteerProcedure
     .input(z.object({ programId: z.string(), tag: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.tag.upsert({

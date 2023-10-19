@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { adminProcedure, router, publicProcedure } from "../trpc";
+import { adminProcedure, volunteerProcedure, router, publicProcedure } from "../trpc";
 
 export const communityRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -79,7 +79,7 @@ export const communityRouter = router({
       });
     }),
 
-  update: adminProcedure
+  update: volunteerProcedure
     .input(
       z.object({
         name: z.string().optional(),
@@ -160,7 +160,7 @@ export const communityRouter = router({
       });
     }),
 
-  disconnectParentCommunity: adminProcedure
+  disconnectParentCommunity: volunteerProcedure
     .input(
       z.object({
         communityId: z.string(),
@@ -180,7 +180,7 @@ export const communityRouter = router({
       });
     }),
 
-  connectExclusiveProgram: adminProcedure
+  connectExclusiveProgram: volunteerProcedure
     .input(
       z.object({
         community: z.string(),
@@ -200,7 +200,7 @@ export const communityRouter = router({
       });
     }),
 
-  connectExclusiveOrg: adminProcedure
+  connectExclusiveOrg: volunteerProcedure
     .input(
       z.object({
         community: z.string(),
@@ -220,7 +220,7 @@ export const communityRouter = router({
       });
     }),
 
-  disconnectExclusiveProgram: adminProcedure
+  disconnectExclusiveProgram: volunteerProcedure
     .input(
       z.object({
         community: z.string(),
@@ -240,7 +240,7 @@ export const communityRouter = router({
       });
     }),
 
-  disconnectExclusiveOrg: adminProcedure
+  disconnectExclusiveOrg: volunteerProcedure
     .input(
       z.object({
         community: z.string(),
@@ -260,7 +260,7 @@ export const communityRouter = router({
       });
     }),
 
-  connectHelpfulProgram: adminProcedure
+  connectHelpfulProgram: volunteerProcedure
     .input(
       z.object({
         community: z.string(),
@@ -280,7 +280,7 @@ export const communityRouter = router({
       });
     }),
 
-  connectHelpfulOrg: adminProcedure
+  connectHelpfulOrg: volunteerProcedure
     .input(
       z.object({
         community: z.string(),
@@ -300,7 +300,7 @@ export const communityRouter = router({
       });
     }),
 
-  disconnectHelpfulProgram: adminProcedure
+  disconnectHelpfulProgram: volunteerProcedure
     .input(
       z.object({
         community: z.string(),

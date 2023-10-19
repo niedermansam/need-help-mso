@@ -15,6 +15,7 @@ import Link from "next/link";
 import ReactModal from "react-modal";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/navigation";
+import { useUserStore, userHasPermission } from "@/utils/userStore";
 
 export function UpdateOrganizationForm({
   org,
@@ -340,6 +341,10 @@ export function UpdateOrganizationForm({
 
 export function DeleteOrganizationButton({ orgId }: { orgId: string }) {
   const router = useRouter();
+  const userRole = useUserStore((state) => state.role);
+
+  const hasPermission = userHasPermission(userRole, "ADMIN")
+
   const deleteOrganization = api.organization.delete.useMutation({
     onSuccess: () => {
       router.push("/admin/to-check");
@@ -355,6 +360,9 @@ export function DeleteOrganizationButton({ orgId }: { orgId: string }) {
 
   const deleteButtonActive = (confirmString: string) =>
     confirmString.toLowerCase().trim() === "confirm";
+
+  if (!hasPermission) return null;
+  
 
   return (
     <>

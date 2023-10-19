@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { router, publicProcedure, adminProcedure } from "../trpc";
+import { router, publicProcedure, adminProcedure, volunteerProcedure } from "../trpc";
 import { SITE_URL } from "@/utils/constants";
 import NodeGeocoder from "node-geocoder";
 //import Airtable from "airtable";
@@ -94,7 +94,7 @@ const createOrgId = (name: string) => {
 };
 
 export const organizationRouter = router({
-  create: adminProcedure.input(orgInput).mutation(async ({ input, ctx }) => {
+  create: volunteerProcedure.input(orgInput).mutation(async ({ input, ctx }) => {
     const options = {
       provider: "openstreetmap",
     } as const;
@@ -193,7 +193,7 @@ export const organizationRouter = router({
     }
   }),
 
-  update: adminProcedure
+  update: volunteerProcedure
     .input(orgUpdateInput)
     .mutation(async ({ input, ctx }) => {
       try {
@@ -347,7 +347,7 @@ export const organizationRouter = router({
       }
     }),
 
-  disconnectTag: adminProcedure
+  disconnectTag: volunteerProcedure
     .input(z.object({ orgId: z.string(), tag: z.string() }))
     .mutation(async ({ input, ctx }) => {
       try {
@@ -368,7 +368,7 @@ export const organizationRouter = router({
       }
     }),
 
-  updateLocation: adminProcedure
+  updateLocation: volunteerProcedure
     .input(
       z.object({
         name: z.string().optional(),
@@ -420,7 +420,7 @@ export const organizationRouter = router({
       }
     }),
 
-    createLocation: adminProcedure
+    createLocation: volunteerProcedure
     .input(
       z.object({
         orgId: z.string(),
@@ -470,7 +470,7 @@ export const organizationRouter = router({
       }
     }),
 
-    updateAdminVerified: adminProcedure
+    updateAdminVerified: volunteerProcedure
     .input(
       z.object({
         orgId: z.string(),
