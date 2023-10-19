@@ -28,7 +28,6 @@ export function UpdateOrganizationForm({
   const updateAdminVerified =
     api.organization.updateAdminVerified.useMutation();
 
-  console.log("locations", org.locations);
 
   type MutationOptions = Parameters<typeof editOrganization.mutate>;
 
