@@ -5,8 +5,10 @@ import { faMapLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import React from "react";
-import { ORGANIZATION_SELECT } from "@/components/organization/utils/fetchAllOrgs";
+import { ORGANIZATION_SELECT, PROGRAM_SELECT } from "@/components/organization/utils/fetchAllOrgs";
 import { MapLink } from "@/components/organization/CategorySection";
+
+
 
 export default async function OrganizationByCategoryPage({
   params,
@@ -26,7 +28,33 @@ export default async function OrganizationByCategoryPage({
     where: { slug: params.category },
     include: {
       allOrganizations: {
-        select: ORGANIZATION_SELECT
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          category: true,
+          website: true,
+          phone: true,
+          email: true,
+          tags: { select: { tag: true } },
+          exclusiveToCommunities: {
+            select: { name: true, id: true },
+          },
+          helpfulToCommunities: {
+            select: { name: true, id: true },
+          },
+          programs: {
+            where: {
+              categoryMeta: {
+                slug: params.category,
+              },
+            },
+            select:  PROGRAM_SELECT,
+          },
+          categories: {
+            select: { category: true },
+          },
+        },
       },
     },
   });

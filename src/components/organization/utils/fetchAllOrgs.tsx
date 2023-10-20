@@ -18,6 +18,17 @@ export const PROGRAM_SELECT = {
   },
 } as const;
 
+export function selectProgramsByCategory (category: string) {
+  return {
+    where: {
+      categoryMeta: {
+        slug: category
+      }
+    },
+    select: PROGRAM_SELECT
+  }
+}
+
 export const ORGANIZATION_SELECT = {
   id: true,
   name: true,
@@ -47,3 +58,16 @@ export const fetchAllOrgs = async () => {
   });
   return orgs;
 };
+
+export function selectOrganzationsByCategory (category: string) {
+  return {
+    where: {
+      categories: {
+        some: {
+          category: category
+        }
+      }
+    },
+    select: {...ORGANIZATION_SELECT, programs: {select: PROGRAM_SELECT}}
+  }
+}

@@ -4,7 +4,7 @@ import React from "react";
 import { MountainLineRoutes } from "@/data/MountainLineRoutes";
 import { jitter } from "@/app/map/utils";
 import { createBusRoute } from "@/app/api/bus-routes/route";
-import { ORGANIZATION_SELECT } from "@/components/organization/utils/fetchAllOrgs";
+import { ORGANIZATION_SELECT, PROGRAM_SELECT } from "@/components/organization/utils/fetchAllOrgs";
 const OrganizationMap = dynamic(
   () => import("@/components/map/OrganizationMapPage"),
   {
@@ -13,7 +13,37 @@ const OrganizationMap = dynamic(
   }
 );
 
+
 const getLocationData = async (category: string) => {
+  console.log(category)
+  const categorySelect = {
+    id: true,
+    name: true,
+    description: true,
+    category: true,
+    website: true,
+    phone: true,
+    email: true,
+    tags: { select: { tag: true } },
+    exclusiveToCommunities: {
+      select: { name: true, id: true },
+    },
+    helpfulToCommunities: {
+      select: { name: true, id: true },
+    },
+    programs: {
+      where: {
+        categoryMeta: {
+          slug:  category,
+        },
+      },
+      select: PROGRAM_SELECT,
+    },
+    categories: {
+      select: { category: true },
+    },
+  };
+
   const locations = await prisma.location.findMany({
     where: {
       NOT: {
@@ -40,7 +70,7 @@ const getLocationData = async (category: string) => {
       state: true,
       zip: true,
       org: {
-        select: ORGANIZATION_SELECT
+        select:  categorySelect,
       },
     },
   });
