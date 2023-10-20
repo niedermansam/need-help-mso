@@ -11,7 +11,7 @@ import {
 } from "@/components/old/Selectors";
 import type { UnwrapTRPCMutation } from "@/types/trpc";
 import { api } from "@/utils/api";
-import { useUserStore } from "@/utils/userStore";
+import { useUserStore, userHasPermission } from "@/utils/userStore";
 import { useRouter } from "next/navigation";
 import React from "react";
 import ReactModal from "react-modal";
@@ -314,9 +314,11 @@ export function UpdateProgramModal({
 }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
-  const isAdmin = useUserStore((state) => state.admin);
+  const role = useUserStore((state) => state.role);
 
-  if (!isAdmin) return null;
+  const hasPermission = userHasPermission(role, "VOLUNTEER");
+
+  if (!hasPermission) return null;
 
   return (
     <>
