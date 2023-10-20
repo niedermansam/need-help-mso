@@ -39,8 +39,6 @@ function UpdateProgramForm({
 }) {
   const [formState, setFormState] = React.useState<UpdateProgramProps>(program);
 
-  console.log(program.helpfulToCommunities);
-
   const updateProgram = api.program.update.useMutation({
     onSuccess: () => {
       onUpdate?.();
@@ -319,7 +317,6 @@ export function UpdateProgramModal({
   const isAdmin = useUserStore((state) => state.admin);
 
   if (!isAdmin) return null;
-  console.log(program.helpfulToCommunities);
 
   return (
     <>
