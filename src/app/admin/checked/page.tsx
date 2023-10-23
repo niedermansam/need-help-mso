@@ -1,6 +1,9 @@
 import { OrganizationCard } from "@/components/DisplayCard/server";
-import { ORGANIZATION_SELECT, PROGRAM_SELECT } from "@/components/organization/utils/fetchAllOrgs";
-import { prisma } from "@/server/db";
+import {
+  ORGANIZATION_SELECT,
+  PROGRAM_SELECT,
+} from "@/components/organization/utils/fetchAllOrgs";
+import { prisma } from "@/server/prisma";
 import React from "react";
 
 export const revalidate = 0;

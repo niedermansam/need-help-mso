@@ -1,4 +1,4 @@
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import React from "react";
 import { LocationFormSection } from "./LocationForm";
 

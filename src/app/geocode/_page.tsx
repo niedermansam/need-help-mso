@@ -1,82 +1,67 @@
-import { prisma } from '@/server/db';
-import  NodeGeocoder from 'node-geocoder'
+import { prisma } from "@/server/prisma";
+import NodeGeocoder from "node-geocoder";
 
-import React from 'react'
+import React from "react";
 
 async function Page() {
-const options = {
-  provider: "openstreetmap",
-} as const;
+  const options = {
+    provider: "openstreetmap",
+  } as const;
 
-const geocoder = NodeGeocoder(options);
+  const geocoder = NodeGeocoder(options);
 
-const locations = await prisma.location.findMany({
+  const locations = await prisma.location.findMany({
     where: {
-        latitude: null,
-        longitude: null,
-    }
-});
+      latitude: null,
+      longitude: null,
+    },
+  });
 
-const location = locations[1]
+  const location = locations[1];
 
-if(!location) return;
+  if (!location) return;
 
-const {address, city, state, zip} = location
+  const { address, city, state, zip } = location;
 
-if(!address || ! city || !state || !zip ) return;
+  if (!address || !city || !state || !zip) return;
 
-// const locationRequest = `${address}, ${city}, ${state} ${zip}`
-for (const loc of locations) {
-    const {address, city, state, zip} = loc
+  // const locationRequest = `${address}, ${city}, ${state} ${zip}`
+  for (const loc of locations) {
+    const { address, city, state, zip } = loc;
 
-    if(!address || ! city || !state || !zip ) return;
+    if (!address || !city || !state || !zip) return;
 
-    const locationRequest = `${address}, ${city}, ${state} ${zip}`
+    const locationRequest = `${address}, ${city}, ${state} ${zip}`;
 
-    const res = await geocoder.geocode(locationRequest)
+    const res = await geocoder.geocode(locationRequest);
 
-    console.log(res)
+    console.log(res);
 
     // wait 1 second between each request
-    await new Promise(resolve => setTimeout(resolve, 1000)).then(async () => {
-        console.log('waiting')
+    await new Promise((resolve) => setTimeout(resolve, 1000)).then(async () => {
+      console.log("waiting");
 
-        if(!res[0]) return;
-        const update = await prisma.location.update({
-            where:  {
-                id: loc.id
-            },
-            data: {
+      if (!res[0]) return;
+      const update = await prisma.location.update({
+        where: {
+          id: loc.id,
+        },
+        data: {
+          latitude: res[0].latitude,
+          longitude: res[0].longitude,
+        },
+      });
 
-                latitude: res[0].latitude,
-                longitude: res[0].longitude,
-            }
+      return update;
+    });
+  }
+  // const res = await geocoder.geocode(locationRequest)
 
-        })
+  // console.log(res)
 
-        return update
-        });
+  console.log(locations);
 
-      
-
-
-
-
-
-}
-// const res = await geocoder.geocode(locationRequest)
-
-// console.log(res)
-
-
-
-console.log(locations)
-
-
-
-  return (
-    <div>Page</div>
-  )
+  return <div>Page</div>;
 }
 
-export default Page
+export default Page;

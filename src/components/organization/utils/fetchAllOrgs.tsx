@@ -1,4 +1,4 @@
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 
 export const PROGRAM_SELECT = {
   id: true,
@@ -8,7 +8,7 @@ export const PROGRAM_SELECT = {
   organizationId: true,
   url: true,
   phone: true,
-  categoryMeta: {select: {slug:true}},
+  categoryMeta: { select: { slug: true } },
   tags: { select: { tag: true } },
   exclusiveToCommunities: {
     select: { name: true, id: true },
@@ -18,15 +18,15 @@ export const PROGRAM_SELECT = {
   },
 } as const;
 
-export function selectProgramsByCategory (category: string) {
+export function selectProgramsByCategory(category: string) {
   return {
     where: {
       categoryMeta: {
-        slug: category
-      }
+        slug: category,
+      },
     },
-    select: PROGRAM_SELECT
-  }
+    select: PROGRAM_SELECT,
+  };
 }
 
 export const ORGANIZATION_SELECT = {
@@ -49,25 +49,25 @@ export const ORGANIZATION_SELECT = {
   },
   categories: {
     select: { category: true },
-  }
+  },
 } as const;
 
 export const fetchAllOrgs = async () => {
   const orgs = await prisma.organization.findMany({
-    select: ORGANIZATION_SELECT
+    select: ORGANIZATION_SELECT,
   });
   return orgs;
 };
 
-export function selectOrganzationsByCategory (category: string) {
+export function selectOrganzationsByCategory(category: string) {
   return {
     where: {
       categories: {
         some: {
-          category: category
-        }
-      }
+          category: category,
+        },
+      },
     },
-    select: {...ORGANIZATION_SELECT, programs: {select: PROGRAM_SELECT}}
-  }
+    select: { ...ORGANIZATION_SELECT, programs: { select: PROGRAM_SELECT } },
+  };
 }

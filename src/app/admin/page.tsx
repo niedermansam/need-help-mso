@@ -1,4 +1,4 @@
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import Link from "next/link";
 import React from "react";
 import RedeployButton from "./RedeployButton";
@@ -55,7 +55,6 @@ async function Page() {
             <br /> Programs
           </p>
         </div>
-
       </div>
       <div className="flex flex-col gap-4 py-4">
         <NewOrgButton className="flex items-center justify-center" />
