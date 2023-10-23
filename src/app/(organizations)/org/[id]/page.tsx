@@ -4,8 +4,7 @@ import React from "react";
 import { getOrgData } from "./getOrgData";
 import ProgramSection from "./ProgramSection";
 import { EditOrgButton } from "@/components/DisplayCard/client";
-import { prisma } from "@/server/db";
-
+import { prisma } from "@/server/prisma";
 
 async function Page({ params }: { params: { id: string } }) {
   const orgData = await getOrgData(params.id);
@@ -51,8 +50,9 @@ export async function generateStaticParams() {
     },
   });
 
-  return  orgs.map((org) => {return {id: org.id}})
-
-  }
+  return orgs.map((org) => {
+    return { id: org.id };
+  });
+}
 
 export default Page;

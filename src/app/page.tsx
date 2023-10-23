@@ -1,6 +1,6 @@
 import { CategorySection } from "@/components/organization/CategorySection";
 import JumpToOrgSelect from "@/components/organization/JumpToOrgSelect";
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import { type NextPage } from "next";
 import Link from "next/link";
 
@@ -68,8 +68,8 @@ const Home: NextPage = async () => {
     select: {
       name: true,
       id: true,
-    }
-  })
+    },
+  });
   const categories = await prisma.category.findMany({});
   return (
     <div className="flex flex-col items-center justify-center bg-stone-50 md:p-10">
@@ -78,13 +78,13 @@ const Home: NextPage = async () => {
         <Description />
         <CallToAction />
       </div>
-      <div className="w-full pt-6 sm:text-lg font-light text-stone-500">
-        <h2 className="pb-2 pt-8 text-center text-lg sm:text-2xl font-thin sm:text-left">
+      <div className="w-full pt-6 font-light text-stone-500 sm:text-lg">
+        <h2 className="pb-2 pt-8 text-center text-lg font-thin sm:text-left sm:text-2xl">
           Already know what you&apos;re looking for? Jump to an organization:
         </h2>
 
         <JumpToOrgSelect orgs={orgs} />
-        <h2 className="pt-12 text-lg text-center sm:text-2xl font-thin sm:text-left">
+        <h2 className="pt-12 text-center text-lg font-thin sm:text-left sm:text-2xl">
           Explore Organizations and Programs by Category:
         </h2>
         <CategorySection categoryList={categories} />

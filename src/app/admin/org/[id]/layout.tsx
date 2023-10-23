@@ -1,4 +1,4 @@
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import React from "react";
 import { AdminNavBar } from "./AdminNavBar";
 
@@ -11,14 +11,14 @@ async function layout({
   };
   children: React.ReactNode;
 }) {
-    const orgName = await prisma.organization.findUnique({
+  const orgName = await prisma.organization.findUnique({
     where: {
       id: params.id,
     },
     select: {
       name: true,
     },
-    });
+  });
   const nextOrg = await prisma.organization.findFirst({
     where: {
       id: {

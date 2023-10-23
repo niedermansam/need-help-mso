@@ -1,14 +1,15 @@
 import { BackButton } from "@/components/BackButton";
 import { SearchComponent } from "@/app/search/SearchComponent";
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import { faMapLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import React from "react";
-import { ORGANIZATION_SELECT, PROGRAM_SELECT } from "@/components/organization/utils/fetchAllOrgs";
+import {
+  ORGANIZATION_SELECT,
+  PROGRAM_SELECT,
+} from "@/components/organization/utils/fetchAllOrgs";
 import { MapLink } from "@/components/organization/CategorySection";
-
-
 
 export default async function OrganizationByCategoryPage({
   params,
@@ -49,7 +50,7 @@ export default async function OrganizationByCategoryPage({
                 slug: params.category,
               },
             },
-            select:  PROGRAM_SELECT,
+            select: PROGRAM_SELECT,
           },
           categories: {
             select: { category: true },
@@ -68,8 +69,7 @@ export default async function OrganizationByCategoryPage({
   return (
     <div>
       <h1 className="mb-6 flex items-center gap-2 text-4xl font-bold text-stone-700">
-        <BackButton /> {category.category}{" "}
-        <MapLink slug={category.slug} />
+        <BackButton /> {category.category} <MapLink slug={category.slug} />
       </h1>
       <SearchComponent searchOptions={category.allOrganizations} />
     </div>

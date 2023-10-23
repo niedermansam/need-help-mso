@@ -1,8 +1,14 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator kysely {
+    provider = "prisma-kysely"
 
-generator client {
-    provider = "prisma-client-js"
+    // Optionally provide a destination directory for the generated file
+    // and a filename of your choice
+    output = "../src/server/kysely"
+    fileName = "types.ts"
+    // Optionally generate runtime enums to a separate file
+     enumFileName = "enums.ts"
 }
 
 datasource db {

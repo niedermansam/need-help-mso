@@ -7,7 +7,7 @@ import {
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "../env.mjs";
-import { prisma } from "./db";
+import { prisma } from "./prisma";
 import type { User as PrismaUser } from "@prisma/client";
 
 /**
@@ -32,7 +32,7 @@ declare module "next-auth" {
     //   // ...other properties
     //   // role: UserRole;
     admin: boolean;
-    role:  PrismaUser["role"];
+    role: PrismaUser["role"];
     currentListId: number | undefined;
   }
 }

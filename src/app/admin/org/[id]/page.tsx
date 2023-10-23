@@ -1,4 +1,4 @@
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import React from "react";
 import { UpdateOrganizationForm } from "../../../../components/organization/UpdateForm";
 import { ORGANIZATION_SELECT } from "@/components/organization/utils/fetchAllOrgs";
@@ -10,26 +10,28 @@ const getOrganization = async (id: string) => {
     where: {
       id: id,
     },
-    select: {...ORGANIZATION_SELECT, adminVerified: true, locations: {
-      select: {
-        id: true,
-        name: true,
-        address: true,
-        apt: true,
-        city: true,
-        state: true,
-        zip: true,
-        latitude: true,
-        longitude: true,
-        orgId: true,
-      }
-    }},
+    select: {
+      ...ORGANIZATION_SELECT,
+      adminVerified: true,
+      locations: {
+        select: {
+          id: true,
+          name: true,
+          address: true,
+          apt: true,
+          city: true,
+          state: true,
+          zip: true,
+          latitude: true,
+          longitude: true,
+          orgId: true,
+        },
+      },
+    },
   });
 
   return orgData;
 };
-
-
 
 export type OrganizationFormProps = NonNullable<
   Awaited<ReturnType<typeof getOrganization>>

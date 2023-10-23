@@ -1,4 +1,4 @@
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import dynamic from "next/dynamic";
 import React from "react";
 import { MountainLineRoutes } from "@/data/MountainLineRoutes";

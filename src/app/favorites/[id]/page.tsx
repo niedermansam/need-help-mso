@@ -1,7 +1,7 @@
 import { OrganizationCard } from "@/components/DisplayCard/server";
 import React from "react";
 import { FavoritesHeader } from "../page";
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import { ORGANIZATION_SELECT } from "@/components/organization/utils/fetchAllOrgs";
 
 export default async function Page({ params }: { params: { id: string } }) {
@@ -9,7 +9,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     where: { id: parseInt(params.id) },
     include: {
       organizations: {
-        select: ORGANIZATION_SELECT
+        select: ORGANIZATION_SELECT,
       },
     },
   });

@@ -19,7 +19,7 @@ import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
 
 import { getServerAuthSession } from "../auth";
-import { prisma } from "../db";
+import { prisma } from "../prisma";
 
 type CreateContextOptions = {
   session: Session | null;
@@ -36,7 +36,6 @@ type CreateContextOptions = {
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  */
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
-
   return {
     session: opts.session,
     prisma,
@@ -126,7 +125,6 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
 
-
 const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user || !ctx.session.user.admin) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -137,8 +135,6 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
       session: { ...ctx.session, user: ctx.session.user },
     },
   });
-} );
+});
 
 export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
-      
-

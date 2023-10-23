@@ -11,7 +11,7 @@ import { getServerSession } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { authOptions } from "../auth";
-import { prisma } from "../db";
+import { prisma } from "../prisma";
 import { userHasPermission } from "@/utils/userStore";
 
 /**
@@ -100,10 +100,9 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
 
-
 const enforceUserIsVolunteer = t.middleware(({ ctx, next }) => {
   const user = ctx.session?.user;
- 
+
   if (!userHasPermission(user?.role, "VOLUNTEER")) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
@@ -117,11 +116,9 @@ const enforceUserIsVolunteer = t.middleware(({ ctx, next }) => {
 
 export const volunteerProcedure = t.procedure.use(enforceUserIsVolunteer);
 
-
-
 const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
   const user = ctx.session?.user;
-  if (!userHasPermission(user?.role, 'ADMIN')) {
+  if (!userHasPermission(user?.role, "ADMIN")) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
@@ -134,14 +131,10 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
 
 export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
 
-
-
 const enforceUserIsSuperAdmin = t.middleware(({ ctx, next }) => {
-
   const user = ctx.session?.user;
 
-
-  if (!userHasPermission(user?.role, 'SUPERADMIN')) {
+  if (!userHasPermission(user?.role, "SUPERADMIN")) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
@@ -150,8 +143,6 @@ const enforceUserIsSuperAdmin = t.middleware(({ ctx, next }) => {
       session: { ...ctx.session, user: user },
     },
   });
-}
-);
-
+});
 
 export const superAdminProcedure = t.procedure.use(enforceUserIsSuperAdmin);

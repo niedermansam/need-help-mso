@@ -1,4 +1,4 @@
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import React from "react";
 import AdminProgramSection from "./ProgramForm";
 import { ORGANIZATION_SELECT } from "@/components/organization/utils/fetchAllOrgs";

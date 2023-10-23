@@ -1,4 +1,4 @@
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import { NextResponse } from "next/server";
 
 export const revalidate = 0;
@@ -10,9 +10,9 @@ export async function GET(req: Request) {
 
   const categories = await prisma.category.findMany({
     select: {
-        slug: true,
-    }
-   });
+      slug: true,
+    },
+  });
 
   return NextResponse.json(categories.map((c) => c.slug));
 }

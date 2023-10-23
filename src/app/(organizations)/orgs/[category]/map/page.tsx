@@ -1,10 +1,13 @@
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import dynamic from "next/dynamic";
 import React from "react";
 import { MountainLineRoutes } from "@/data/MountainLineRoutes";
 import { jitter } from "@/app/map/utils";
 import { createBusRoute } from "@/app/api/bus-routes/route";
-import { ORGANIZATION_SELECT, PROGRAM_SELECT } from "@/components/organization/utils/fetchAllOrgs";
+import {
+  ORGANIZATION_SELECT,
+  PROGRAM_SELECT,
+} from "@/components/organization/utils/fetchAllOrgs";
 const OrganizationMap = dynamic(
   () => import("@/components/map/OrganizationMapPage"),
   {
@@ -13,9 +16,8 @@ const OrganizationMap = dynamic(
   }
 );
 
-
 const getLocationData = async (category: string) => {
-  console.log(category)
+  console.log(category);
   const categorySelect = {
     id: true,
     name: true,
@@ -34,7 +36,7 @@ const getLocationData = async (category: string) => {
     programs: {
       where: {
         categoryMeta: {
-          slug:  category,
+          slug: category,
         },
       },
       select: PROGRAM_SELECT,
@@ -70,7 +72,7 @@ const getLocationData = async (category: string) => {
       state: true,
       zip: true,
       org: {
-        select:  categorySelect,
+        select: categorySelect,
       },
     },
   });

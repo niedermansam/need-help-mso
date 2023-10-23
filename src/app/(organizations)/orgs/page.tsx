@@ -1,6 +1,6 @@
 // import type { Organization } from '@prisma/client'
 import React from "react";
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import { CategorySection } from "@/components/organization/CategorySection";
 
 async function OrganizationPage() {

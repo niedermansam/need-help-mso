@@ -1,8 +1,8 @@
-import { prisma } from "@/server/db";
+import { prisma } from "@/server/prisma";
 import dynamic from "next/dynamic";
 import React from "react";
 import { jitter } from "./utils";
-import {  createBusRoute } from "../api/bus-routes/route";
+import { createBusRoute } from "../api/bus-routes/route";
 import { MountainLineRoutes } from "@/data/MountainLineRoutes";
 import { ORGANIZATION_SELECT } from "@/components/organization/utils/fetchAllOrgs";
 const OrganizationMap = dynamic(
@@ -33,7 +33,7 @@ const getLocationData = async () => {
       state: true,
       zip: true,
       org: {
-        select: ORGANIZATION_SELECT
+        select: ORGANIZATION_SELECT,
       },
     },
   });
