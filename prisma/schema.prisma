@@ -1,413 +1,272 @@
-generator kysely {
-  provider     = "prisma-kysely"
-  output       = "../src/server/kysely"
-  fileName     = "types.ts"
-  enumFileName = "enums.ts"
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider          = "mysql"
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
-  relationMode      = "prisma"
+    provider = "mysql"
+    // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+    // Further reading:
+    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+    url      = env("DATABASE_URL")
+
+    relationMode = "prisma"
 }
 
+// Necessary for Next auth
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
-  @@index([userId])
+    @@unique([provider, providerAccountId])
+    @@index([userId])
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-}
-
-model User {
-  id            String                @id @default(cuid())
-  name          String?
-  email         String?               @unique
-  emailVerified DateTime?
-  image         String?
-  admin         Boolean               @default(false)
-  currentListId Int?
-  role          Role                  @default(USER)
-  accounts      Account[]
-  sessions      Session[]
-  adminOf       Organization[]
-  programs      ProgramContact[]
-  organizations OrganizationContact[]
-  roles         OrganizationRole[]
-  lists         FavoritesList[]       @relation("AuthorizedUsers")
-  createdLists  FavoritesList[]       @relation("Admin")
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-model Category {
-  category         String         @id @unique
-  description      String?        @db.Text
-  slug             String         @unique @default(cuid())
-  organizations    Organization[]
-  programs         Program[]
-  tags             Tag[]
-  allOrganizations Organization[] @relation("OrganizationCategory")
-
-  @@index([category])
-  @@index([slug])
-}
-
-model Tag {
-  tag           String         @id @unique
-  
-  organizations Organization[]
-  programs      Program[]
-  categories    Category[]
-
-  @@index([tag])
-}
-
-model Community {
-  name              String         @id @unique
-  id                String         @unique @default(cuid())
-  slug              String         @unique @default(cuid())
-  description       String?        @db.Text
-  exclusiveOrgs     Organization[] @relation("ExclusiveOrg")
-  exclusivePrograms Program[]      @relation("ExclusiveProgram")
-  helpfulOrgs       Organization[] @relation("HelpfulOrg")
-  helpfulPrograms   Program[]      @relation("CommunityToHelpfulProgram")
-  parentCommunities Community[]    @relation("SubCommunity")
-  subCommunities    Community[]    @relation("SubCommunity")
-
-  @@index([name])
-}
-
-model Organization {
-  id                     String                @id @unique @default(cuid())
-  name                   String                @unique
-  createdAt              DateTime              @default(now())
-  updatedAt              DateTime              @updatedAt
-  description            String                @db.Text
-  category               String
-  website                String?
-  logo                   String?
-  phone                  String?
-  email                  String?
-  address                String?
-  adminVerified          Boolean               @default(false)
-  admins                 User[]
-  categoryMeta           Category              @relation(fields: [category], references: [category])
-  categories             Category[]            @relation("OrganizationCategory")
-  tags                   Tag[]                  
-  adminOf                Organization[]        @relation("AffiliatedOrgs")
-  administeringOrg       Organization[]        @relation("AffiliatedOrgs")
-  programs               Program[]
-  assistsWith            Program[]             @relation("HelpingOrgs")
-  exclusiveToCommunities Community[]           @relation("ExclusiveOrg")
-  helpfulToCommunities   Community[]           @relation("HelpfulOrg")
-  roles                  OrganizationRole[]
-  contacts               OrganizationContact[]
-  lists                  FavoritesList[]
-  locations              Location[]
-
-  @@index([name])
-  @@index([id])
-  @@index([category])
-  @@index([phone, email, website])
-}
-
-model OrganizationRole {
-  userId       String
-  orgId        String
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-
-  @@id([userId, orgId])
-  @@index([userId])
-  @@index([orgId])
-}
-
-model Location {
-  id          String        @id @unique @default(cuid())
-  name        String?
-  description String?       @db.Text
-  latitude    Float?
-  longitude   Float?
-  address     String?
-  city        String?
-  state       String?
-  zip         String?
-  orgId       String?
-  apt         String?
-  hours       String?
-  org         Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  programs    Program[]
-
-  @@index([name])
-  @@index([id])
-  @@index([orgId])
-}
-
-model Program {
-  id                     String           @id @unique @default(cuid())
-  name                   String
-  description            String?          @db.Text
-  url                    String?
-  organizationId         String
-  category               String
-  barriersToEntry        BarriersToEntry?
-  barriersToEntryDetails String?
-  speedOfAidDetails      String?
-  free                   Boolean          @default(false)
-  phone                  String?
-  organization           Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  helpingOrganizations   Organization[]   @relation("HelpingOrgs")
-  categoryMeta           Category         @relation(fields: [category], references: [category])
-  tags                   Tag[]
-  exclusiveToCommunities Community[]      @relation("ExclusiveProgram")
-  helpfulToCommunities   Community[]      @relation("CommunityToHelpfulProgram")
-  contacts               ProgramContact[]
-  lists                  FavoritesList[]
-  locations              Location[]
-
-  @@index([name])
-  @@index([id])
-  @@index([category])
-  @@index([organizationId])
-}
-
-model ProgramContact {
-  userId    String
-  programId String
-  phone     String?
-  email     String?
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
-
-  @@id([userId, programId])
-  @@index([userId])
-  @@index([programId])
-}
-
-model OrganizationContact {
-  userId       String
-  orgId        String
-  phone        String?
-  email        String?
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-
-  @@id([userId, orgId])
-  @@index([userId])
-  @@index([orgId])
-}
-
-model FavoritesList {
-  id              Int            @id @unique @default(autoincrement())
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  adminId         String
-  name            String         @default("Favorites")
-  notes           String?
-  public          Boolean        @default(true)
-  admin           User           @relation("Admin", fields: [adminId], references: [id], onDelete: Cascade)
-  authorizedUsers User[]         @relation("AuthorizedUsers")
-  programs        Program[]
-  organizations   Organization[]
-
-  @@index([adminId])
-}
-
-model Foo {
-  id String @id @default(cuid())
-  bars Bar[]
-
-}
-
-model Bar {
-  id String @id @default(cuid())
-  foos Foo[]
-
-}
-
-model AffiliatedOrgs {
-  A String
-  B String
-
-  @@unique([A, B], map: "_AffiliatedOrgs_AB_unique")
-  @@index([B], map: "_AffiliatedOrgs_B_index")
-  @@map("_AffiliatedOrgs")
-}
-
-model AuthorizedUsers {
-  A Int
-  B String
-
-  @@unique([A, B], map: "_AuthorizedUsers_AB_unique")
-  @@index([B], map: "_AuthorizedUsers_B_index")
-  @@map("_AuthorizedUsers")
-}
-
-model CategoryToTag {
-  A String
-  B String
-
-  @@unique([A, B], map: "_CategoryToTag_AB_unique")
-  @@index([B], map: "_CategoryToTag_B_index")
-  @@map("_CategoryToTag")
-}
-
-model ExclusiveOrg {
-  A String
-  B String
-
-  @@unique([A, B], map: "_ExclusiveOrg_AB_unique")
-  @@index([B], map: "_ExclusiveOrg_B_index")
-  @@map("_ExclusiveOrg")
-}
-
-model ExclusiveProgram {
-  A String
-  B String
-
-  @@unique([A, B], map: "_ExclusiveProgram_AB_unique")
-  @@index([B], map: "_ExclusiveProgram_B_index")
-  @@map("_ExclusiveProgram")
-}
-
-model FavoritesListToOrganization {
-  A Int
-  B String
-
-  @@unique([A, B], map: "_FavoritesListToOrganization_AB_unique")
-  @@index([B], map: "_FavoritesListToOrganization_B_index")
-  @@map("_FavoritesListToOrganization")
-}
-
-model FavoritesListToProgram {
-  A Int
-  B String
-
-  @@unique([A, B], map: "_FavoritesListToProgram_AB_unique")
-  @@index([B], map: "_FavoritesListToProgram_B_index")
-  @@map("_FavoritesListToProgram")
-}
-
-model HelpfulOrg {
-  A String
-  B String
-
-  @@unique([A, B], map: "_HelpfulOrg_AB_unique")
-  @@index([B], map: "_HelpfulOrg_B_index")
-  @@map("_HelpfulOrg")
-}
-
-model HelpfulProgram {
-  A String
-  B String
-
-  @@unique([A, B], map: "_HelpfulProgram_AB_unique")
-  @@index([B], map: "_HelpfulProgram_B_index")
-  @@map("_HelpfulProgram")
-}
-
-model HelpingOrgs {
-  A String
-  B String
-
-  @@unique([A, B], map: "_HelpingOrgs_AB_unique")
-  @@index([B], map: "_HelpingOrgs_B_index")
-  @@map("_HelpingOrgs")
-}
-
-model LocationToProgram {
-  A String
-  B String
-
-  @@unique([A, B], map: "_LocationToProgram_AB_unique")
-  @@index([B], map: "_LocationToProgram_B_index")
-  @@map("_LocationToProgram")
-}
-
-model OrganizationCategory {
-  A String
-  B String
-
-  @@unique([A, B], map: "_OrganizationCategory_AB_unique")
-  @@index([B], map: "_OrganizationCategory_B_index")
-  @@map("_OrganizationCategory")
-}
-
-model OrganizationToTag {
-  A String
-  B String
-
-  @@unique([A, B], map: "_OrganizationToTag_AB_unique")
-  @@index([B], map: "_OrganizationToTag_B_index")
-  @@map("_OrganizationToTag")
-}
-
-model OrganizationToUser {
-  A String
-  B String
-
-  @@unique([A, B], map: "_OrganizationToUser_AB_unique")
-  @@index([B], map: "_OrganizationToUser_B_index")
-  @@map("_OrganizationToUser")
-}
-
-model ProgramToTag {
-  A String
-  B String
-
-  @@unique([A, B], map: "_ProgramToTag_AB_unique")
-  @@index([B], map: "_ProgramToTag_B_index")
-  @@map("_ProgramToTag")
-}
-
-model SubCommunity {
-  A String
-  B String
-
-  @@unique([A, B], map: "_SubCommunity_AB_unique")
-  @@index([B], map: "_SubCommunity_B_index")
-  @@map("_SubCommunity")
+    @@index([userId])
 }
 
 enum Role {
-  SUPERADMIN
-  ADMIN
-  VOLUNTEER
-  USER
+    SUPERADMIN
+    ADMIN
+    VOLUNTEER
+    USER
+}
+
+model User {
+    id            String                @id @default(cuid())
+    name          String?
+    email         String?               @unique
+    emailVerified DateTime?
+    image         String?
+    accounts      Account[]
+    sessions      Session[]
+    adminOf       Organization[]
+    programs      ProgramContact[]
+    organizations OrganizationContact[]
+    roles         OrganizationRole[]
+    admin         Boolean               @default(false)
+    role          Role                  @default(USER)
+    lists         FavoritesList[]       @relation("AuthorizedUsers")
+    createdLists  FavoritesList[]       @relation("Admin")
+    currentListId Int?
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+model Category {
+    category         String         @id @unique
+    slug             String         @unique @default(cuid())
+    description      String?        @db.Text
+    organizations    Organization[]
+    programs         Program[]
+    tags             Tag[]
+    allOrganizations Organization[] @relation("OrganizationCategory")
+
+    @@index([category])
+    @@index([slug])
+}
+
+model Tag {
+    tag           String         @id @unique
+    description   String?        @db.Text
+    organizations Organization[]
+    programs      Program[]
+    categories    Category[]
+
+    @@index([tag])
+}
+
+model Community {
+    name              String         @id @unique
+    id                String         @unique @default(cuid())
+    slug              String         @unique @default(cuid())
+    description       String?        @db.Text
+    exclusiveOrgs     Organization[] @relation("ExclusiveOrg")
+    exclusivePrograms Program[]      @relation("ExclusiveProgram")
+    helpfulOrgs       Organization[] @relation("HelpfulOrg")
+    helpfulPrograms   Program[]      @relation("HelpfulProgram")
+    parentCommunities Community[]    @relation("SubCommunity")
+    subCommunities    Community[]    @relation("SubCommunity")
+
+    @@index([name])
+}
+
+model Organization {
+    id                     String                @id @unique @default(cuid())
+    name                   String                @unique
+    createdAt              DateTime              @default(now())
+    updatedAt              DateTime              @updatedAt
+    admins                 User[]
+    description            String                @db.Text
+    category               String
+    categoryMeta           Category              @relation(fields: [category], references: [category])
+    categories             Category[]            @relation("OrganizationCategory")
+    tags                   Tag[]
+    website                String?
+    logo                   String?
+    phone                  String?
+    email                  String?
+    adminOf                Organization[]        @relation("AffiliatedOrgs")
+    administeringOrg       Organization[]        @relation("AffiliatedOrgs")
+    programs               Program[]
+    assistsWith            Program[]             @relation("HelpingOrgs")
+    exclusiveToCommunities Community[]           @relation("ExclusiveOrg")
+    helpfulToCommunities   Community[]           @relation("HelpfulOrg")
+    roles                  OrganizationRole[]
+    contacts               OrganizationContact[]
+    lists                  FavoritesList[]
+    locations              Location[]
+    address                String?
+    adminVerified          Boolean               @default(false)
+
+    @@index([name])
+    @@index([id])
+    @@index([category])
+    @@index([phone, email, website])
+}
+
+model OrganizationRole {
+    userId       String
+    orgId        String
+    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+    @@id([userId, orgId])
+    @@index([userId])
+    @@index([orgId])
+}
+
+model Location {
+    id          String        @id @unique @default(cuid())
+    name        String?
+    description String?       @db.Text
+    hours       String?
+    latitude    Float?
+    longitude   Float?
+    address     String?
+    apt         String?
+    city        String?
+    state       String?
+    zip         String?
+    orgId       String?
+    org         Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+    programs    Program[]
+
+    @@index([name])
+    @@index([id])
+    @@index([orgId])
 }
 
 enum BarriersToEntry {
-  MINIMAL
-  LOW
-  MEDIUM
-  HIGH
+    MINIMAL
+    LOW
+    MEDIUM
+    HIGH
+}
+
+enum SpeedOfAid {
+    IMMEDIATE
+    DAYS
+    WEEKS
+    MONTHS
+    YEARS
+}
+
+model Program {
+    id                     String           @id @unique @default(cuid())
+    name                   String
+    description            String?           @db.Text
+    url                    String?
+    phone                 String?
+    organizationId         String
+    organization           Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    helpingOrganizations   Organization[]   @relation("HelpingOrgs")
+    category               String
+    categoryMeta           Category         @relation(fields: [category], references: [category])
+    tags                   Tag[]
+    exclusiveToCommunities Community[]      @relation("ExclusiveProgram")
+    helpfulToCommunities   Community[]      @relation("HelpfulProgram")
+    contacts               ProgramContact[]
+    barriersToEntry        BarriersToEntry?
+    barriersToEntryDetails String?
+    speedOfAidDetails      String?
+    lists                  FavoritesList[]
+    free                   Boolean          @default(false)
+    locations              Location[]
+
+    @@index([name])
+    @@index([id])
+    @@index([category])
+    @@index([organizationId])
+}
+
+model ProgramContact {
+    userId    String
+    programId String
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+    phone String?
+    email String?
+
+    @@id([userId, programId])
+    @@index([userId])
+    @@index([programId])
+}
+
+model OrganizationContact {
+    userId       String
+    orgId        String
+    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+    phone String?
+    email String?
+
+    @@id([userId, orgId])
+    @@index([userId])
+    @@index([orgId])
+}
+
+model FavoritesList {
+    id              Int            @id @unique @default(autoincrement())
+    createdAt       DateTime       @default(now())
+    updatedAt       DateTime       @updatedAt
+    adminId         String
+    admin           User           @relation(fields: [adminId], references: [id], onDelete: Cascade, name: "Admin")
+    authorizedUsers User[]         @relation("AuthorizedUsers")
+    name            String         @default("Favorites")
+    notes           String?
+    programs        Program[]
+    organizations   Organization[]
+    public          Boolean        @default(true)
+
+    @@index([adminId])
 }
