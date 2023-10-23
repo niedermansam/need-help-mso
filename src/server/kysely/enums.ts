@@ -13,3 +13,11 @@ export const BarriersToEntry = {
 } as const;
 export type BarriersToEntry =
   (typeof BarriersToEntry)[keyof typeof BarriersToEntry];
+export const SpeedOfAid = {
+  IMMEDIATE: "IMMEDIATE",
+  DAYS: "DAYS",
+  WEEKS: "WEEKS",
+  MONTHS: "MONTHS",
+  YEARS: "YEARS",
+} as const;
+export type SpeedOfAid = (typeof SpeedOfAid)[keyof typeof SpeedOfAid];
