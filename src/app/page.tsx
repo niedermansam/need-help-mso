@@ -72,19 +72,22 @@ const Home: NextPage = async () => {
   });
   const categories = await prisma.category.findMany({});
   return (
-    <div className="flex flex-col items-center justify-center bg-stone-50 md:p-10">
+    <div className="flex flex-col items-center justify-center bg-stone-50 ">
+
+      <div className="w-full font-light text-stone-500 sm:text-lg pb-12">
+        <h2 className="pb-2  text-center text-lg font-semibold sm:text-left sm:text-2xl">
+          Already know what you&apos;re looking for? Jump to an organization:
+        </h2>
+
+        <JumpToOrgSelect orgs={orgs} />
+        </div>
       <div className="flex max-w-6xl  flex-wrap justify-center rounded-xl border border-stone-200 bg-white  pb-10 pt-10 shadow-xl md:px-6">
         <Title />
         <Description />
         <CallToAction />
       </div>
       <div className="w-full pt-6 font-light text-stone-500 sm:text-lg">
-        <h2 className="pb-2 pt-8 text-center text-lg font-thin sm:text-left sm:text-2xl">
-          Already know what you&apos;re looking for? Jump to an organization:
-        </h2>
-
-        <JumpToOrgSelect orgs={orgs} />
-        <h2 className="pt-12 text-center text-lg font-thin sm:text-left sm:text-2xl">
+        <h2 className="pt-12 text-center text-lg font-semibold sm:text-left sm:text-2xl">
           Explore Organizations and Programs by Category:
         </h2>
         <CategorySection categoryList={categories} />
