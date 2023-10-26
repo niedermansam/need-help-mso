@@ -128,6 +128,7 @@ export const organizationRouter = router({
                   where: { tag },
                   create: {
                     tag,
+                    name: tag,
                   },
                 }))
               : [],
@@ -224,6 +225,7 @@ export const organizationRouter = router({
                     where: { tag },
                     create: {
                       tag,
+                      name: tag
                     },
                   }))
                 : [],

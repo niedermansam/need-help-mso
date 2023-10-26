@@ -196,6 +196,7 @@ export const programRouter = router({
                   where: { tag },
                   create: {
                     tag,
+                    name: tag
                   },
                 }))
               : [],
