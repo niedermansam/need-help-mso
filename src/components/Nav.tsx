@@ -95,11 +95,11 @@ export default function NavBar() {
         } overflow-hidden transition-height duration-200 ease-in-out md:h-auto`}
       >
         <div className=" md:flex-grow">
-          <NavLink
+          {false && <NavLink
             href="/about"
             label="About"
             isActive={/^\/about/.test(pathname)}
-          />
+          />}
           <NavLink
             href="/orgs"
             label="Organizations"
