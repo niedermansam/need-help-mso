@@ -73,6 +73,7 @@ export const tagRouter = router({
         where: { tag: input.tag },
         create: {
           tag: input.tag,
+          name: input.tag,
           organizations: {
             connect: {
               id: input.orgId,
@@ -116,6 +117,7 @@ export const tagRouter = router({
         where: { tag: input.tag },
         create: {
           tag: input.tag,
+          name: input.tag,
           programs: {
             connect: {
               id: input.programId,
