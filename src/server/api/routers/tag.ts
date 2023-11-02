@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { volunteerProcedure, router, publicProcedure } from "../trpc";
+import { volunteerProcedure, router, publicProcedure, adminProcedure } from "../trpc";
 import { decodeTag } from "../../../utils/manageUrl";
 import type { Program, Organization, Tag, Category } from "@prisma/client";
 
@@ -192,6 +192,21 @@ export const tagRouter = router({
         const organizations = tagArray.map((tag) => tag.organizations).flat();
 
         return { programs, organizations };
+      } catch (err) {
+        console.log(err);
+      }
+    }),
+
+    update: adminProcedure
+    .input(z.object({ old: z.string(), new: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await ctx.prisma.$transaction([
+          ctx.prisma.$executeRaw`UPDATE Tag SET tag = ${input.new}, name = ${input.new} WHERE tag = ${input.old}`,
+          ctx.prisma.$executeRaw`UPDATE _ProgramToTag SET B = ${input.new} WHERE B = ${input.old}`,
+          ctx.prisma.$executeRaw`UPDATE _OrganizationToTag SET B = ${input.new} WHERE B = ${input.old}`,
+        ])
+
       } catch (err) {
         console.log(err);
       }
