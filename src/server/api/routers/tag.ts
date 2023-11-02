@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-import { volunteerProcedure, router, publicProcedure, adminProcedure } from "../trpc";
+import {
+  volunteerProcedure,
+  router,
+  publicProcedure,
+  adminProcedure,
+} from "../trpc";
 import { decodeTag } from "../../../utils/manageUrl";
 import type { Program, Organization, Tag, Category } from "@prisma/client";
 
@@ -108,8 +113,6 @@ export const tagRouter = router({
       return true;
     }),
 
-
-
   connectProgram: volunteerProcedure
     .input(z.object({ programId: z.string(), tag: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -197,18 +200,32 @@ export const tagRouter = router({
       }
     }),
 
-    update: adminProcedure
+  update: adminProcedure
     .input(z.object({ old: z.string(), new: z.string() }))
     .mutation(async ({ ctx, input }) => {
       try {
         await ctx.prisma.$transaction([
-          ctx.prisma.$executeRaw`UPDATE Tag SET tag = ${input.new}, name = ${input.new} WHERE tag = ${input.old}`,
-          ctx.prisma.$executeRaw`UPDATE _ProgramToTag SET B = ${input.new} WHERE B = ${input.old}`,
-          ctx.prisma.$executeRaw`UPDATE _OrganizationToTag SET B = ${input.new} WHERE B = ${input.old}`,
-        ])
-
+          ctx.prisma
+            .$executeRaw`UPDATE Tag SET tag = ${input.new}, name = ${input.new} WHERE tag = ${input.old}`,
+          ctx.prisma
+            .$executeRaw`UPDATE _ProgramToTag SET B = ${input.new} WHERE B = ${input.old}`,
+          ctx.prisma
+            .$executeRaw`UPDATE _OrganizationToTag SET B = ${input.new} WHERE B = ${input.old}`,
+        ]);
       } catch (err) {
         console.log(err);
       }
     }),
+
+  getProgramTagsByCategory: publicProcedure.query(async ({ ctx }) => {
+    try {
+      return await ctx.prisma
+        .$queryRaw`SELECT Tags.category, JSON_ARRAYAGG(tag) as tags FROM
+(SELECT DISTINCT category, prog_tag.B as tag FROM \`Program\` as prog 
+JOIN _ProgramToTag as prog_tag ON (prog.id = prog_tag.A)) as Tags
+GROUP BY category;`;
+    } catch (err) {
+      console.log(err);
+    }
+  }),
 });
