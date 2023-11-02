@@ -105,6 +105,7 @@ model Category {
 
 model Tag {
     tag           String         @id @unique
+    name         String         @unique
     description   String?        @db.Text
     organizations Organization[]
     programs      Program[]
