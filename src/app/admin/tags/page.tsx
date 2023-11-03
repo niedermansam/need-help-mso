@@ -12,7 +12,7 @@ async function Page() {
 
   return (
     <div>
-        <TagOptions />
+        <TagOptions category='Food' />
         {
             tags.map(tag => (
                 <UpdateTag key={tag.tag} tag={tag.tag} />

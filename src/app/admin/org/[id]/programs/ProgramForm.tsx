@@ -11,10 +11,12 @@ import {
 } from "@/components/old/Selectors";
 import type { UnwrapTRPCMutation } from "@/types/trpc";
 import { api } from "@/utils/api";
+import { getGroupedTags } from "@/utils/getGroupedTags";
 import { useUserStore, userHasPermission } from "@/utils/userStore";
 import { useRouter } from "next/navigation";
 import React from "react";
 import ReactModal from "react-modal";
+import ReactSelect from "react-select";
 import { twMerge } from "tailwind-merge";
 
 type DefaultsFromOrganization = {
@@ -44,6 +46,8 @@ function UpdateProgramForm({
       onUpdate?.();
     },
   });
+
+  const {data: programTagOptions} = api.tag.getProgramTagsByCategory.useQuery();
 
   const [exclusiveToCommunities, setExclusiveToCommunities] = React.useState<
     { value: string; label: string }[]
@@ -182,10 +186,11 @@ function UpdateProgramForm({
           >
             Tags
           </label>
-          <TagSelect
+          <ReactSelect
             name="tags"
             id="tags"
-            title=""
+            options={getGroupedTags(programTagOptions, formState.category || "all")}
+            isMulti
             onChange={(e) => {
               const newValue = e as { value: string; label: string }[];
 
@@ -356,6 +361,11 @@ function CreateProgramForm({
 }) {
   const router = useRouter();
   const { id: orgId, category: orgCategory } = org;
+
+
+  const { data: programTagOptions } =
+    api.tag.getProgramTagsByCategory.useQuery()
+
   const createProgram = api.program.create.useMutation({
     onSuccess: () => {
       setFormState({
@@ -517,10 +527,11 @@ function CreateProgramForm({
         >
           Tags
         </label>
-        <TagSelect
+        <ReactSelect
           name="tags"
           id="tags"
-          title=""
+          isMulti
+          options={ getGroupedTags(programTagOptions, formState.category || "all")}
           onChange={(e) => {
             const newValue = e as { value: string; label: string }[];
 

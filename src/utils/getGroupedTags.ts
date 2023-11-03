@@ -1,0 +1,22 @@
+export function getGroupedTags(
+  optionMap: Map<string, string[]> | undefined,
+  selectedCategory: string
+) {
+  const selectedOptions = optionMap?.get(selectedCategory)?.map((x) => {
+    return { value: x, label: x };
+  });
+
+  const otherOptions = new Set(
+    Array.from(optionMap?.keys() || []).filter((x) => x !== selectedCategory)
+  );
+
+  return [
+    { label: selectedCategory, options: selectedOptions || [] },
+    {
+      label: "Other",
+      options: [...otherOptions].map((x) => {
+        return { value: x, label: x };
+      }),
+    },
+  ];
+}

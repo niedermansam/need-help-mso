@@ -219,13 +219,57 @@ export const tagRouter = router({
 
   getProgramTagsByCategory: publicProcedure.query(async ({ ctx }) => {
     try {
-      return await ctx.prisma
-        .$queryRaw`SELECT Tags.category, JSON_ARRAYAGG(tag) as tags FROM
+      const data = await ctx.prisma
+        .$queryRaw< {
+          category: string;
+          tags: string[];
+        }[]>
+        `SELECT Tags.category, JSON_ARRAYAGG(tag) as tags FROM
 (SELECT DISTINCT category, prog_tag.B as tag FROM \`Program\` as prog 
 JOIN _ProgramToTag as prog_tag ON (prog.id = prog_tag.A)) as Tags
 GROUP BY category;`;
+
+        const dataMap =  new Map<string, string[]>();
+
+        data.forEach((item) => {
+          dataMap.set('all', [...(dataMap.get('all') || []), ...item.tags]);
+          dataMap.set(item.category, item.tags);
+        });
+
+        return dataMap;
+
+
     } catch (err) {
       console.log(err);
     }
   }),
+
+  getOrganizationTagsByCategory: publicProcedure.query(async ({ ctx }) => {
+    try {
+      const data = await ctx.prisma
+        .$queryRaw< {
+          category: string;
+          tags: string[];
+        }[]>
+        `SELECT Tags.category, JSON_ARRAYAGG(tag) FROM (
+SELECT DISTINCT _org_tag.B  as tag, category from Organization AS org
+JOIN _OrganizationToTag as _org_tag ON (org.id = _org_tag.A )) as Tags
+GROUP BY category;`
+
+        const dataMap =  new Map<string, string[]>();
+
+        data.forEach((item) => {
+          dataMap.set('all', [...(dataMap.get('all') || []), ...item.tags]);
+          dataMap.set(item.category, item.tags);
+        });
+
+        return dataMap;
+
+    }
+    catch (err) {
+      console.log(err);
+    }
+
+  }),
+
 });
