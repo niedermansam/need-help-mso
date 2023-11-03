@@ -236,6 +236,8 @@ GROUP BY category;`;
           dataMap.set(item.category, item.tags);
         });
 
+        dataMap.set('all', [...new Set(dataMap.get('all') || [])]);
+
         return dataMap;
 
 
@@ -262,6 +264,8 @@ GROUP BY category;`
           dataMap.set('all', [...(dataMap.get('all') || []), ...item.tags]);
           dataMap.set(item.category, item.tags);
         });
+
+        dataMap.set('all', [... new Set(dataMap.get('all') || [])]);
 
         return dataMap;
 

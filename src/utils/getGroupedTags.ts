@@ -7,7 +7,9 @@ export function getGroupedTags(
   });
 
   const otherOptions = new Set(
-    Array.from(optionMap?.keys() || []).filter((x) => x !== selectedCategory)
+    optionMap?.get('all')?.filter((x) => {
+        return !optionMap?.get(selectedCategory)?.includes(x);
+    })
   );
 
   return [
