@@ -9,6 +9,7 @@ import {
   CommunitySelect,
   TagSelect,
 } from "@/components/old/Selectors";
+import CreatableSelect from "react-select/creatable";
 import type { UnwrapTRPCMutation } from "@/types/trpc";
 import { api } from "@/utils/api";
 import { getGroupedTags } from "@/utils/getGroupedTags";
@@ -186,7 +187,7 @@ function UpdateProgramForm({
           >
             Tags
           </label>
-          <ReactSelect
+          <CreatableSelect
             name="tags"
             id="tags"
             options={getGroupedTags(programTagOptions, formState.category || "all")}
@@ -527,10 +528,11 @@ function CreateProgramForm({
         >
           Tags
         </label>
-        <ReactSelect
+        <CreatableSelect
           name="tags"
           id="tags"
           isMulti
+          
           options={ getGroupedTags(programTagOptions, formState.category || "all")}
           onChange={(e) => {
             const newValue = e as { value: string; label: string }[];
