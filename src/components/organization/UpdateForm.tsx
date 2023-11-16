@@ -366,7 +366,7 @@ export function DeleteOrganizationButton({ orgId }: { orgId: string }) {
   return (
     <>
       <button
-        className="rounded bg-rose-500 p-2 text-white"
+        className="rounded bg-rose-500 p-2 text-white my-4"
         onClick={(e) => {
           e.preventDefault();
           setIsOpen(true);
