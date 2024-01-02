@@ -28,6 +28,9 @@ const server = z.object({
   REDIS_PASSWORD: z.string().min(1),
 
   VERCEL_DEPLOY_HOOK: z.string().url(),
+
+  EMAIL_FROM: z.string().email(),
+  EMAIL_SERVER: z.string().url(),
 });
 
 /**
@@ -62,6 +65,9 @@ const processEnv = {
 
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   VERCEL_DEPLOY_HOOK: process.env.VERCEL_DEPLOY_HOOK,
+
+  EMAIL_FROM: process.env.EMAIL_FROM,
+  EMAIL_SERVER: process.env.EMAIL_SERVER,
 };
 
 // Don't touch the part below
