@@ -7,7 +7,6 @@ import { FormItemWrapper } from "@/components/FormItemWrapper";
 import {
   CategorySelect,
   CommunitySelect,
-  TagSelect,
 } from "@/components/old/Selectors";
 import CreatableSelect from "react-select/creatable";
 import type { UnwrapTRPCMutation } from "@/types/trpc";
@@ -17,7 +16,6 @@ import { useUserStore, userHasPermission } from "@/utils/userStore";
 import { useRouter } from "next/navigation";
 import React from "react";
 import ReactModal from "react-modal";
-import ReactSelect from "react-select";
 import { twMerge } from "tailwind-merge";
 
 type DefaultsFromOrganization = {
@@ -268,7 +266,7 @@ function UpdateProgramForm({
               setFormState((prevState) => ({
                 ...prevState,
                 exclusiveToCommunities: newValue.map(
-                  (community) => community.value
+                  (community) => community.label
                 ),
               }));
               setExclusiveToCommunities(newValue);
