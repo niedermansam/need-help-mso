@@ -169,6 +169,7 @@ export type SubCommunity = {
 };
 export type Tag = {
   tag: string;
+  name: string;
   description: string | null;
 };
 export type User = {

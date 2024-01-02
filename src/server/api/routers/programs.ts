@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { adminProcedure, router, publicProcedure, volunteerProcedure } from "../trpc";
 import { getTagsFromPrograms } from "./tag";
+import { kysely } from "@/server/kysely";
 
 const createProgramId = (name: string, orgName: string) => {
   let newId = name.trim().replace(/\s/g, "-").toLowerCase();
@@ -276,18 +277,68 @@ export const programRouter = router({
         url,
         tags,
         helpfulToCommunities,
+        exclusiveToCommunities,
         phone,
         free,
       } = input;
+
+
+
+      type OldData =  {
+        type: string;
+        array: string[];
+      }[];
+
+      const oldData = await ctx.prisma
+        .$queryRaw<OldData>`SELECT type, JSON_ARRAYAGG(id) as array FROM (SELECT _tags.B as id, "tags" as type 
+FROM _ProgramToTag as _tags 
+WHERE A = ${id} 
+UNION 
+SELECT _exclusive.A as exclusiveCommunities, "exclusive" from _ExclusiveProgram as _exclusive
+WHERE B = ${id}
+UNION 
+SELECT _helpful.A as helpful, "helpful" from _HelpfulProgram as _helpful
+WHERE B = ${id}) as Foo
+GROUP BY type;`;
+
+
+
+const oldTagData = oldData.find((x) => x.type === "tags")?.array || [];
+
+const oldExclusiveData = oldData.find((x) => x.type === "exclusive")?.array || [];
+
+const oldHelpfulData = oldData.find((x) => x.type === "helpful")?.array || [];
+
+      const newTags = tags?.filter((tag) => !oldTagData.includes(tag)) || [];
+
+      const removedTags = oldTagData.filter((tag) => !tags?.includes(tag));
+
+      const newExclusive = exclusiveToCommunities?.filter(
+        (community) => !oldExclusiveData.includes(community)
+      );
+
+      const removedExclusive = oldExclusiveData.filter(
+        (community) => !exclusiveToCommunities?.includes(community)
+      );
+
+      const newHelpful = helpfulToCommunities?.filter(
+        (community) => !oldHelpfulData.includes(community)
+      );
+
+      const removedHelpful = oldHelpfulData.filter(
+        (community) => !helpfulToCommunities?.includes(community)
+      );
+
+
+
+
+
 
       const oldProgram = await ctx.prisma.program.update({
         where: {
           id: id,
         },
-        include: {
-          tags: true,
-          exclusiveToCommunities: true,
-          helpfulToCommunities: true,
+        select: {
           organization: {
             select: {
               id: true,
@@ -310,26 +361,43 @@ export const programRouter = router({
             : undefined,
 
           tags: {
-            connectOrCreate: tags
-              ? tags.map((tag) => ({
+            connectOrCreate: newTags.map((tag) => ({
                   where: { tag },
                   create: {
                     tag,
                     name: tag
                   },
-                }))
-              : [],
+                })),
+            disconnect: removedTags.map((tag) => ({
+                  tag,
+                })),
           },
           url: url,
           helpfulToCommunities: {
-            connectOrCreate: helpfulToCommunities
-              ? helpfulToCommunities.map((community) => ({
+            connectOrCreate: newHelpful?.map((community) => ({
                   where: { name: community },
                   create: {
                     name: community,
                   },
-                }))
-              : [],
+                })),
+            disconnect: removedHelpful.map((community) => ({
+                  name: community,
+                })),
+
+
+          },
+          exclusiveToCommunities: {
+            connectOrCreate: newExclusive?.map((community) => ({
+
+                  where: { name: community },
+                  create: {
+                    name: community,
+                  },
+                })),
+            disconnect: removedExclusive.map((community) => ({
+                  name: community,
+                })),
+
           },
 
           free: free || undefined,
@@ -350,74 +418,9 @@ export const programRouter = router({
           },
         });
 
-      // update org with new tags
 
-      await ctx.prisma.program.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          tags: {
-            disconnect: oldProgram.tags.filter((tag) => {
-              if (!input.tags) return true;
-              return !input.tags.find((tag2) => tag2 === tag.tag);
-            }),
-          },
-        },
-      });
+        console.log("FINISHED UPDATE")
 
-      // get exclusiveToCommunities that were removed from old program
-
-      await ctx.prisma.program.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          exclusiveToCommunities: {
-            disconnect: oldProgram.exclusiveToCommunities.filter(
-              (community) => {
-                if (!input.exclusiveToCommunities) return true;
-                return !input.exclusiveToCommunities.find(
-                  (community2) => community2 === community.id
-                );
-              }
-            ),
-            connectOrCreate: input.exclusiveToCommunities
-              ? input.exclusiveToCommunities.map((community) => ({
-                  where: { name: community },
-                  create: {
-                    name: community,
-                  },
-                }))
-              : undefined,
-          },
-        },
-      });
-
-      // get helpfulToCommunities that were removed from old program
-      await ctx.prisma.program.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          helpfulToCommunities: {
-            disconnect: oldProgram.helpfulToCommunities.filter((community) => {
-              if (!input.helpfulTo) return true;
-              return !input.helpfulTo.find(
-                (community2) => community2 === community.id
-              );
-            }),
-            connectOrCreate: input.helpfulTo
-              ? input.helpfulTo.map((community) => ({
-                  where: { name: community },
-                  create: {
-                    name: community,
-                  },
-                }))
-              : undefined,
-          },
-        },
-      });
       return oldProgram;
     }),
 
