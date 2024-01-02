@@ -19,7 +19,7 @@ function RedeployButton() {
         Redeploy
       </button>
       <div>
-        <p className="text-bold text-xs text-rose-600">
+        <p className="font-bold text-xs text-rose-600 ">
           Warning: Changes made by administrators on the dashboard do not
           automatically update the site.
         </p>
