@@ -131,7 +131,7 @@ export function CommunitySelect({
           options
             ? options
             : data?.map((community) => ({
-                value: community.id,
+                value: community.name,
                 label: community.name,
               })) ?? []
         }
