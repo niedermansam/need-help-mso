@@ -1,4 +1,4 @@
-import { router, publicProcedure, superAdminProcedure } from "./trpc";
+import { router, publicProcedure, superAdminProcedure, volunteerProcedure, adminProcedure } from "./trpc";
 import { organizationRouter } from "./routers/organization";
 import { programRouter } from "./routers/programs";
 import { tagRouter } from "./routers/tag";
@@ -23,7 +23,7 @@ export const appRouter = router({
     return categories;
   }),
 
-  rebuildApp: superAdminProcedure.mutation(async () => {
+  rebuildApp: adminProcedure.mutation(async () => {
     const res = await fetch(
       env.VERCEL_DEPLOY_HOOK, {
       method: 'POST',
