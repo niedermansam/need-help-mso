@@ -14,6 +14,7 @@ import {
 } from "./client";
 import { UpdateProgramModal } from "@/app/admin/org/[id]/programs/ProgramForm";
 import { ProgramModal } from "./client";
+import { HighlightedText } from "@/app/test/HighlightedText";
 
 export type ContactInfo = {
   phone: string | null;
@@ -133,15 +134,25 @@ export function ContactIcons({
   );
 }
 
-type ProgramBaseProps = Pick<Program, "name" | "description" | "url" | "organizationId" | "phone" | "category" | "id"> 
+type ProgramBaseProps = Pick<
+  Program,
+  | "name"
+  | "description"
+  | "url"
+  | "organizationId"
+  | "phone"
+  | "category"
+  | "id"
+>;
 
-type TagProps = Pick<Tag, 
-"tag">;
-
+type TagProps = Pick<Tag, "tag">;
 
 type CommunityProps = Pick<Community, "name">;
 
-type OrganizationProps = Pick<Organization, "name" | "phone" | "email" | "website" | "category" | "description" |'id'>;
+type OrganizationProps = Pick<
+  Organization,
+  "name" | "phone" | "email" | "website" | "category" | "description" | "id"
+>;
 
 export type ProgramProps = ProgramBaseProps & {
   exclusiveToCommunities: CommunityProps[];
@@ -150,9 +161,7 @@ export type ProgramProps = ProgramBaseProps & {
   tags: TagProps[];
 };
 
-
-
-export type OrgCardProps =  OrganizationProps & {
+export type OrgCardProps = OrganizationProps & {
   programs: ProgramProps[];
 };
 
@@ -203,9 +212,20 @@ const ContactIconSection = ({
 export function OrganizationCard({
   org,
   search,
+  programInclude,
+  hightlightPrograms,
+  favoriteTags
 }: {
   org: OrgCardProps;
   search?: string;
+  programInclude: {
+    name: boolean;
+    description: boolean;
+    tags: boolean;
+    category: boolean;
+  };
+  hightlightPrograms: boolean;
+  favoriteTags: Set<string>;
 }) {
   const orgId = org.id;
 
@@ -218,8 +238,8 @@ export function OrganizationCard({
             className="flex items-center justify-center"
             href={`/org/${org.id}`}
           >
-            <h3 className="truncate text-xl font-bold text-stone-600 hover:text-rose-600  md:text-lg">
-              {org.name}
+            <h3 className="truncate text-xl font-bold text-stone-600 hover:text-rose-600  md:text-lg"> 
+              <HighlightedText text={org.name} highlight={search || ""} />
             </h3>
           </Link>
         </div>
@@ -238,6 +258,7 @@ export function OrganizationCard({
       <div className="flex h-fit flex-col p-3 xs:row-span-2 xs:mt-4 md:col-span-6 md:row-span-1 md:mt-0 md:p-1 lg:col-span-5">
         <p className="text-sm font-light tracking-wide text-stone-600">
           {org.description}
+          <HighlightedText text={org.description} highlight={search || ""} />
         </p>
       </div>
       <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
@@ -251,6 +272,9 @@ export function OrganizationCard({
                 key={program.id}
                 program={program}
                 search={search}
+                include={programInclude}
+                highlight={hightlightPrograms}
+                favoriteTags={favoriteTags}
               />
             );
           })}
