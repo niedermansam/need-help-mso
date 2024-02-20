@@ -13,8 +13,9 @@ import {
   ProgramDetailsModal,
 } from "./client";
 import { UpdateProgramModal } from "@/app/admin/org/[id]/programs/ProgramForm";
-import { ProgramModal } from "./client";
+import { ProgramModal } from "./ProgramModal";
 import { HighlightedText } from "@/app/test/HighlightedText";
+import { twMerge } from "tailwind-merge";
 
 export type ContactInfo = {
   phone: string | null;
@@ -152,7 +153,10 @@ type CommunityProps = Pick<Community, "name">;
 type OrganizationProps = Pick<
   Organization,
   "name" | "phone" | "email" | "website" | "category" | "description" | "id"
->;
+> &{
+  categories?: { category: string }[];
+  tags: TagProps[];
+};
 
 export type ProgramProps = ProgramBaseProps & {
   exclusiveToCommunities: CommunityProps[];
@@ -183,7 +187,7 @@ const DesktopContactInfo = ({
 
 const CardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="my-4 grid w-full  auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-12 md:pb-2">
+    <div className="xs:grid-cols-2 my-4 grid  w-full auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white py-2 pb-4 shadow md:grid-cols-12 md:pb-2">
       {children}
     </div>
   );
@@ -214,7 +218,7 @@ export function OrganizationCard({
   search,
   programInclude,
   hightlightPrograms,
-  favoriteTags
+  tagOptions
 }: {
   org: OrgCardProps;
   search?: string;
@@ -225,23 +229,57 @@ export function OrganizationCard({
     category: boolean;
   };
   hightlightPrograms: boolean;
-  favoriteTags: Set<string>;
+  tagOptions: {
+    selected: Set<string>;
+    hidden: Set<string>;
+  };
 }) {
   const orgId = org.id;
+  
+  const allCategories = org.categories?.map((x) => x.category) 
+
+  
+  const allTags = org.tags.map((tag) => tag.tag);
+ 
+
 
   return (
     <CardWrapper>
-      <div className="flex w-full flex-wrap items-start justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left">
-        <div className="flex truncate">
-          <EditOrgButton orgId={orgId} />
-          <Link
-            className="flex items-center justify-center"
-            href={`/org/${org.id}`}
-          >
-            <h3 className="truncate text-xl font-bold text-stone-600 hover:text-rose-600  md:text-lg"> 
-              <HighlightedText text={org.name} highlight={search || ""} />
-            </h3>
+      <div className="flex w-full flex-wrap items-start justify-center px-2 text-center md:col-span-4 lg:col-span-3 lg:ml-4 lg:justify-start lg:text-left ">
+        <div className="flex truncate flex-col"><div className="flex">
+          
+            <EditOrgButton orgId={orgId} />
+            <Link
+              className="flex items-center justify-center"
+              href={`/org/${org.id}`}
+            >
+              <h3 className="truncate text-xl font-bold text-stone-600 hover:text-rose-600  md:text-lg">
+                <HighlightedText text={org.name} highlight={search || ""} />
+              </h3>
           </Link>
+        </div>
+          <div className="w-full"> 
+              <p className="text-sm font-light text-stone-600">
+                {allCategories?.join(", ")}
+              </p> 
+
+              <p className="flex gap-x-2 gap-y-1 flex-wrap">
+                {allTags.map((tag) => (
+                  <span
+                    key={tag}
+                    className={twMerge("rounded bg-stone-400 px-2 text-sm text-white",
+                    tagOptions.selected.has(tag) ? "bg-green-600" : ""
+                    )}
+                  >
+                    {tag}
+                  </span>
+                ))}
+
+
+              </p>
+            
+          </div> 
+
         </div>
         <ContactIconSection
           phone={org.phone}
@@ -255,13 +293,13 @@ export function OrganizationCard({
         website={org.website}
       />
 
-      <div className="flex h-fit flex-col p-3 xs:row-span-2 xs:mt-4 md:col-span-6 md:row-span-1 md:mt-0 md:p-1 lg:col-span-5">
+      <div className="xs:row-span-2 xs:mt-4 flex h-fit flex-col p-3 md:col-span-6 md:row-span-1 md:mt-0 md:p-1 lg:col-span-5">
         <p className="text-sm font-light tracking-wide text-stone-600">
           {org.description}
           <HighlightedText text={org.description} highlight={search || ""} />
         </p>
       </div>
-      <div className="mt-4 flex items-center justify-center xs:row-span-2 md:col-span-2 md:row-span-1 md:mt-0">
+      <div className="xs:row-span-2 mt-4 flex items-center justify-center md:col-span-2 md:row-span-1 md:mt-0">
         <FavoriteOrgButton orgId={orgId} />
       </div>
       {org.programs.length >= 1 && (
@@ -274,7 +312,7 @@ export function OrganizationCard({
                 search={search}
                 include={programInclude}
                 highlight={hightlightPrograms}
-                favoriteTags={favoriteTags}
+                tagOptions={tagOptions}
               />
             );
           })}
@@ -355,7 +393,7 @@ export function ProgramCard({
   const orgId = program.organizationId;
 
   return (
-    <div className="my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white px-4 py-2 pb-4 shadow xs:grid-cols-2 md:grid-cols-4 md:pb-2">
+    <div className="xs:grid-cols-2 my-4 grid w-full max-w-7xl auto-rows-min grid-cols-1 rounded border border-stone-200 bg-white px-4 py-2 pb-4 shadow md:grid-cols-4 md:pb-2">
       <div className="flex w-full flex-wrap items-start justify-start text-start md:col-span-4 lg:col-span-3 lg:justify-start lg:text-left">
         {showOrgName && (
           <Link href={`/org/${orgId}`}>

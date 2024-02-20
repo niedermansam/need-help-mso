@@ -16,8 +16,22 @@ export const organizationIsInSearch = (
     description: boolean;
     tags: boolean;
     category: boolean;
+  },
+  tagOptions: {
+    selected: Set<string>;
+    hidden: Set<string>;
   }
 ) => {
+  const orgTags = org.tags.map((tag) => tag.tag);
+
+  const orgHasHiddenTag = orgTags.some((tag) => tagOptions.hidden.has(tag));
+ 
+ 
+
+  if (orgHasHiddenTag) {
+    return false;
+  }
+
   const nameMatch = org.name.toLowerCase().includes(searchTerm.toLowerCase());
   const descriptionMatch = org.description
     .toLowerCase()

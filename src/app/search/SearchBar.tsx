@@ -15,7 +15,7 @@ export const SearchBar = ({
     <input
       type="text"
       className="w-full rounded-md border border-gray-300 p-2"
-      placeholder="Search..."
+      placeholder="Search for organizations and programs..."
       value={searchTerm}
       onChange={(e) => {
         setSearchTerm(e.target.value);
@@ -64,7 +64,7 @@ export function SearchOptionsBar({
     <div>
       {" "}
       <div className="flex [&_input]:ml-4 [&_input]:mr-0.5">
-        <label className="font-bold tracking-tight text-stone-500">
+        <label className="font-bold tracking-tight text-stone-500 w-36">
           Include in Search:
         </label>
         <input
@@ -110,7 +110,7 @@ export function SearchOptionsBar({
       </div>
       {orgInclude.programs && (
         <div className="flex [&_input]:ml-4 [&_input]:mr-0.5">
-          <label className="font-bold tracking-tight text-stone-500">
+          <label className="font-bold tracking-tight text-stone-500 w-36">
             Program search:
           </label>
           <input
