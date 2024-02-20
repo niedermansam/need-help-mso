@@ -283,8 +283,24 @@ function FavoritesList({
 
   return (
     <div>
-      {organizations.map((org) => (
-        <OrganizationCard org={org} key={org.id}  />
+      {organizations.map((org) => ( 
+          <OrganizationCard
+            key={org.id}
+            org={org}
+            programInclude={{
+              name: true,
+              description: true,
+              tags: true,
+              category: true,
+            }}
+            hightlightPrograms={true}
+            search={""}
+            tagOptions={{
+              selected: new Set(),
+              hidden: new Set(),
+            }}
+          /> 
+           
       ))}
 
       <PlainTextContactModal contact={organizations} />
