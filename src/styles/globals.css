@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
 .ellipsis {
     display: inline-block;
     position: relative;

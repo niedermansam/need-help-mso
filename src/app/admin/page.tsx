@@ -7,6 +7,8 @@ import { authOptions } from "@/server/auth";
 import { userHasPermission } from "@/utils/userStore";
 import { NewOrgButton } from "@/components/organization/CreateForm";
 import OrgsToCheckPage from "./to-check/page";
+import { fetchAllOrgs } from "@/components/organization/utils/fetchAllOrgs";
+import { AdminOrgPage } from "./AdminOrgPage";
 
 export const revalidate = 0;
 
@@ -24,6 +26,16 @@ async function Page() {
       adminVerified: true,
     },
   });
+
+  const orgs = await fetchAllOrgs();
+
+  const tagsArr = orgs.flatMap((org) => {
+    const programTags = org.programs.flatMap((program) =>
+      program.tags.map((tag) => tag.tag)
+    );
+    return [...org.tags.map((tag) => tag.tag), ...programTags];
+  });
+  const tags = new Set(tagsArr);
 
   const totalPrograms = await prisma.program.count();
   return (
@@ -60,10 +72,7 @@ async function Page() {
         <NewOrgButton className="flex items-center justify-center" />
         <RedeployButton />
       </div>
-      <h2 className="py-6 text-2xl font-bold text-stone-500">
-        Organizations to Check
-      </h2>
-      <OrgsToCheckPage />
+      <AdminOrgPage orgs={orgs} tags={tags} />
     </div>
   );
 }

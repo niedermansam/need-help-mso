@@ -18,7 +18,24 @@ async function Page() {
   return (
     <div>
       {orgs.map((org) => {
-        return <OrganizationCard key={org.id} org={org} />;
+        return (
+          <OrganizationCard
+            key={org.id}
+            org={org}
+            programInclude={{
+              name: true,
+              description: true,
+              tags: true,
+              category: true,
+            }}
+            hightlightPrograms={true}
+            search={""}
+            tagOptions={{
+              selected: new Set(),
+              hidden: new Set(),
+            }}
+          />
+        );
       })}
     </div>
   );

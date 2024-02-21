@@ -511,4 +511,34 @@ export const organizationRouter = router({
         console.log(err)
       }
     }),
+
+    updateTags: volunteerProcedure
+    .input(
+      z.object({
+        orgId: z.string(), 
+        addedTags: z.array(z.string()),
+        removedTags: z.array(z.string())
+      })
+    ).mutation(async ({ input, ctx }) => { 
+        return await ctx.prisma.organization.update({
+          where: {
+            id: input.orgId
+          },
+          data: {
+            tags: {
+              connectOrCreate: input.addedTags.map((tag) => ({
+                where: { tag },
+                create: {
+                  tag,
+                  name: tag
+                }
+              })),
+              disconnect: input.removedTags.map((tag) => ({
+                tag
+              }))
+            }
+          }
+        }) 
+    })
+
 });

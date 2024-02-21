@@ -17,8 +17,7 @@ const OrganizationMap = dynamic(
 );
 
 const getLocationData = async (category: string) => {
-  console.log(category);
-  const categorySelect = {
+   const categorySelect = {
     id: true,
     name: true,
     description: true,

@@ -9,10 +9,11 @@ import "leaflet-defaulticon-compatibility";
 import { FavoriteOrgButton } from "../DisplayCard/client";
 import type { BusRoute } from "../../app/api/bus-routes/route";
 import { OrganizationMap } from "./OrganizationMap";
-import { ProgramModal } from "../DisplayCard/client";
+import { ProgramModal } from "../DisplayCard/ProgramModal";
 import { BackButton } from "../BackButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRectangleList } from "@fortawesome/free-solid-svg-icons";
+import { HighlightedText } from "@/app/test/HighlightedText";
 
 export function PaginatedMapList({
   allLocations,
@@ -60,7 +61,7 @@ export function PaginatedMapList({
               <FavoriteOrgButton orgId={org.id} />
               <Link href={`/org/${org.id}`}>
                 <h2 className="text-lg font-semibold hover:text-rose-600">
-                  {org.name}
+                <HighlightedText highlight={search} text={org.name} />
                 </h2>
               </Link>
             </div>
@@ -71,6 +72,19 @@ export function PaginatedMapList({
                     program={program}
                     key={program.id}
                     search={search}
+                    highlight={true}
+                    tagOptions={{
+                      selected: new Set(),
+                      hidden: new Set(),
+                    }}
+
+                    include={{
+                      name: true,
+                      description: false,
+                      tags: true,
+                      category: true,
+                    }}
+
                   />
                 ))}
             </div>

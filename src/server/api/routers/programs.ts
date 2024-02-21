@@ -424,6 +424,48 @@ const oldHelpfulData = oldData.find((x) => x.type === "helpful")?.array || [];
       return oldProgram;
     }),
 
+
+    updateTags: volunteerProcedure  
+      .input(z.object({
+        programId: z.string(),
+        addedTags: z.set(z.string()).optional(),
+        removedTags: z.set(z.string()).optional(),
+      })).mutation(async ({ input, ctx }) => {
+        const { programId, addedTags, removedTags } = input;
+
+        console.log(addedTags)
+
+        const addedTagsArr = addedTags ? [...addedTags] : [];
+
+       await ctx.prisma.tag.createMany({
+          data:  addedTagsArr.map((tag) => ({ tag, name: tag })),
+          skipDuplicates: true,
+        });
+
+
+        const program = await ctx.prisma.program.update({
+          where: {
+            id: programId,
+          },
+          select: {
+            tags: {
+              select: {
+                tag: true,
+              },
+            },
+          },
+          data: {
+            tags: {
+              connect: addedTagsArr ? addedTagsArr.map((tag) => ({ tag })) : undefined,
+              disconnect: removedTags ? [...removedTags].map((tag) => ({ tag })) : undefined,
+            },
+          },
+        });
+
+        return program;
+      }
+    ),
+
   reassignAdministeringOrg: volunteerProcedure
     .input(
       z.object({
