@@ -37,6 +37,7 @@ export default async function OrganizationByCategoryPage({
           website: true,
           phone: true,
           email: true,
+          adminVerified: true,
           tags: { select: { tag: true } },
           exclusiveToCommunities: {
             select: { name: true, id: true },

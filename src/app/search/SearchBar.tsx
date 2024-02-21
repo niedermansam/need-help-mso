@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import type { OrganizationSearchListProps } from "./page";
 import { Popover, PopoverContent } from "@/components/ui/popover";
 import { PopoverTrigger } from "@radix-ui/react-popover";
+import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react";
 
 export const SearchBar = ({
   searchInput,
@@ -210,7 +212,12 @@ export function SearchOptionsPopover (
 
   return ( <Popover>
     <PopoverTrigger> 
-      <button>Search Options</button>
+      <Button
+        variant={"secondary"} 
+        className="mr-2 font-bold text-sm text-stone-500 "
+      >
+        <Settings className="h-5 w-5 mr-1" />
+        Search Options</Button>
     </PopoverTrigger>
     <PopoverContent>
       <SearchOptionsBar

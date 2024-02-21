@@ -8,7 +8,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { ArrowUp, Eye, EyeOff, ChevronsUpDown, X } from "lucide-react";
+import { ArrowUp, Eye, EyeOff, ChevronsUpDown, X, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -241,45 +241,46 @@ export function TagSelectSection({
         setTagOptions={setTagOptions}
       />
       <div className="ml-1 flex flex-col gap-2 gap-y-1">
-       {
-       tagOptions.selected.size > 0 && <div className="flex flex-wrap gap-1 text-xs font-bold">
-          <span className="tracking-tight">Selected Tags:</span>
-          {Array.from(tagOptions.selected).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-lg bg-green-600 px-2 text-xs font-medium text-white flex items-center"
-            >
-              <button
-              className="-ml-1 m-0.5"
-                onClick={() => {
-                  setTagOptions((prev) => {
-                    const newSelectedSet = new Set(prev.selected);
-                    newSelectedSet.delete(tag);
-                    return {
-                      hidden: prev.hidden,
-                      selected: newSelectedSet,
-                    };
-                  });
-                }} 
+        {tagOptions.selected.size > 0 && (
+          <div className="flex flex-wrap gap-1 text-xs font-bold">
+            <span className="tracking-tight">Selected Tags:</span>
+            {Array.from(tagOptions.selected).map((tag) => (
+              <span
+                key={tag}
+                className="flex items-center rounded-lg bg-green-600 px-2 text-xs font-medium text-white"
               >
-                <X className="h-3 w-3" />
-              </button>
+                <button
+                  className="m-0.5 -ml-1"
+                  onClick={() => {
+                    setTagOptions((prev) => {
+                      const newSelectedSet = new Set(prev.selected);
+                      newSelectedSet.delete(tag);
+                      return {
+                        hidden: prev.hidden,
+                        selected: newSelectedSet,
+                      };
+                    });
+                  }}
+                >
+                  <X className="h-3 w-3" />
+                </button>
 
-              {tag}
-            </span>
-          ))}
-        </div>
-}
-      {tagOptions.hidden.size >0 &&  <div className="flex flex-wrap gap-1 text-xs font-bold">
-          <span className="tracking-tight">Hidden Tags:</span>
-          {Array.from(tagOptions.hidden).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-lg bg-red-600 px-2 text-xs font-medium text-white flex items-center"
-            >
-              <button
- 
- className="-ml-1 m-0.5"onClick={() => {
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+        {tagOptions.hidden.size > 0 && (
+          <div className="flex flex-wrap gap-1 text-xs font-bold">
+            <span className="tracking-tight">Hidden Tags:</span>
+            {Array.from(tagOptions.hidden).map((tag) => (
+              <span
+                key={tag}
+                className="flex items-center rounded-lg bg-red-600 px-2 text-xs font-medium text-white"
+              >
+                <button
+                  className="m-0.5 -ml-1"
+                  onClick={() => {
                     setTagOptions((prev) => {
                       const newHiddenSet = new Set(prev.hidden);
                       newHiddenSet.delete(tag);
@@ -288,15 +289,23 @@ export function TagSelectSection({
                         selected: prev.selected,
                       };
                     });
-                  }}>
-                <X
-                  className="h-3 w-3"
-                  />
-              </button>
-              {tag}
+                  }}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+        {tagOptions.hidden.size === 0 && tagOptions.selected.size === 0 && (
+          <div className="text-xs py-1 ml-1 rounded border border-amber-300 bg-amber-100 text-amber-900 font-bold grid grid-cols-[auto_1fr] grid-rows-2 items-center gap-x-2.5 tracking-tight leading-tight px-2">
+            <AlertTriangle className="size-6 row-span-2 text-amber-600 stroke-2" /> Tag filterings/sorting is currently under development.
+            <span className="font-normal">
+            Some organizations and programs may be incorrectly tagged. Please use caution when using this feature.
             </span>
-          ))}
-        </div>}
+          </div>
+        )}
       </div>
     </div>
   );

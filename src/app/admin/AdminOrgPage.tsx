@@ -19,16 +19,22 @@ export const AdminOrgPage = ({
     setShowVerifiedOrgs(!showVerifiedOrgs);
     setDisplayOrgs(
       showVerifiedOrgs
-        ? orgs.filter((org) => org.adminVerified)
+        ? orgs 
         : orgs.filter((org) => !org.adminVerified)
     );
   };
 
 
   
-  return (<div>
-      <input type="checkbox" checked={showVerifiedOrgs} onChange={handleToggleVerified} />
-      <label>Verified</label>
+  return (<div><div className="flex items-center">
+    
+        <input type="checkbox" checked={showVerifiedOrgs} onChange={handleToggleVerified} />
+        <label className="ml-1 text-sm font-bold tracking-tight text-stone-600"
+          onClick={handleToggleVerified}
+        >
+          Hide Verified Orgs
+        </label>
+  </div>
 
       <OrganizationSearchPage
         searchOptions={displayOrgs}

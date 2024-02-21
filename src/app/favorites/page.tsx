@@ -1,195 +1,13 @@
 "use client";
 import { OrganizationCard } from "@/components/DisplayCard/server";
-import { trpc } from "@/components/providers";
 import { LoadingAnimation } from "@/components/old";
 import { api } from "@/utils/api";
 import { useFavoriteOrgStore } from "@/utils/userStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React from "react";
 import ReactModal from "react-modal";
-
-const invalidateFavorites = () => {
-  const utils = trpc.useContext();
-
-  const invalidate = () => {
-    utils.user.getOwnFavoritesLists
-      .invalidate()
-      .then(() => {
-        console.log("invalidated");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  return invalidate();
-};
-
-export function DeleteListButton({
-  listId,
-  afterDelete,
-}: {
-  listId: number;
-  afterDelete?: () => void;
-}) {
-  const utils = trpc.useContext();
-
-  const favoriteStore = useFavoriteOrgStore((state) => state.setFavoriteListId);
-
-  const { data: userOwnsList, isLoading } =
-    api.user.userOwnsFavoritesList.useQuery({ listId });
-  const deleteList = api.user.deleteFavoritesList.useMutation({
-    onSuccess: (data) => {
-      favoriteStore(data.currentListId);
-      utils.user.getOwnFavoritesLists
-        .invalidate()
-        .then(() => {
-          console.log("invalidated");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-
-      if (afterDelete) afterDelete();
-    },
-  });
-
-  const handleDelete = () => {
-    deleteList.mutate({ listId });
-  };
-
-  if (isLoading || !userOwnsList) return null;
-
-  return (
-    <button
-      onClick={handleDelete}
-      className="ml-2 rounded bg-rose-500 px-2 py-1 text-white"
-      data-umami-event="delete-list"
-    >
-      Delete List
-    </button>
-  );
-}
-
-export function FavoritesActionButtons({ listId }: { listId: number }) {
-  const favoriteStore = useFavoriteOrgStore((state) => state.setFavoriteListId);
-  const router = useRouter();
-
-  const createList = api.user.createFavoriteList.useMutation({
-    onSuccess: (data) => {
-      favoriteStore(data);
-      router.refresh();
-    },
-  });
-
-  const copyList = api.user.copyFavoritesList.useMutation({
-    onSuccess: (data) => {
-      favoriteStore(data.id);
-      router.refresh();
-    },
-  });
-
-  const handleCreateList = () => {
-    createList.mutate();
-  };
-
-  return (
-    <div className="flex">
-      <button
-        onClick={handleCreateList}
-        data-umami-event="create-list"
-        className="rounded bg-stone-500 px-2 py-1 text-white"
-      >
-        Create New List
-      </button>
-      {listId && (
-        <button
-          onClick={() => copyList.mutate({ listId })}
-          className="ml-2 rounded bg-stone-500 px-2 py-1 text-white"
-          data-umami-event="copy-list"
-          data-umami-event-id={listId}
-        >
-          Copy List
-        </button>
-      )}
-      {listId && <DeleteListButton listId={listId} />}
-    </div>
-  );
-}
-
-export function FavoritesHeader({
-  name,
-  id,
-}: {
-  name: string;
-  id: number;
-  afterDelete?: () => void;
-}) {
-  const [prevName, setPrevName] = React.useState(name || "");
-  const [newName, setNewName] = React.useState(name || "");
-
-  const invalidate = invalidateFavorites;
-
-  const { data: userOwnsList } = api.user.userOwnsFavoritesList.useQuery(
-    { listId: id || null },
-    {
-      enabled: !!id,
-    }
-  );
-
-  useEffect(() => {
-    setNewName(name);
-    setPrevName(name);
-  }, [name]);
-
-  const updateList = api.user.updateFavoritesListInfo.useMutation({
-    onSuccess: () => {
-      setPrevName(newName);
-      invalidate();
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (newName === prevName) return;
-    updateList.mutate({ listId: id, name: newName });
-  };
-
-  if (userOwnsList)
-    return (
-      <div>
-        <form className="flex" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            className="rounded border border-gray-200 px-2 text-4xl font-bold text-stone-700"
-            onChange={(e) => setNewName(e.target.value)}
-            value={newName}
-          />
-          {newName !== prevName && (
-            <button
-              type="submit"
-              className="rounded bg-stone-500 px-2 py-1 text-white"
-              data-umami-event="update-list-name"
-            >
-              Save
-            </button>
-          )}
-        </form>
-        <p className="text-stone-500">You own this list. ID: {id}</p>
-        <FavoritesActionButtons listId={id} />
-      </div>
-    );
-
-  return (
-    <div>
-      <h1 className="text-4xl font-bold text-stone-700">
-        {name || "Favorites"}
-      </h1>
-      <FavoritesActionButtons listId={id} />
-    </div>
-  );
-}
+import { FavoritesHeader } from "./FavoritesHeader";
 
 type ContactProps = {
   name: string | null;
@@ -283,24 +101,23 @@ function FavoritesList({
 
   return (
     <div>
-      {organizations.map((org) => ( 
-          <OrganizationCard
-            key={org.id}
-            org={org}
-            programInclude={{
-              name: true,
-              description: true,
-              tags: true,
-              category: true,
-            }}
-            hightlightPrograms={true}
-            search={""}
-            tagOptions={{
-              selected: new Set(),
-              hidden: new Set(),
-            }}
-          /> 
-           
+      {organizations.map((org) => (
+        <OrganizationCard
+          key={org.id}
+          org={org}
+          programInclude={{
+            name: true,
+            description: true,
+            tags: true,
+            category: true,
+          }}
+          hightlightPrograms={true}
+          search={""}
+          tagOptions={{
+            selected: new Set(),
+            hidden: new Set(),
+          }}
+        />
       ))}
 
       <PlainTextContactModal contact={organizations} />
