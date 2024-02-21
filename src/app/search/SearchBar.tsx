@@ -1,6 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import type { OrganizationSearchListProps } from "./page";
+import { Popover, PopoverContent } from "@/components/ui/popover";
+import { PopoverTrigger } from "@radix-ui/react-popover";
 
 export const SearchBar = ({
   searchInput,
@@ -31,7 +33,9 @@ export function SearchOptionsBar({
   setOrgInclude,
   programInclude,
   setProgramInclude,
+  className = " font-light grid grid-cols-[2rem_1fr] gap-2",
 }: {
+  className?: string;
   orgInclude: {
     name: boolean;
     description: boolean;
@@ -61,68 +65,74 @@ export function SearchOptionsBar({
   }) => void;
 }) {
   return (
-    <div>
-      {" "}
-      <div className="flex [&_input]:ml-4 [&_input]:mr-0.5">
-        <label className="font-bold tracking-tight text-stone-500 w-36">
+    <div className={className}> 
+        <label className=" col-span-2 font-bold tracking-tight text-stone-500">
           Include in Search:
-        </label>
+        </label> 
+
         <input
           type="checkbox"
+          className="size-4"
           checked={orgInclude.name}
           onChange={(e) =>
             setOrgInclude({ ...orgInclude, name: e.target.checked })
           }
         />
-        Name
+        <label htmlFor="name">Name</label>
+        
         <input
           type="checkbox"
+          className="size-4"
           checked={orgInclude.description}
           onChange={(e) =>
             setOrgInclude({ ...orgInclude, description: e.target.checked })
           }
         />
-        Description
+        <label htmlFor="description">Description</label>
         <input
           type="checkbox"
+          className="size-4"
           checked={orgInclude.tags}
           onChange={(e) =>
             setOrgInclude({ ...orgInclude, tags: e.target.checked })
           }
         />
-        Tags
+          <label htmlFor="tags">Tags</label>
         <input
           type="checkbox"
+          className="size-4"
           checked={orgInclude.categories}
           onChange={(e) =>
             setOrgInclude({ ...orgInclude, categories: e.target.checked })
           }
         />
-        Categories
+          <label htmlFor="categories">Categories</label>
         <input
           type="checkbox"
+          className="size-4"
           checked={orgInclude.programs}
           onChange={(e) =>
             setOrgInclude({ ...orgInclude, programs: e.target.checked })
           }
-        />
-        Programs
-      </div>
+        /> 
+          <label htmlFor="programs">Programs</label>
       {orgInclude.programs && (
-        <div className="flex [&_input]:ml-4 [&_input]:mr-0.5">
-          <label className="font-bold tracking-tight text-stone-500 w-36">
+        <>
+          <label className="col-span-2 font-bold tracking-tight text-stone-500">
             Program search:
           </label>
           <input
             type="checkbox"
+            className="size-4"
             checked={programInclude.name}
             onChange={(e) =>
               setProgramInclude({ ...programInclude, name: e.target.checked })
             }
           />
-          Name
+            <label htmlFor="name">Name</label>
           <input
             type="checkbox"
+            className="size-4"
             checked={programInclude.description}
             onChange={(e) =>
               setProgramInclude({
@@ -131,17 +141,19 @@ export function SearchOptionsBar({
               })
             }
           />
-          Description
+            <label htmlFor="description">Description</label>
           <input
             type="checkbox"
+            className="size-4"
             checked={programInclude.tags}
             onChange={(e) =>
               setProgramInclude({ ...programInclude, tags: e.target.checked })
             }
           />
-          Tags
+              <label htmlFor="tags">Tags</label>
           <input
             type="checkbox"
+            className="size-4"
             checked={programInclude.category}
             onChange={(e) =>
               setProgramInclude({
@@ -149,10 +161,67 @@ export function SearchOptionsBar({
                 category: e.target.checked,
               })
             }
-          />
-          Category
-        </div>
+          /> 
+            <label htmlFor="category">Category</label>
+        </>
       )}
     </div>
   );
+}
+
+
+export function SearchOptionsPopover (
+  {
+    orgInclude,
+    setOrgInclude,
+    programInclude,
+    setProgramInclude,
+  }: {
+    orgInclude: {
+      name: boolean;
+      description: boolean;
+      tags: boolean;
+      categories: boolean;
+      programs: boolean;
+    };
+    programInclude: {
+      name: boolean;
+      description: boolean;
+      tags: boolean;
+      category: boolean;
+    };
+    setOrgInclude: (orgInclude: {
+      name: boolean;
+      description: boolean;
+      tags: boolean;
+      categories: boolean;
+      programs: boolean;
+    }) => void;
+
+    setProgramInclude: (programInclude: {
+      name: boolean;
+      description: boolean;
+      tags: boolean;
+      category: boolean;
+    }) => void;
+  }
+) {
+
+
+  return ( <Popover>
+    <PopoverTrigger> 
+      <button>Search Options</button>
+    </PopoverTrigger>
+    <PopoverContent>
+      <SearchOptionsBar
+        orgInclude={orgInclude}
+        setOrgInclude={setOrgInclude}
+        programInclude={programInclude}
+        setProgramInclude={setProgramInclude}
+      />
+    </PopoverContent>
+  </Popover>
+  )
+
+
 }

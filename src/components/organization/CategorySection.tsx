@@ -9,8 +9,8 @@ export const MapLink = ({
   slug: string;
   className?: HTMLAttributes<HTMLDivElement>["className"];
 }) => (
-  <Link href={`/orgs/${slug}/map`} className={className}>
-    <div className="flex gap-1 text-sm items-center border px-2 py-1 rounded font-semibold text-stone-500 hover:text-white hover:bg-rose-500 hover:border-rose-500">
+  <Link href={`/orgs/${slug}/map`}  >
+    <div className={twMerge("flex gap-1 text-sm items-center border px-2 py-1 rounded font-semibold text-stone-500 hover:text-white hover:bg-rose-500 hover:border-rose-500", className)}>
       View&nbsp;Map
     </div>
   </Link>

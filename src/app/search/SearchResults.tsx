@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import type { OrganizationSearchListProps } from "./page";
+import type { OrganizationSearchListProps, OrganizationSearchProps } from "./page";
 import { OrganizationCard } from "../../components/DisplayCard/server";
 import autoAnimate from "@formkit/auto-animate";
 import { Pagination } from "./Pagination";
@@ -13,7 +13,10 @@ export const SearchResults = ({
   orgInclude,
   favoriteTags,
   hiddenTags,
+  OrgCard,
+  resultsPerPage,
 }: {
+  resultsPerPage?: number;
   favoriteTags: Set<string>;
   hiddenTags: Set<string>;
   searchOptions: OrganizationSearchListProps;
@@ -31,8 +34,9 @@ export const SearchResults = ({
     categories: boolean;
     programs: boolean;
   };
+  OrgCard?: (org:OrganizationSearchListProps[number]) => JSX.Element;
 }) => {
-  const pageLength = 10;
+  const pageLength = resultsPerPage ?? 10;
   const [page, setPage] = useState(1);
   const parent = useRef(null);
   const [visibleOrgs, setVisibleOrgs] = useState(searchOptions);
@@ -49,8 +53,7 @@ export const SearchResults = ({
 
   useEffect(() => {
 
-    console.log('filtering')
-
+ 
   const pageOptions = searchOptions
         .sort((orgA, orgB) => {
           const programTagsA = orgA.programs.flatMap((program) =>
@@ -85,14 +88,19 @@ export const SearchResults = ({
         }).slice(start, end);
 
     setVisibleOrgs(pageOptions);
-
   },
   [searchOptions, favoriteTags, hiddenTags, page, pageLength, end, start]);
+
+  useEffect(() => {
+
+    window.scrollTo(0, 0);
+  }
+  , [page]);
 
 
   return (
     <div ref={parent}>
-      {visibleOrgs
+      {OrgCard === undefined ? visibleOrgs
         .map((org) => (
           <OrganizationCard
             org={org}
@@ -101,6 +109,11 @@ export const SearchResults = ({
             programInclude={programInclude}
             hightlightPrograms={orgInclude.programs}
             tagOptions={{ selected: favoriteTags, hidden: hiddenTags }}
+          />
+        )) : visibleOrgs.map((org) => (
+          <OrgCard
+            {...org}
+            key={org.id}
           />
         ))}
       <Pagination setPage={setPage} page={page} maxPage={maxPage} />

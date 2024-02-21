@@ -1,21 +1,26 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import type { OrganizationSearchListProps } from "./page";
+import type { OrganizationSearchListProps, OrganizationSearchProps } from "./page";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SearchResults } from "./SearchResults";
 import { organizationIsInSearch } from "./organizationIsInSearch";
-import { SearchBar, SearchOptionsBar } from "./SearchBar";
+import { SearchBar, SearchOptionsBar, SearchOptionsPopover } from "./SearchBar";
 
 import { TagSelectSection } from "./TagSelectSection";
 
-export const SearchPage = ({
+export const OrganizationSearchPage = ({
   searchOptions,
   availableTags,
+  OrgCard,
+  resultsPerPage,
 }: {
   searchOptions: OrganizationSearchListProps;
   availableTags: Set<string>;
+  OrgCard?: (org: OrganizationSearchListProps[number]) => JSX.Element;
+  resultsPerPage?: number;
 }) => {
-  const router = useRouter();
+ 
+  // const router = useRouter();
   const searchParams = useSearchParams();
 
   const searchQuery = searchParams?.get("q") || "";
@@ -70,16 +75,16 @@ export const SearchPage = ({
 
     setDisplayOrgs(newDisplayOrgs);
 
-    if (searchTerm === "") {
-      router.replace("?");
-      return;
-    } else {
-      router.replace(`?q=${searchTerm}`);
-    }
+    // if (searchTerm === "") {
+    //   router.replace("?");
+    //   return;
+    // } else {
+    //   router.replace(`?q=${searchTerm}`);
+    // }
   }, [
     searchTerm,
     searchOptions,
-    router,
+    // router,
     orgInclude,
     programInclude,
     tagOptions,
@@ -87,13 +92,13 @@ export const SearchPage = ({
 
   return (
     <div>
-      <div className="grid grid-cols-[1fr_auto] gap-2">
+      <div id="top" className="grid grid-cols-[1fr_auto] gap-2">
         <SearchBar
           searchOptions={searchOptions}
           searchInput={searchTerm}
           setSearchInput={setSearchTerm}
         />
-        <SearchOptionsBar
+        <SearchOptionsPopover
           orgInclude={orgInclude}
           setOrgInclude={setOrgInclude}
           programInclude={programInclude}
@@ -112,6 +117,8 @@ export const SearchPage = ({
         orgInclude={orgInclude}
         favoriteTags={tagOptions.selected}
         hiddenTags={tagOptions.hidden}
+        OrgCard={OrgCard}
+        resultsPerPage={resultsPerPage}
       />
     </div>
   );

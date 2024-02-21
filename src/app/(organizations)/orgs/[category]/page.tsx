@@ -1,5 +1,5 @@
 import { BackButton } from "@/components/BackButton";
-import { SearchPage } from "@/app/search/SearchPage";
+import { OrganizationSearchPage } from "@/app/search/SearchPage";
 import { prisma } from "@/server/prisma";
 import { faMapLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -71,8 +71,7 @@ export default async function OrganizationByCategoryPage({
       program.tags.map((tag) => tag.tag)
     );
     return [...org.tags.map((tag) => tag.tag), ...programTags];
-  }
-  );
+  });
 
   const availableTags = new Set(allTags);
 
@@ -81,7 +80,8 @@ export default async function OrganizationByCategoryPage({
       <h1 className="mb-6 flex items-center gap-2 text-4xl font-bold text-stone-700">
         <BackButton /> {category.category} <MapLink slug={category.slug} />
       </h1>
-      <SearchPage searchOptions={category.allOrganizations} 
+      <OrganizationSearchPage
+        searchOptions={category.allOrganizations}
         availableTags={availableTags}
       />
     </div>

@@ -54,7 +54,7 @@ export const ORGANIZATION_SELECT = {
 
 export const fetchAllOrgs = async () => {
   const orgs = await prisma.organization.findMany({
-    select: ORGANIZATION_SELECT,
+    select: {...ORGANIZATION_SELECT, adminVerified: true},
   });
   return orgs;
 };

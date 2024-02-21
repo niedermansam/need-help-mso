@@ -12,6 +12,7 @@ import { useState } from "react";
 import superjson from "superjson";
 import type { AppRouter } from "../server/api/root";
 import ReactModal from "react-modal";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 
 ReactModal.setAppElement("#app");
@@ -60,10 +61,13 @@ export const Providers: React.FC<{ children: React.ReactNode }> = ({
   );
   return (
     <div id="app">
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        <SessionProvider>{children}</SessionProvider>
-      </QueryClientProvider>
-    </trpc.Provider></div>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <SessionProvider>{children}</SessionProvider>{" "}
+          <ReactQueryDevtools initialIsOpen={false} />
+          <ReactQueryDevtools />
+        </QueryClientProvider>
+      </trpc.Provider>
+    </div>
   );
 };

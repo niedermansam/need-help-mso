@@ -1,5 +1,5 @@
 import React from "react";
-import { SearchPage } from "./SearchPage";
+import { OrganizationSearchPage } from "./SearchPage";
 import { fetchAllOrgs } from "../../components/organization/utils/fetchAllOrgs";
 import type { Program } from "@prisma/client";
 
@@ -29,14 +29,13 @@ async function Page() {
       program.tags.map((tag) => tag.tag)
     );
     return [...org.tags.map((tag) => tag.tag), ...programTags];
-  }) 
+  });
   const tags = new Set(tagsArr);
- 
 
   return (
     <div>
       <h1>Search</h1>
-      <SearchPage searchOptions={orgs} availableTags={tags} />
+      <OrganizationSearchPage searchOptions={orgs} availableTags={tags} />
     </div>
   );
 }

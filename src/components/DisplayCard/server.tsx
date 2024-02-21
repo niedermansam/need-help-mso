@@ -294,8 +294,7 @@ export function OrganizationCard({
       />
 
       <div className="xs:row-span-2 xs:mt-4 flex h-fit flex-col p-3 md:col-span-6 md:row-span-1 md:mt-0 md:p-1 lg:col-span-5">
-        <p className="text-sm font-light tracking-wide text-stone-600">
-          {org.description}
+        <p className="text-sm font-light tracking-wide text-stone-600"> 
           <HighlightedText text={org.description} highlight={search || ""} />
         </p>
       </div>
